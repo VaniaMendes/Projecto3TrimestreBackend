@@ -13,7 +13,7 @@ public class Login {
  * The username of the user trying to log in.
  */
 @XmlElement
-private String username;
+private String email;
 
     /**
      * The password of the user trying to log in.
@@ -26,21 +26,20 @@ private String password;
      */
     public Login(){}
 
-
     /**
-     * Returns the username of the user trying to log in.
-     * @return the username of the user trying to log in.
+     * Returns the email of the user trying to log in.
+     * @return the e mail of the user trying to log in.
      */
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
     /**
-     * Sets the username of the user trying to log in.
-     * @param username the username of the user trying to log in.
+     * Sets the email of the user trying to log in.
+     * @param email the email of the user trying to log in.
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**
