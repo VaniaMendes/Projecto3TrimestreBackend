@@ -1,11 +1,6 @@
 package aor.paj.proj_final_aor_backend.entity;
 
-import aor.paj.proj_final_aor_backend.entity.InterestEntity;
-import aor.paj.proj_final_aor_backend.entity.SkillEntity;
-import aor.paj.proj_final_aor_backend.entity.NotificationEntity;
-import aor.paj.proj_final_aor_backend.entity.MessageEntity;
-import aor.paj.proj_final_aor_backend.dto.UserType;
-import jakarta.faces.event.WebsocketEvent;
+import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

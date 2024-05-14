@@ -1,4 +1,4 @@
-package aor.paj.proj_final_aor_backend.dto;
+package aor.paj.proj_final_aor_backend.util.enums;
 
 /**
  * This enum represents the type of a user.

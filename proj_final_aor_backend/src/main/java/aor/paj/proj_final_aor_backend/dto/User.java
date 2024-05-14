@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
