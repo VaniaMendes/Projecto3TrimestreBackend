@@ -1,11 +1,10 @@
 package aor.paj.proj_final_aor_backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * SkillEntity is a JPA entity that represents the skills of the users.
@@ -35,6 +34,11 @@ public class SkillEntity implements Serializable {
      */
     @Column(name = "type", nullable = false, unique = true, updatable = false)
     private String type;
+
+    // Set of projects associated with the skill
+    @ManyToMany(mappedBy = "skills")
+    private Set<ProjectEntity> projects = new HashSet<>();
+
 
     /**
      * Default constructor of the SkillEntity class.

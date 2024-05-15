@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -147,6 +148,15 @@ public class UserEntity implements Serializable {
      */
     @OneToMany(mappedBy = "user")
     private Set<SessionEntity> sessions;
+
+    // Set of tasks associated with the user
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<TaskEntity> tasks = new HashSet<>();
+
+    // Lab associated with the user
+    @ManyToOne
+    @JoinColumn(name = "lab_id", referencedColumnName = "id")
+    private LabEntity lab;
 
 
     @OneToMany(mappedBy = "user")
@@ -418,6 +428,43 @@ public class UserEntity implements Serializable {
         this.notifications = notifications;
     }
 
+    public Set<MessageEntity> getMessagesSent() {
+        return messagesSent;
+    }
 
+    public void setMessagesSent(Set<MessageEntity> messagesSent) {
+        this.messagesSent = messagesSent;
+    }
 
+    public Set<MessageEntity> getMessagesReceived() {
+        return messagesReceived;
+    }
+
+    public void setMessagesReceived(Set<MessageEntity> messagesReceived) {
+        this.messagesReceived = messagesReceived;
+    }
+
+    public Set<SessionEntity> getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(Set<SessionEntity> sessions) {
+        this.sessions = sessions;
+    }
+
+    public Set<TaskEntity> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(Set<TaskEntity> tasks) {
+        this.tasks = tasks;
+    }
+
+    public LabEntity getLab() {
+        return lab;
+    }
+
+    public void setLab(LabEntity lab) {
+        this.lab = lab;
+    }
 }

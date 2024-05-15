@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  */
 
 @XmlRootElement
-public abstract class TextEvent {
+public abstract class  TextEvent {
 
     /**
      * The id of the text event.
