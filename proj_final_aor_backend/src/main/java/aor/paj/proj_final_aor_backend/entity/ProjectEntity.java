@@ -68,16 +68,27 @@ public class ProjectEntity implements Serializable {
 
     // Lab associated with the project
     @ManyToOne
-    @JoinColumn(name = "lab", referencedColumnName = "name")
+    @JoinColumn(name = "lab_id", referencedColumnName = "id")
     private LabEntity lab;
 
     // Set of resources associated with the project
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<ProjectResource> resources = new HashSet<>();
 
-    // Set of tasks associated with the project
+    // Set of tasks associated with the user
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TaskEntity> tasks = new HashSet<>();
+
+    /**
+     * The skills associated with the projects. It is a many-to-many relationship with the SkillEntity.
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "project_skill",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    private Set<SkillEntity> skills = new HashSet<>();
+
 
     /**
      * Default constructor for the ProjectEntity class.

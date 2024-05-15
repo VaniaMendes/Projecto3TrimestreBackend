@@ -101,6 +101,13 @@ public class TaskEntity implements Serializable {
     private ProjectEntity project;
 
     /**
+     * The user responsible for the task. It is a many-to-one relationship with the UserEntity.
+     */
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private UserEntity user;
+
+    /**
      * Default constructor.
      */
     public TaskEntity() {

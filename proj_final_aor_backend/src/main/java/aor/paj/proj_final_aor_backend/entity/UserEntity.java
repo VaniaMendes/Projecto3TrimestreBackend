@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -141,6 +142,10 @@ public class UserEntity implements Serializable {
 
     @OneToMany(mappedBy = "user")
     private Set<SessionEntity> sessions;
+
+    // Set of tasks associated with the user
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<TaskEntity> tasks = new HashSet<>();
 
     public UserEntity() {
 
