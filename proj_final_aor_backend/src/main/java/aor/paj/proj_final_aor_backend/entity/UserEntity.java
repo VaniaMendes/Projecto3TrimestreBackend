@@ -136,12 +136,26 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "sender")
     private Set<MessageEntity> messagesSent;
 
+    /**
+     * Messages received by the user.
+     */
     @OneToMany(mappedBy = "receiver")
     private Set<MessageEntity> messagesReceived;
 
+    /**
+     * Sessions of the user.
+     */
     @OneToMany(mappedBy = "user")
     private Set<SessionEntity> sessions;
 
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserProject> projects;
+
+
+    /**
+     * Default constructor for the UserEntity class.
+     */
     public UserEntity() {
 
     }
@@ -211,98 +225,195 @@ public class UserEntity implements Serializable {
         this.firstName = firstName;
     }
 
+    /**
+     * Getter for the last name.
+     * @return last name of the user.
+     */
     public String getLastName() {
         return lastName;
     }
 
+    /**
+     * Setter for the last name.
+     * @param lastName new last name of the user.
+     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    /**
+     * Getter for the visibility state.
+     * @return visibility state of the user.
+     */
     public boolean isVisibilityState() {
         return visibilityState;
     }
 
+    /**
+     * Setter for the visibility state.
+     * @param visibilityState new visibility state of the user.
+     */
     public void setVisibilityState(boolean visibilityState) {
         this.visibilityState = visibilityState;
     }
 
+    /**
+     * Getter for the authentication state.
+     * @return authentication state of the user.
+     */
     public boolean isAuthState() {
         return authState;
     }
 
+    /**
+     * Setter for the authentication state.
+     * @param authState new authentication state of the user.
+     */
     public void setAuthState(boolean authState) {
         this.authState = authState;
     }
 
+    /**
+     * Getter for the active state.
+     * @return active state of the user.
+     */
     public boolean isActiveState() {
         return activeState;
     }
 
+    /**
+     * Setter for the active state.
+     * @param activeState new active state of the user.
+     */
     public void setActiveState(boolean activeState) {
         this.activeState = activeState;
     }
 
+    /**
+     * Getter for the reset password token.
+     * @return reset password token of the user.
+     */
     public String getResetPassToken() {
         return resetPassToken;
     }
 
+    /**
+     * Setter for the reset password token.
+     * @param resetPassToken new reset password token of the user.
+     */
     public void setResetPassToken(String resetPassToken) {
         this.resetPassToken = resetPassToken;
     }
 
+    /**
+     * Getter for the reset password token expiricy.
+     * @return reset password token expiricy of the user.
+     */
     public String getResetPassTokenExpiricy() {
         return resetPassTokenExpiricy;
     }
 
+    /**
+     * Setter for the reset password token expiricy.
+     * @param resetPassTokenExpiricy new reset password token expiricy of the user.
+     */
     public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
         this.resetPassTokenExpiricy = resetPassTokenExpiricy;
     }
+
+    /**
+     * Getter for the biography.
+     * @return biography of the user.
+     */
 
     public String getBiography() {
         return biography;
     }
 
+    /**
+     * Setter for the biography.
+     * @param biography new biography of the user.
+     */
     public void setBiography(String biography) {
         this.biography = biography;
     }
 
+    /**
+     * Getter for the register date.
+     * @return register date of the user.
+     */
     public String getRegisterDate() {
         return registerDate;
     }
 
+    /**
+     * Setter for the register date.
+     * @param registerDate new register date of the user.
+     */
     public void setRegisterDate(String registerDate) {
         this.registerDate = registerDate;
     }
 
+    /**
+     * Getter for the user type.
+     * @return user type of the user.
+     */
     public UserType getUserType() {
         return userType;
     }
 
+    /**
+     * Setter for the user type.
+     * @param userType new user type of the user.
+     */
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
 
+    /**
+     * Getter for the interests.
+     * @return interests of the user.
+     */
     public Set<InterestEntity> getInterests() {
         return interests;
     }
 
+    /**
+     * Setter for the interests.
+     * @param interests new interests of the user.
+     */
     public void setInterests(Set<InterestEntity> interests) {
         this.interests = interests;
     }
 
+    /**
+     * Getter for the skills.
+     * @return skills of the user.
+     */
     public Set<SkillEntity> getSkills() {
         return skills;
     }
 
+    /**
+     * Setter for the skills.
+     * @param skills new skills of the user.
+     */
     public void setSkills(Set<SkillEntity> skills) {
         this.skills = skills;
     }
 
+    /**
+     * Getter for the messages sent.
+     * @return messages sent by the user.
+     */
     public Set<NotificationEntity> getNotifications() {
         return notifications;
     }
 
+    /**
+     * Setter for the messages sent.
+     * @param notifications new messages sent by the user.
+     */
     public void setNotifications(Set<NotificationEntity> notifications) {
         this.notifications = notifications;
     }
