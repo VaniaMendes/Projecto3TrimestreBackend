@@ -115,7 +115,7 @@ public class UserEntity implements Serializable {
     @ManyToMany
     @JoinTable(
             name = "user_skill",
-            joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     private Set<SkillEntity> skills;
 
@@ -125,7 +125,7 @@ public class UserEntity implements Serializable {
     @ManyToMany
     @JoinTable(
             name = "user_notification",
-            joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id"))
     private Set<NotificationEntity> notifications;
 
