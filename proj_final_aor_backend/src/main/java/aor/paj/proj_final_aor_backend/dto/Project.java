@@ -54,6 +54,9 @@ public class Project {
     @XmlElement
     private Lab lab;
 
+    @XmlElement
+    private String needs;
+
     // Current state of the project
     @XmlElement
     private String state;
@@ -268,5 +271,13 @@ public class Project {
      */
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getNeeds() {
+        return needs;
+    }
+
+    public void setNeeds(String needs) {
+        this.needs = needs;
     }
 }

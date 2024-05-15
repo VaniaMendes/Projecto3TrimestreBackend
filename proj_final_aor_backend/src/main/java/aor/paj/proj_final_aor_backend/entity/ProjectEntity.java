@@ -14,6 +14,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "project")
+@NamedQuery(name = "Project.findAllProjects", query = "SELECT p FROM ProjectEntity p")
+@NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name")
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -61,6 +63,10 @@ public class ProjectEntity implements Serializable {
     // Maximum number of members in the project
     @Column(name = "max_members", nullable = false, unique = false, updatable = true)
     private int maxMembers;
+
+    // Needs of the project
+    @Column(name = "needs", nullable = true, unique = false, updatable = true)
+    private String needs;
 
     // Set of activities associated with the project
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -324,5 +330,29 @@ public class ProjectEntity implements Serializable {
      */
     public void setTasks(Set<TaskEntity> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getNeeds() {
+        return needs;
+    }
+
+    public void setNeeds(String needs) {
+        this.needs = needs;
+    }
+
+    public Set<UserProjectEntity> getUserProjects() {
+        return userProjects;
+    }
+
+    public void setUserProjects(Set<UserProjectEntity> userProjects) {
+        this.userProjects = userProjects;
+    }
+
+    public Set<SkillEntity> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(Set<SkillEntity> skills) {
+        this.skills = skills;
     }
 }
