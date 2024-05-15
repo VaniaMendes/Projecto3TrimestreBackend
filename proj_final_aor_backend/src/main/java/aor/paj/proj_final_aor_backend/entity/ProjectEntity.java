@@ -79,6 +79,10 @@ public class ProjectEntity implements Serializable {
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TaskEntity> tasks = new HashSet<>();
 
+    @OneToMany(mappedBy = "project")
+    private Set<UserProject> userProjects = new HashSet<>();
+
+
     /**
      * The skills associated with the projects. It is a many-to-many relationship with the SkillEntity.
      */
