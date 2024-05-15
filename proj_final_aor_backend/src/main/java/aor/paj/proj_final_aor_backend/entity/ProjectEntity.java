@@ -14,6 +14,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "project")
+@NamedQuery(name = "Project.findAllProjects", query = "SELECT p FROM ProjectEntity p")
+@NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name")
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -62,6 +64,7 @@ public class ProjectEntity implements Serializable {
     @Column(name = "max_members", nullable = false, unique = false, updatable = true)
     private int maxMembers;
 
+    // Needs of the project
     @Column(name = "needs", nullable = true, unique = false, updatable = true)
     private String needs;
 
