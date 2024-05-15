@@ -29,8 +29,12 @@ public class LabEntity implements Serializable {
     private Workplace name;
 
     // Set of projects associated with the lab
-    @OneToMany(mappedBy = "lab", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lab")
     private Set<ProjectEntity> projects;
+
+    // Set of users associated with the lab
+    @OneToMany(mappedBy = "lab")
+    private Set<ProjectEntity> users;
 
     /**
      * Default constructor for the LabEntity class.
@@ -84,5 +88,21 @@ public class LabEntity implements Serializable {
      */
     public void setProjects(Set<ProjectEntity> projects) {
         this.projects = projects;
+    }
+
+    /**
+     * Getter for the users associated with the lab.
+     * @return users associated with the lab.
+     */
+    public Set<ProjectEntity> getUsers() {
+        return users;
+    }
+
+    /**
+     * Setter for the users associated with the lab.
+     * @param users the new users associated with the lab.
+     */
+    public void setUsers(Set<ProjectEntity> users) {
+        this.users = users;
     }
 }

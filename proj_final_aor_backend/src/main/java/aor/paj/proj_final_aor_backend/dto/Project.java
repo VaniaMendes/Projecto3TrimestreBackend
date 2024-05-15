@@ -60,17 +60,17 @@ public class Project {
 
     // Constants representing different states of the project
     @XmlElement
-    public static final int PLANNING = 10;
+    public static final int PLANNING = 100;
     @XmlElement
-    public static final int READY = 20;
+    public static final int READY = 200;
     @XmlElement
-    public static final int APPROVED = 30;
+    public static final int APPROVED = 300;
     @XmlElement
-    public static final int IN_PROGRESS = 40;
+    public static final int IN_PROGRESS = 400;
     @XmlElement
-    public static final int FINISHED = 50;
+    public static final int FINISHED = 500;
     @XmlElement
-    public static final int CANCELLED = 60;
+    public static final int CANCELLED = 600;
 
     /**
      * Default constructor for the Project class.
