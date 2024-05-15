@@ -2,9 +2,11 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "user_project")
-public class UserProject {
+public class UserProjectEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,7 +30,10 @@ public class UserProject {
     @Column(name="approved", nullable = false)
     private boolean approved;
 
-    public UserProject() {
+    @OneToMany(mappedBy = "receiverGroup")
+    private Set<MessageEntity> messagesReceived;
+
+    public UserProjectEntity() {
     }
 
     public long getId() {
@@ -69,5 +74,13 @@ public class UserProject {
 
     public void setApproved(boolean approved) {
         this.approved = approved;
+    }
+
+    public Set<MessageEntity> getMessagesReceived() {
+        return messagesReceived;
+    }
+
+    public void setMessagesReceived(Set<MessageEntity> messagesReceived) {
+        this.messagesReceived = messagesReceived;
     }
 }

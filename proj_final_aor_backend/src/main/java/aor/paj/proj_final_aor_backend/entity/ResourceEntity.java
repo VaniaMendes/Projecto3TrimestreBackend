@@ -49,9 +49,8 @@ public class ResourceEntity implements Serializable {
     /**
      * The brand of the resource. It is a many-to-one relationship with the BrandEntity.
      */
-    @ManyToOne
-    @JoinColumn(name = "brand", referencedColumnName = "name")
-    private BrandEntity brand;
+    @Column(name = "brand", nullable = false, unique = false, updatable = true)
+    private String brand;
 
     /**
      * The observation of the resource.
@@ -174,7 +173,7 @@ public class ResourceEntity implements Serializable {
      * Returns the brand of the resource.
      * @return brand of the resource
      */
-    public BrandEntity getBrand() {
+    public String getBrand() {
         return brand;
     }
 
@@ -182,7 +181,7 @@ public class ResourceEntity implements Serializable {
      * Sets the brand of the resource.
      * @param brand the new brand of the resource
      */
-    public void setBrand(BrandEntity brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 
@@ -280,5 +279,13 @@ public class ResourceEntity implements Serializable {
      */
     public void setSuppliers(Set<SupplierEntity> suppliers) {
         this.suppliers = suppliers;
+    }
+
+    public Set<ProjectResource> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<ProjectResource> projects) {
+        this.projects = projects;
     }
 }

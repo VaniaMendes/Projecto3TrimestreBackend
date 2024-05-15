@@ -160,7 +160,7 @@ public class UserEntity implements Serializable {
 
 
     @OneToMany(mappedBy = "user")
-    private Set<UserProject> projects;
+    private Set<UserProjectEntity> projects;
 
 
     /**

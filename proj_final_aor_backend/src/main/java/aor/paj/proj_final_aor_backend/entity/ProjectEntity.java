@@ -80,7 +80,7 @@ public class ProjectEntity implements Serializable {
     private Set<TaskEntity> tasks = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private Set<UserProject> userProjects = new HashSet<>();
+    private Set<UserProjectEntity> userProjects = new HashSet<>();
 
 
     /**
