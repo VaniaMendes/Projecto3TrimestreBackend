@@ -1,7 +1,6 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.xml.bind.annotation.XmlElement;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -54,12 +53,22 @@ public class MessageEntity implements Serializable {
     private UserEntity sender;
 
     /**
-     * Receiver of the message
+     * Single User Receiver of the message
 
      */
     @ManyToOne
-    @JoinColumn(name="receiver_id", nullable = false, unique = false, updatable = true)
+    @JoinColumn(name="receiver_id", nullable = true)
     private UserEntity receiver;
+
+    /**
+     * Group Receiver of the message
+
+     */
+    @ManyToOne
+    @JoinColumn(name="receiver_group_id", nullable = true)
+    private UserProjectEntity receiverGroup;
+
+
 
     /**
      * Default constructor for the MessageEntity class.
@@ -174,4 +183,11 @@ public class MessageEntity implements Serializable {
         this.receiver = receiver;
     }
 
+    public UserProjectEntity getReceiverGroup() {
+        return receiverGroup;
+    }
+
+    public void setReceiverGroup(UserProjectEntity receiverGroup) {
+        this.receiverGroup = receiverGroup;
+    }
 }
