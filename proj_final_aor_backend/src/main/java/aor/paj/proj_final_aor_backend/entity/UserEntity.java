@@ -126,7 +126,7 @@ public class UserEntity implements Serializable {
     @ManyToMany
     @JoinTable(
             name = "user_notification",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            joinColumns = @JoinColumn(name = "receiver_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id"))
     private Set<NotificationEntity> notifications;
 

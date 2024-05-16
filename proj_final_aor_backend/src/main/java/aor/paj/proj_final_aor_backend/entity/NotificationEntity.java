@@ -1,12 +1,11 @@
 package aor.paj.proj_final_aor_backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class represents a NotificationEntity in the system.
@@ -33,8 +32,8 @@ public class NotificationEntity implements Serializable {
     /**
      * Receiver of the notification
      */
-    @Column(name = "receiver_id", nullable = false, unique = false, updatable = false)
-    private long receiver_id;
+    @ManyToMany(mappedBy = "notifications")
+    private Set<UserEntity> receivers = new HashSet<>();
 
     /**
      * Read status of the notification
@@ -169,15 +168,15 @@ public class NotificationEntity implements Serializable {
      * Getter for the receiver of the notification.
      * @return receiver of the notification.
      */
-    public long getReceiver_id() {
-        return receiver_id;
+    public Set<UserEntity> getReceivers() {
+        return receivers;
     }
 
     /**
      * Setter for the receiver of the notification.
-     * @param receiver_id the new receiver of the notification.
+     * @param receivers the new receiver of the notification.
      */
-    public void setReceiver_id(long receiver_id) {
-        this.receiver_id = receiver_id;
+    public void setReceivers(Set<UserEntity> receivers) {
+        this.receivers = receivers;
     }
 }
