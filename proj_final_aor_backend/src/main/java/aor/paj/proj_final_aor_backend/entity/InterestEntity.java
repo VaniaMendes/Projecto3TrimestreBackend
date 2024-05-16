@@ -32,22 +32,45 @@ public class InterestEntity implements Serializable {
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
+    /**
+     * Default constructor for InterestEntity.
+     * It is required by JPA for entity instantiation.
+     */
     public InterestEntity() {
     }
 
-
+    /**
+     * Getter for the 'id' field.
+     *
+     * @return long - The id of the interest.
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * Setter for the 'id' field.
+     *
+     * @param id - The id to set for the interest.
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     * Getter for the 'name' field.
+     *
+     * @return String - The name of the interest.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Setter for the 'name' field.
+     *
+     * @param name - The name to set for the interest.
+     */
     public void setName(String name) {
         this.name = name;
     }

@@ -15,7 +15,15 @@ import java.util.Set;
 @Entity
 @Table(name = "project")
 @NamedQuery(name = "Project.findAllProjects", query = "SELECT p FROM ProjectEntity p")
-@NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name")
+@NamedQuery(name = "Project.findAllProjectsOrderedDESC", query = "SELECT p FROM ProjectEntity p ORDER BY p.createdAt DESC")
+@NamedQuery(name = "Project.findProjectById", query = "SELECT p FROM ProjectEntity p WHERE p.id = :id")
+@NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name ORDER BY p.createdAt DESC")
+@NamedQuery(name = "Project.findProjectsByLab", query = "SELECT p FROM ProjectEntity p WHERE p.lab = :lab")
+@NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
+@NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
+@NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
+@NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.skills s WHERE s.name = :skillName")
+@NamedQuery(name = "Project.findUsersByProjectId", query = "SELECT up.user FROM UserProjectEntity up WHERE up.project.id = :projectId")
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -28,44 +36,44 @@ public class ProjectEntity implements Serializable {
     private Long id;
 
     // Name of the project
-    @Column(name = "name", nullable = false, unique = true, updatable = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     // Description of the project
-    @Column(name = "description", nullable = true, unique = false, updatable = true)
+    @Column(name = "description")
     private String description;
 
     // Date and time when the project was created
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, unique = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     // Initial date of the project
-    @Column(name = "initial_date", nullable = false, unique = false, updatable = true)
+    @Column(name = "initial_date", nullable = false)
     private LocalDateTime initialDate;
 
     // Deadline of the project
-    @Column(name = "deadline", nullable = false, unique = false, updatable = true)
+    @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
 
     // Conclusion date of the project
-    @Column(name = "conclusion_date", nullable = true, unique = false, updatable = true)
+    @Column(name = "conclusion_date")
     private LocalDateTime conclusionDate;
 
     // State ID of the project
-    @Column(name = "stateId", nullable = false, unique = false, updatable = true)
+    @Column(name = "stateId", nullable = false)
     private int stateId;
 
     // Keywords related to the project
-    @Column(name = "keywords", nullable = false, unique = false, updatable = true)
+    @Column(name = "keywords", nullable = false)
     private String keywords;
 
     // Maximum number of members in the project
-    @Column(name = "max_members", nullable = false, unique = false, updatable = true)
+    @Column(name = "max_members", nullable = false)
     private int maxMembers;
 
     // Needs of the project
-    @Column(name = "needs", nullable = true, unique = false, updatable = true)
+    @Column(name = "needs")
     private String needs;
 
     // Set of activities associated with the project
@@ -328,30 +336,54 @@ public class ProjectEntity implements Serializable {
      * Setter for the tasks associated with the project.
      * @param tasks the new tasks associated with the project.
      */
-    public void setTasks(Set<TaskEntity> tasks) {
-        this.tasks = tasks;
-    }
-
+    /**
+     * Getter for the needs of the project.
+     * @return needs of the project.
+     */
     public String getNeeds() {
         return needs;
     }
 
+    /**
+     * Setter for the needs of the project.
+     * @param needs the new needs of the project.
+     */
     public void setNeeds(String needs) {
         this.needs = needs;
     }
 
+    /**
+     * Getter for the user projects associated with the project.
+     * This is a many-to-many relationship with the UserProjectEntity.
+     * @return user projects associated with the project.
+     */
     public Set<UserProjectEntity> getUserProjects() {
         return userProjects;
     }
 
+    /**
+     * Setter for the user projects associated with the project.
+     * This is a many-to-many relationship with the UserProjectEntity.
+     * @param userProjects the new user projects associated with the project.
+     */
     public void setUserProjects(Set<UserProjectEntity> userProjects) {
         this.userProjects = userProjects;
     }
 
+    /**
+     * Getter for the skills associated with the project.
+     * This is a many-to-many relationship with the SkillEntity.
+     * @return skills associated with the project.
+     */
     public Set<SkillEntity> getSkills() {
         return skills;
     }
 
+    /**
+     * Setter for the skills associated with the project.
+     * This is a many-to-many relationship with the SkillEntity.
+     * @param skills the new skills associated with the project.
+     */
     public void setSkills(Set<SkillEntity> skills) {
         this.skills = skills;
     }
