@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import jakarta.ejb.EJB;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
@@ -15,10 +16,10 @@ import java.io.Serializable;
 public class UserBean implements Serializable {
     private static final Logger logger = LogManager.getLogger(UserBean.class);
 
-    @Inject
+    @EJB
     UserDao userDao;
 
-    @Inject
+    @EJB
     SessionDao sessionDao;
     public UserBean() {
     }
