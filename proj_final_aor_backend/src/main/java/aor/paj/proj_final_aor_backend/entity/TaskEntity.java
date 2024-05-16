@@ -14,6 +14,13 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "task")
+@NamedQuery(name = "Task.findAllTasks", query = "SELECT t FROM TaskEntity t")
+@NamedQuery(name = "Task.findTaskById", query = "SELECT t FROM TaskEntity t WHERE t.id = :id")
+@NamedQuery(name = "Task.findTasksByProject", query = "SELECT t FROM TaskEntity t WHERE t.project = :project")
+@NamedQuery(name = "Task.findTasksByUser", query = "SELECT t FROM TaskEntity t WHERE t.responsibleUser = :responsibleUser")
+@NamedQuery(name = "Task.findTasksByState", query = "SELECT t FROM TaskEntity t WHERE t.stateId = :stateId")
+@NamedQuery(name = "Task.findTasksByPriority", query = "SELECT t FROM TaskEntity t WHERE t.priorityId = :priorityId")
+
 public class TaskEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -105,7 +112,7 @@ public class TaskEntity implements Serializable {
      */
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private UserEntity user;
+    private UserEntity responsibleUser;
 
     /**
      * Default constructor.
@@ -319,5 +326,21 @@ public class TaskEntity implements Serializable {
      */
     public void setProject(ProjectEntity project) {
         this.project = project;
+    }
+
+    /**
+     * Returns the user responsible for the task.
+     * @return responsibleUser - the user responsible for the task
+     */
+    public UserEntity getResponsibleUser() {
+        return responsibleUser;
+    }
+
+    /**
+     * Sets the user responsible for the task.
+     * @param responsibleUser - the new user responsible for the task
+     */
+    public void setResponsibleUser(UserEntity responsibleUser) {
+        this.responsibleUser = responsibleUser;
     }
 }

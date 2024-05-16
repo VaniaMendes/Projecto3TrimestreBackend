@@ -54,7 +54,6 @@ public class MessageEntity implements Serializable {
 
     /**
      * Single User Receiver of the message
-
      */
     @ManyToOne
     @JoinColumn(name="receiver_id", nullable = true)
@@ -62,7 +61,6 @@ public class MessageEntity implements Serializable {
 
     /**
      * Group Receiver of the message
-
      */
     @ManyToOne
     @JoinColumn(name="receiver_group_id", nullable = true)

@@ -16,8 +16,21 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "resource")
-@NamedQuery(name = "ResourceEntity.findAllResources", query = "SELECT r FROM ResourceEntity r")
-@NamedQuery(name = "ResourceEntity.findAllResourcesOrderedDESC", query = "SELECT r FROM ResourceEntity r ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findAllResources", query = "SELECT r FROM ResourceEntity r")
+@NamedQuery(name = "Resource.findAllResourcesOrderedDESC", query = "SELECT r FROM ResourceEntity r ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourceById", query = "SELECT r FROM ResourceEntity r WHERE r.id = :id")
+@NamedQuery(name = "Resource.findResourceByName", query = "SELECT r FROM ResourceEntity r WHERE r.name = :name")
+@NamedQuery(name = "Resource.findResourcesByType", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type")
+@NamedQuery(name = "Resource.findResourcesByBrand", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand")
+@NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourceBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
+
+//Combinations
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrand", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.type = :type AND s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.brand = :brand AND s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.type = :type AND r.brand = :brand AND s.name = :supplierName")
+
 
 public class ResourceEntity implements Serializable {
 

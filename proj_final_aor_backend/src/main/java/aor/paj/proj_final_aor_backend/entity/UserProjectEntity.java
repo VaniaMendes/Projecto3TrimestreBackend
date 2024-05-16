@@ -6,6 +6,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user_project")
+
 public class UserProjectEntity {
 
     private static final long serialVersionUID = 1L;

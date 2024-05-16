@@ -22,7 +22,8 @@ import java.util.Set;
 @NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
-
+@NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.skills s WHERE s.name = :skillName")
+@NamedQuery(name = "Project.findUsersByProjectId", query = "SELECT up.user FROM UserProjectEntity up WHERE up.project.id = :projectId")
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
