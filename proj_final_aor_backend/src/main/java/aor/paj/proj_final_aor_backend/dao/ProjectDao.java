@@ -182,4 +182,43 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * Retrieves all projects associated with a given user.
+     *
+     * This method uses a named query "Project.findProjectsByUserId" defined in the ProjectEntity class.
+     * The query is expected to select projects from the database where the user ID matches the provided parameter.
+     * The user ID is set as a parameter in the query using the setParameter method.
+     *
+     * If the query returns results, a list of ProjectEntity objects is returned.
+     * If the query does not return any results (i.e., there are no projects associated with the given user),
+     * a NoResultException is caught and an empty list is returned.
+     *
+     * @param userId the ID of the user to retrieve projects for.
+     * @return a list of projects associated with the given user, or an empty list if no such projects are found.
+     */
+    public List<ProjectEntity> findProjectsByUser(Long userId) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByUserId", ProjectEntity.class).setParameter("userId", userId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ProjectEntity> findAllProjectsOrderedByVacancy() {
+        try {
+            return em.createNamedQuery("Project.findAllProjectsOrderedByVacancy", ProjectEntity.class).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public Integer countAllProjects() {
+        try {
+            return ((Number) em.createNamedQuery("Project.countAllProjects").getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
