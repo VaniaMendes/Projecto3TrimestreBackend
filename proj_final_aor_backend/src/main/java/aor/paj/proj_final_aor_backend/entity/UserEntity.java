@@ -57,11 +57,7 @@ public class UserEntity implements Serializable {
     @Column(name = "visibilityState", nullable = false)
     private boolean visibilityState;
 
-    /**
-     * Authentication state of the user. Cannot be null.
-     */
-    @Column(name = "authState", nullable = false)
-    private boolean authState;
+
 
     /**
      * Active state of the user. Cannot be null.
@@ -69,17 +65,6 @@ public class UserEntity implements Serializable {
     @Column(name = "activeState", nullable = false)
     private boolean activeState;
 
-    /**
-     * Reset password token of the user. It is unique.
-     */
-    @Column(name = "resetPassToken", unique = true)
-    private String resetPassToken;
-
-    /**
-     * Reset password token expiricy of the user.
-     */
-    @Column(name = "resetPassTokenExpiricy")
-    private String resetPassTokenExpiricy;
 
     /**
      * Biography of the user.
@@ -87,11 +72,7 @@ public class UserEntity implements Serializable {
     @Column(name = "biography")
     private String biography;
 
-    /**
-     * Register date of the user. Cannot be null.
-     */
-    @Column(name = "registerDate", nullable = false)
-    private String registerDate;
+
 
     /**
      * Type of the user. Cannot be null.
@@ -161,6 +142,9 @@ public class UserEntity implements Serializable {
 
     @OneToMany(mappedBy = "user")
     private Set<UserProjectEntity> projects;
+
+    @OneToOne(mappedBy = "user")
+    private AuthenticationEntity authentication;
 
 
     /**
@@ -267,21 +251,7 @@ public class UserEntity implements Serializable {
         this.visibilityState = visibilityState;
     }
 
-    /**
-     * Getter for the authentication state.
-     * @return authentication state of the user.
-     */
-    public boolean isAuthState() {
-        return authState;
-    }
 
-    /**
-     * Setter for the authentication state.
-     * @param authState new authentication state of the user.
-     */
-    public void setAuthState(boolean authState) {
-        this.authState = authState;
-    }
 
     /**
      * Getter for the active state.
@@ -299,37 +269,7 @@ public class UserEntity implements Serializable {
         this.activeState = activeState;
     }
 
-    /**
-     * Getter for the reset password token.
-     * @return reset password token of the user.
-     */
-    public String getResetPassToken() {
-        return resetPassToken;
-    }
 
-    /**
-     * Setter for the reset password token.
-     * @param resetPassToken new reset password token of the user.
-     */
-    public void setResetPassToken(String resetPassToken) {
-        this.resetPassToken = resetPassToken;
-    }
-
-    /**
-     * Getter for the reset password token expiricy.
-     * @return reset password token expiricy of the user.
-     */
-    public String getResetPassTokenExpiricy() {
-        return resetPassTokenExpiricy;
-    }
-
-    /**
-     * Setter for the reset password token expiricy.
-     * @param resetPassTokenExpiricy new reset password token expiricy of the user.
-     */
-    public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
-        this.resetPassTokenExpiricy = resetPassTokenExpiricy;
-    }
 
     /**
      * Getter for the biography.
@@ -348,21 +288,6 @@ public class UserEntity implements Serializable {
         this.biography = biography;
     }
 
-    /**
-     * Getter for the register date.
-     * @return register date of the user.
-     */
-    public String getRegisterDate() {
-        return registerDate;
-    }
-
-    /**
-     * Setter for the register date.
-     * @param registerDate new register date of the user.
-     */
-    public void setRegisterDate(String registerDate) {
-        this.registerDate = registerDate;
-    }
 
     /**
      * Getter for the user type.
@@ -466,5 +391,21 @@ public class UserEntity implements Serializable {
 
     public void setLab(LabEntity lab) {
         this.lab = lab;
+    }
+
+    public Set<UserProjectEntity> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<UserProjectEntity> projects) {
+        this.projects = projects;
+    }
+
+    public AuthenticationEntity getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(AuthenticationEntity authentication) {
+        this.authentication = authentication;
     }
 }
