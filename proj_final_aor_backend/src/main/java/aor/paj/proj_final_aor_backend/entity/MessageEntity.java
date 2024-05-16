@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name="messages")
+
+//Querys for the MessageEntity class
+@NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user1 AND m.receiver.id = :user2)")
+@NamedQuery(name= "Message.findMessagesGroupedBySender", query = "SELECT m FROM MessageEntity m WHERE m.receiver.id = :receiver ORDER BY m.sendTimestamp DESC")
 public class MessageEntity implements Serializable {
 
     /**

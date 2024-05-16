@@ -80,4 +80,30 @@ public class UserDao extends AbstractDao<UserEntity> {
     }
 
 
+    /**
+     * Method to update a user.
+     * If the update is successful, it returns true. Otherwise, it returns false.
+     * @param userEntity The userEntity object to update.
+     * @return true if the update is successful, false otherwise.
+     */
+    public boolean updateUser(UserEntity userEntity) {
+        try {
+            em.merge(userEntity);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Method to create a new user.
+     * It uses the EntityManager's persist method to insert the new userEntity into the database.
+     *
+     * @param userEntity The UserEntity object to be created.
+     */
+    public void createUser(UserEntity userEntity) {
+        em.persist(userEntity);
+    }
+
 }
