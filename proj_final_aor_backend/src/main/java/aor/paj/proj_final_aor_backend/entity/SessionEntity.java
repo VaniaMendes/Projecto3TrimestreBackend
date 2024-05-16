@@ -29,7 +29,7 @@ public class SessionEntity implements Serializable {
     /**
      * End timestamp of the session
      */
-    @Column(name = "endSession", nullable = false)
+    @Column(name = "endSession", nullable = true)
     private LocalDateTime endSession;
 
     /**

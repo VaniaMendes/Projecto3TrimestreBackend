@@ -34,7 +34,6 @@ public class User {
     private boolean activeState;
     @XmlElement
     private String resetPassToken;
-
     @XmlElement
     private String resetPassTokenExpiricy;
     @XmlElement
