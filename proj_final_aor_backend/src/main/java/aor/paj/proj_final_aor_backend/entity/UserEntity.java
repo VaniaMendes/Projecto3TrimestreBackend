@@ -12,10 +12,15 @@ import java.util.Set;
  * It contains details about a user such as id, email, password, first name, last name, visibility state,
  * authentication state, active state, reset password token, reset password token expiricy, biography, register date,
  * user type, interests, skills, notifications, messages sent and messages received.
- *
  */
 @Entity
 @Table(name="user")
+//Querys for the UserEntity
+@NamedQuery(name="User.findUserById", query = "SELECT u FROM UserEntity u WHERE u.id = :id")
+@NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email")
+@NamedQuery(name = "User.findAllAtiveUsers", query = "SELECT u FROM UserEntity u WHERE u.activeState = true")
+@NamedQuery(name="User.findUserByNameStartingWith", query = "SELECT u FROM UserEntity u WHERE LOWER (u.firstName) LIKE LOWER (:prefix) OR LOWER (u.lastName) LIKE LOWER (:prefix)")
+
 public class UserEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -58,20 +63,17 @@ public class UserEntity implements Serializable {
     private boolean visibilityState;
 
 
-
     /**
      * Active state of the user. Cannot be null.
      */
     @Column(name = "activeState", nullable = false)
     private boolean activeState;
 
-
     /**
      * Biography of the user.
      */
     @Column(name = "biography")
     private String biography;
-
 
 
     /**
@@ -151,7 +153,6 @@ public class UserEntity implements Serializable {
      * Default constructor for the UserEntity class.
      */
     public UserEntity() {
-
     }
 
     /**
