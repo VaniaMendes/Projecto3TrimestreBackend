@@ -20,7 +20,7 @@ import java.util.Set;
 @NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email")
 @NamedQuery(name = "User.findAllAtiveUsers", query = "SELECT u FROM UserEntity u WHERE u.activeState = true")
 @NamedQuery(name="User.findUserByNameStartingWith", query = "SELECT u FROM UserEntity u WHERE LOWER (u.firstName) LIKE LOWER (:prefix) OR LOWER (u.lastName) LIKE LOWER (:prefix)")
-
+@NamedQuery(name = "User.findSkillsByUserId", query = "SELECT u.skills FROM UserEntity u WHERE u.id = :id")
 public class UserEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
