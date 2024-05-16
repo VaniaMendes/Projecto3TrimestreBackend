@@ -150,7 +150,7 @@ public class UserEntity implements Serializable {
     private Set<SessionEntity> sessions;
 
     // Set of tasks associated with the user
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "responsibleUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TaskEntity> tasks = new HashSet<>();
 
     // Lab associated with the user
