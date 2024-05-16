@@ -5,6 +5,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class represents a skill, which extends an interest.
+ * It has an id, name, and type.
  */
 
 @XmlRootElement

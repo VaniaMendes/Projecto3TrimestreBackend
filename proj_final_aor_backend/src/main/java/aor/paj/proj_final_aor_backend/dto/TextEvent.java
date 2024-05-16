@@ -7,56 +7,42 @@ import java.time.LocalDateTime;
 
 /**
  * This class represents a text event.
+ * It has an id, read status, send timestamp, read timestamp, sender id, and receiver id.
  */
 
 @XmlRootElement
-public abstract class  TextEvent {
+public class  TextEvent {
 
-    /**
-     * The id of the text event.
-     */
     @XmlElement
     private long id;
 
-    /**
-     * The read status of the text event.
-     */
     @XmlElement
     private boolean readStatus;
 
-    /**
-     * The time when the text event was sent.
-     */
     @XmlElement
     private LocalDateTime sendTimestamp;
 
-    /**
-     * The time when the text event was read.
-     */
+
     @XmlElement
     private LocalDateTime readTimestamp;
 
-    /**
-     * The id of the sender of the text event.
-     */
+
     @XmlElement
     private long sender_id;
 
-    /**
-     * The id of the receiver of the text event.
-     */
+
     @XmlElement
     private long receiver_id;
 
 
     /**
-     * Default constructor.
+     * Default constructor of the class.
      */
     public TextEvent() {
     }
 
     /**
-     * Returns the ID of the text event.
+     * Gets the ID of the text event.
      * @return the ID of the text event.
      */
 
@@ -74,7 +60,7 @@ public abstract class  TextEvent {
     }
 
     /**
-     * Returns the read status of the text event.
+     * Gets the read status of the text event.
      * @return the read status of the text event.
      */
 
@@ -91,7 +77,7 @@ public abstract class  TextEvent {
     }
 
     /**
-     * Returns the time when the text event was sent.
+     * Gets the time when the text event was sent.
      * @return the time when the text event was sent.
      */
     public LocalDateTime getSendTimestamp() {
@@ -108,7 +94,7 @@ public abstract class  TextEvent {
     }
 
     /**
-     * Returns the time when the text event was read.
+     * Gets the time when the text event was read.
      * @return the time when the text event was read.
      */
 
@@ -125,7 +111,7 @@ public abstract class  TextEvent {
     }
 
     /**
-     * Returns the ID of the sender of the text event.
+     * Gets the ID of the sender of the text event.
      * @return the ID of the sender of the text event.
      */
 
@@ -142,7 +128,7 @@ public abstract class  TextEvent {
     }
 
     /**
-     * Returns the ID of the receiver of the text event.
+     * Gets the ID of the receiver of the text event.
      * @return the ID of the receiver of the text event.
      */
     public long getReceiver_id() {

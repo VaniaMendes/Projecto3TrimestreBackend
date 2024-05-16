@@ -22,7 +22,7 @@ public class Interest {
     private String name;
 
     /**
-     * Default constructor.
+     * Default constructor of the Interest Class.
      */
     public Interest() {
     }

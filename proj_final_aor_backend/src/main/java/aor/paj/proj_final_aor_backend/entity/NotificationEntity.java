@@ -13,6 +13,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name="notifications")
+
+//Querys for the NotificationEntity class
+
 public class NotificationEntity implements Serializable {
 
     /**
