@@ -16,6 +16,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "resource")
+@NamedQuery(name = "ResourceEntity.findAllResources", query = "SELECT r FROM ResourceEntity r")
+@NamedQuery(name = "ResourceEntity.findAllResourcesOrderedDESC", query = "SELECT r FROM ResourceEntity r ORDER BY r.createdAt DESC")
+
 public class ResourceEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -72,15 +75,21 @@ public class ResourceEntity implements Serializable {
     private LocalDateTime createdAt;
 
     /**
+     * The last update timestamp of the resource.
+     */
+    @Column(name = "updated_at", nullable = true)
+    private LocalDateTime updatedAt;
+
+    /**
      * The source ID of the resource.
      */
-    @Column(name = "source_id", nullable = false, unique = false, updatable = true)
+    @Column(name = "source_id", nullable = false)
     private String sourceId;
 
     /**
      * The quantity of the resource.
      */
-    @Column(name = "quantity", nullable = false, unique = false, updatable = true)
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
     /**
@@ -281,11 +290,45 @@ public class ResourceEntity implements Serializable {
         this.suppliers = suppliers;
     }
 
+    /**
+     * Returns the projects that use the resource.
+     * This is a getter method for retrieving the projects associated with the resource.
+     * It is a part of the one-to-many relationship between ResourceEntity and ProjectResource.
+     *
+     * @return a Set of ProjectResource objects that are associated with the resource
+     */
     public Set<ProjectResource> getProjects() {
         return projects;
     }
 
+    /**
+     * Sets the projects that use the resource.
+     * This is a setter method for defining the projects associated with the resource.
+     * It is a part of the one-to-many relationship between ResourceEntity and ProjectResource.
+     *
+     * @param projects a Set of ProjectResource objects to be associated with the resource
+     */
     public void setProjects(Set<ProjectResource> projects) {
         this.projects = projects;
+    }
+
+    /**
+     * Returns the last update timestamp of the resource.
+     * This is a getter method for retrieving the last update timestamp of the resource.
+     *
+     * @return updatedAt, the last update timestamp of the resource
+     */
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    /**
+     * Sets the last update timestamp of the resource.
+     * This is a setter method for defining the last update timestamp of the resource.
+     *
+     * @param updatedAt the new last update timestamp of the resource
+     */
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

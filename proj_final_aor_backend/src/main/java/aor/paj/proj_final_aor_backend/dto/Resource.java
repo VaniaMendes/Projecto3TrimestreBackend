@@ -47,6 +47,10 @@ public class Resource {
     @XmlElement
     private LocalDateTime createdAt;
 
+    // Date and time when the resource was last updated
+    @XmlElement
+    private LocalDateTime updatedAt;
+
     // Source ID of the resource
     @XmlElement
     private String sourceId;
@@ -197,6 +201,26 @@ public class Resource {
      */
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * Returns the last update timestamp of the resource.
+     * This is a getter method for retrieving the last update timestamp of the resource.
+     *
+     * @return updatedAt, the last update timestamp of the resource
+     */
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    /**
+     * Sets the last update timestamp of the resource.
+     * This is a setter method for defining the last update timestamp of the resource.
+     *
+     * @param updatedAt the new last update timestamp of the resource
+     */
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     /**
