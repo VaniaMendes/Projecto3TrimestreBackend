@@ -28,18 +28,13 @@ public class User {
 
     @XmlElement
     private boolean visibilityState;
-    @XmlElement
-    private boolean authState;
+
     @XmlElement
     private boolean activeState;
-    @XmlElement
-    private String resetPassToken;
-    @XmlElement
-    private String resetPassTokenExpiricy;
+
     @XmlElement
     private String biography;
-    @XmlElement
-    private LocalDateTime registerDate;
+
     @XmlElement
     private UserType userType;
 
@@ -103,13 +98,7 @@ public User(){}
         this.visibilityState = visibilityState;
     }
 
-    public boolean isAuthState() {
-        return authState;
-    }
 
-    public void setAuthState(boolean authState) {
-        this.authState = authState;
-    }
 
     public boolean isActiveState() {
         return activeState;
@@ -119,21 +108,7 @@ public User(){}
         this.activeState = activeState;
     }
 
-    public String getResetPassToken() {
-        return resetPassToken;
-    }
 
-    public void setResetPassToken(String resetPassToken) {
-        this.resetPassToken = resetPassToken;
-    }
-
-    public String getResetPassTokenExpiricy() {
-        return resetPassTokenExpiricy;
-    }
-
-    public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
-        this.resetPassTokenExpiricy = resetPassTokenExpiricy;
-    }
 
     public String getBiography() {
         return biography;
@@ -143,13 +118,7 @@ public User(){}
         this.biography = biography;
     }
 
-    public LocalDateTime getRegisterDate() {
-        return registerDate;
-    }
 
-    public void setRegisterDate(LocalDateTime registerDate) {
-        this.registerDate = registerDate;
-    }
     public UserType getUserType() {
         return userType;
     }

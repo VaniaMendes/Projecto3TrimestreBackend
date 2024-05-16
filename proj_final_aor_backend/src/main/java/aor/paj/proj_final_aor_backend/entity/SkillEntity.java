@@ -39,7 +39,6 @@ public class SkillEntity implements Serializable {
     @ManyToMany(mappedBy = "skills")
     private Set<ProjectEntity> projects = new HashSet<>();
 
-
     /**
      * Default constructor of the SkillEntity class.
      */

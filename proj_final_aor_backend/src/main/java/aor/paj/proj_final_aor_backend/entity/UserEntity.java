@@ -12,10 +12,15 @@ import java.util.Set;
  * It contains details about a user such as id, email, password, first name, last name, visibility state,
  * authentication state, active state, reset password token, reset password token expiricy, biography, register date,
  * user type, interests, skills, notifications, messages sent and messages received.
- *
  */
 @Entity
 @Table(name="user")
+//Querys for the UserEntity
+@NamedQuery(name="User.findUserById", query = "SELECT u FROM UserEntity u WHERE u.id = :id")
+@NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email")
+@NamedQuery(name = "User.findAllAtiveUsers", query = "SELECT u FROM UserEntity u WHERE u.activeState = true")
+@NamedQuery(name="User.findUserByNameStartingWith", query = "SELECT u FROM UserEntity u WHERE LOWER (u.firstName) LIKE LOWER (:prefix) OR LOWER (u.lastName) LIKE LOWER (:prefix)")
+
 public class UserEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -57,11 +62,6 @@ public class UserEntity implements Serializable {
     @Column(name = "visibilityState", nullable = false)
     private boolean visibilityState;
 
-    /**
-     * Authentication state of the user. Cannot be null.
-     */
-    @Column(name = "authState", nullable = false)
-    private boolean authState;
 
     /**
      * Active state of the user. Cannot be null.
@@ -70,28 +70,11 @@ public class UserEntity implements Serializable {
     private boolean activeState;
 
     /**
-     * Reset password token of the user. It is unique.
-     */
-    @Column(name = "resetPassToken", unique = true)
-    private String resetPassToken;
-
-    /**
-     * Reset password token expiricy of the user.
-     */
-    @Column(name = "resetPassTokenExpiricy")
-    private String resetPassTokenExpiricy;
-
-    /**
      * Biography of the user.
      */
     @Column(name = "biography")
     private String biography;
 
-    /**
-     * Register date of the user. Cannot be null.
-     */
-    @Column(name = "registerDate", nullable = false)
-    private String registerDate;
 
     /**
      * Type of the user. Cannot be null.
@@ -162,12 +145,14 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user")
     private Set<UserProjectEntity> projects;
 
+    @OneToOne(mappedBy = "user")
+    private AuthenticationEntity authentication;
+
 
     /**
      * Default constructor for the UserEntity class.
      */
     public UserEntity() {
-
     }
 
     /**
@@ -267,21 +252,7 @@ public class UserEntity implements Serializable {
         this.visibilityState = visibilityState;
     }
 
-    /**
-     * Getter for the authentication state.
-     * @return authentication state of the user.
-     */
-    public boolean isAuthState() {
-        return authState;
-    }
 
-    /**
-     * Setter for the authentication state.
-     * @param authState new authentication state of the user.
-     */
-    public void setAuthState(boolean authState) {
-        this.authState = authState;
-    }
 
     /**
      * Getter for the active state.
@@ -299,37 +270,7 @@ public class UserEntity implements Serializable {
         this.activeState = activeState;
     }
 
-    /**
-     * Getter for the reset password token.
-     * @return reset password token of the user.
-     */
-    public String getResetPassToken() {
-        return resetPassToken;
-    }
 
-    /**
-     * Setter for the reset password token.
-     * @param resetPassToken new reset password token of the user.
-     */
-    public void setResetPassToken(String resetPassToken) {
-        this.resetPassToken = resetPassToken;
-    }
-
-    /**
-     * Getter for the reset password token expiricy.
-     * @return reset password token expiricy of the user.
-     */
-    public String getResetPassTokenExpiricy() {
-        return resetPassTokenExpiricy;
-    }
-
-    /**
-     * Setter for the reset password token expiricy.
-     * @param resetPassTokenExpiricy new reset password token expiricy of the user.
-     */
-    public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
-        this.resetPassTokenExpiricy = resetPassTokenExpiricy;
-    }
 
     /**
      * Getter for the biography.
@@ -348,21 +289,6 @@ public class UserEntity implements Serializable {
         this.biography = biography;
     }
 
-    /**
-     * Getter for the register date.
-     * @return register date of the user.
-     */
-    public String getRegisterDate() {
-        return registerDate;
-    }
-
-    /**
-     * Setter for the register date.
-     * @param registerDate new register date of the user.
-     */
-    public void setRegisterDate(String registerDate) {
-        this.registerDate = registerDate;
-    }
 
     /**
      * Getter for the user type.
@@ -466,5 +392,21 @@ public class UserEntity implements Serializable {
 
     public void setLab(LabEntity lab) {
         this.lab = lab;
+    }
+
+    public Set<UserProjectEntity> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<UserProjectEntity> projects) {
+        this.projects = projects;
+    }
+
+    public AuthenticationEntity getAuthentication() {
+        return authentication;
+    }
+
+    public void setAuthentication(AuthenticationEntity authentication) {
+        this.authentication = authentication;
     }
 }
