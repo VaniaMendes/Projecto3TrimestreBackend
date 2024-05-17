@@ -1,10 +1,13 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
+import aor.paj.proj_final_aor_backend.utils.EmailService;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Singleton;
@@ -13,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @Stateless
 public class UserBean implements Serializable {
@@ -23,6 +29,10 @@ public class UserBean implements Serializable {
 
     @EJB
     SessionDao sessionDao;
+    @EJB
+    EmailService emailService;
+    @EJB
+    AuthenticationDao authenticationDao;
     public UserBean() {
     }
 
@@ -63,19 +73,46 @@ public class UserBean implements Serializable {
         //Creating a new user
         UserEntity newUser = new UserEntity();
         newUser.setEmail(email);
+
         //Encrypting the password
-         String encryptedPassword = encryptPassword(password);
-         newUser.setPassword(encryptedPassword);
+        String encryptedPassword = encryptPassword(password);
+        newUser.setPassword(encryptedPassword);
         newUser.setActiveState(false);
         newUser.setVisibilityState(false);
-        newUser.setUserType(UserType.AUTHENTICATED_USER);
+        newUser.setUserType(UserType.LOGGED_IN);
 
         ///Save the new user in the database
         userDao.createUser(newUser);
+
+        //Generating a token for the confirmation email
+        String tokenConfirmation = UUID.randomUUID().toString();
+
+        //Save the token and userId in the authentication table
+        AuthenticationEntity authenticationEntity = new AuthenticationEntity();
+        authenticationEntity.setAuthenticationToken(tokenConfirmation);
+
+        // Format LocalDateTime to String
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = LocalDateTime.now().format(formatter);
+        authenticationEntity.setRegisterDate(formattedDate);
+        authenticationEntity.setUser(newUser);
+        authenticationEntity.setAuthState(false);
+        authenticationDao.create(authenticationEntity);
+
+        sendConfirmationEmail("proj_final_aor@outlook.com", tokenConfirmation);
        return true;
     }
 
 
+    public void sendConfirmationEmail(String to, String token){
+        //Sending the confirmation email
+        logger.info("Sending confirmation email to " + to + " with token " + token);
+        String subject = "Account Confirmation ";
+        String body = "Thank you for your registration. Please click the link below to confirm your account: \n" +
+                "http://localhost:3000/confirm?token=" + token;
+
+        emailService.sendEmail(to, subject, body);
+    }
     public boolean isValidemail(String email){
         //Verifying if the email is valid
         if(email == null ){

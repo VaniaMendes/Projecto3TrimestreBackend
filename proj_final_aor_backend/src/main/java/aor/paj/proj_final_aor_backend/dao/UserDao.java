@@ -22,6 +22,11 @@ public class UserDao extends AbstractDao<UserEntity> {
     }
 
 
+    public void createAuthenticationToken(UserEntity userEntity, String token) {
+        userEntity.getAuthentication().setAuthenticationToken(token);
+        em.merge(userEntity);
+    }
+
     /**
      * Method to find a user by their ID.
      * It uses a named query "User.findUserById" and sets the "id" parameter for the query.
