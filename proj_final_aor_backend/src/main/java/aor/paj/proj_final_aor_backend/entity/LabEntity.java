@@ -12,6 +12,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "lab")
+
+@NamedQuery(name = "Lab.findLabById", query = " SELECT l FROM LabEntity l WHERE l.id = :id")
+@NamedQuery(name = "Lab.findLabByName", query = " SELECT l FROM LabEntity l WHERE l.name = :name")
 public class LabEntity implements Serializable {
 
     // Unique identifier for serialization

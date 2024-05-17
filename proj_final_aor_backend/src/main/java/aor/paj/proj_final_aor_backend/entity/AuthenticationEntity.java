@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "authentication")
+//Querys to table authentication
+@NamedQuery(name= "Authentication.findUserByToken", query = "SELECT a.user FROM AuthenticationEntity a WHERE a.authenticationToken = :authenticationToken")
+@NamedQuery(name= "Authentication.findByToken", query = "SELECT a FROM AuthenticationEntity a WHERE a.authenticationToken = :authenticationToken")
 public class AuthenticationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

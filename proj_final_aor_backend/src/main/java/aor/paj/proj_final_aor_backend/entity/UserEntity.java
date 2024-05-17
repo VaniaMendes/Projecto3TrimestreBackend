@@ -76,6 +76,18 @@ public class UserEntity implements Serializable {
     @Column(name = "biography")
     private String biography;
 
+    /**
+     * Photo of the user.
+     */
+    @Column(name = "photo")
+    private String photo;
+
+    /**
+     * Nickname of the user.
+     */
+    @Column(name = "nickname")
+    private String nickname;
+
 
     /**
      * Type of the user. Cannot be null.
@@ -409,5 +421,21 @@ public class UserEntity implements Serializable {
 
     public void setAuthentication(AuthenticationEntity authentication) {
         this.authentication = authentication;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

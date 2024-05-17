@@ -32,7 +32,7 @@ public class UserBeanTest {
     public void registerUser_withValidInput_returnsTrue() {
         when(userDao.findUserByEmail(anyString())).thenReturn(null);
 
-        boolean result = userBean.registerUser("test@test.com", "Password1!", "Password1!");
+        boolean result = userBean.registerUser("taest@test.com", "Paassword1!", "Paassword1!");
 
         assertTrue(result);
         verify(userDao, times(1)).createUser(any(UserEntity.class));
