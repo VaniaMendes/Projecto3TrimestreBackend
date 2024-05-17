@@ -28,6 +28,7 @@ public class UserEntity implements Serializable {
      * Unique identifier for user.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
