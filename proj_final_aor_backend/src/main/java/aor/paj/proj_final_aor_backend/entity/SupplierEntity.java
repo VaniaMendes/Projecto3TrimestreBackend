@@ -27,11 +27,11 @@ public class SupplierEntity implements Serializable {
     private Long id;
 
     // Name of the supplier
-    @Column(name = "name", nullable = false, unique = true, updatable = false)
+    @Column(name = "name", nullable = false, unique = true, updatable = true)
     private String name;
 
     // Contact information of the supplier
-    @Column(name = "contact", nullable = false, unique = true, updatable = false)
+    @Column(name = "contact", nullable = false, unique = true, updatable = true)
     private String contact;
 
     // Set of resources associated with the supplier

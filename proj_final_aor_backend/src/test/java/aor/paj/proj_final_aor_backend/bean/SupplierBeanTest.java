@@ -9,6 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -100,5 +104,114 @@ class SupplierBeanTest {
         SupplierEntity resultEntity = supplierBean.createSupplier(supplier);
 
         assertNull(resultEntity);
+    }
+
+    @Test
+    void getAllSuppliersReturnsAllSuppliers() {
+        SupplierEntity supplierEntity1 = new SupplierEntity();
+        supplierEntity1.setId(1L);
+        supplierEntity1.setName("Supplier 1");
+        supplierEntity1.setContact("Contact 1");
+
+        SupplierEntity supplierEntity2 = new SupplierEntity();
+        supplierEntity2.setId(2L);
+        supplierEntity2.setName("Supplier 2");
+        supplierEntity2.setContact("Contact 2");
+
+        List<SupplierEntity> supplierEntities = Arrays.asList(supplierEntity1, supplierEntity2);
+
+        when(supplierDao.findAllSuppliers()).thenReturn(supplierEntities);
+
+        List<Supplier> suppliers = supplierBean.getAllSuppliers();
+
+        assertNotNull(suppliers);
+        assertEquals(2, suppliers.size());
+        assertEquals("Supplier 1", suppliers.get(0).getName());
+        assertEquals("Contact 1", suppliers.get(0).getContact());
+        assertEquals("Supplier 2", suppliers.get(1).getName());
+        assertEquals("Contact 2", suppliers.get(1).getContact());
+    }
+
+    @Test
+    void getAllSuppliersReturnsEmptyListWhenNoSuppliers() {
+        when(supplierDao.findAllSuppliers()).thenReturn(new ArrayList<>());
+
+        List<Supplier> suppliers = supplierBean.getAllSuppliers();
+
+        assertNotNull(suppliers);
+        assertTrue(suppliers.isEmpty());
+    }
+
+    @Test
+    void updateSupplierSuccessfullyUpdatesNameAndContact() {
+        Long id = 1L;
+        String newName = "Updated Supplier";
+        String newContact = "Updated Contact";
+        SupplierEntity existingEntity = new SupplierEntity();
+        existingEntity.setId(id);
+        existingEntity.setName("Old Supplier");
+        existingEntity.setContact("Old Contact");
+
+        when(supplierDao.findSupplierById(id)).thenReturn(existingEntity);
+        doAnswer(i -> i.getArguments()[0]).when(supplierDao).merge(any(SupplierEntity.class));
+
+        SupplierEntity resultEntity = supplierBean.updateSupplier(id, newName, newContact);
+
+        assertNotNull(resultEntity);
+        assertEquals(newName, resultEntity.getName());
+        assertEquals(newContact, resultEntity.getContact());
+    }
+
+    @Test
+    void updateSupplierWithNonExistingIdReturnsNull() {
+        Long id = 1L;
+        String newName = "Updated Supplier";
+        String newContact = "Updated Contact";
+
+        when(supplierDao.findSupplierById(id)).thenReturn(null);
+
+        SupplierEntity resultEntity = supplierBean.updateSupplier(id, newName, newContact);
+
+        assertNull(resultEntity);
+    }
+
+    @Test
+    void updateSupplierWithNullNameDoesNotUpdateName() {
+        Long id = 1L;
+        String oldName = "Old Supplier";
+        String newContact = "Updated Contact";
+        SupplierEntity existingEntity = new SupplierEntity();
+        existingEntity.setId(id);
+        existingEntity.setName(oldName);
+        existingEntity.setContact("Old Contact");
+
+        when(supplierDao.findSupplierById(id)).thenReturn(existingEntity);
+        doAnswer(i -> i.getArguments()[0]).when(supplierDao).merge(any(SupplierEntity.class));
+
+        SupplierEntity resultEntity = supplierBean.updateSupplier(id, null, newContact);
+
+        assertNotNull(resultEntity);
+        assertEquals(oldName, resultEntity.getName());
+        assertEquals(newContact, resultEntity.getContact());
+    }
+
+    @Test
+    void updateSupplierWithNullContactDoesNotUpdateContact() {
+        Long id = 1L;
+        String newName = "Updated Supplier";
+        String oldContact = "Old Contact";
+        SupplierEntity existingEntity = new SupplierEntity();
+        existingEntity.setId(id);
+        existingEntity.setName("Old Supplier");
+        existingEntity.setContact(oldContact);
+
+        when(supplierDao.findSupplierById(id)).thenReturn(existingEntity);
+        doAnswer(i -> i.getArguments()[0]).when(supplierDao).merge(any(SupplierEntity.class));
+
+        SupplierEntity resultEntity = supplierBean.updateSupplier(id, newName, null);
+
+        assertNotNull(resultEntity);
+        assertEquals(newName, resultEntity.getName());
+        assertEquals(oldContact, resultEntity.getContact());
     }
 }
