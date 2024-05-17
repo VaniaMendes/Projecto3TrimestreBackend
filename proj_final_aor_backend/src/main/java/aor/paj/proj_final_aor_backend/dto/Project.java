@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.dto;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
  * This class represents a Project in the system.
  * It contains various properties related to a project and their getter and setter methods.
  */
+@XmlRootElement
 public class Project {
 
     // Unique identifier for the project
@@ -56,6 +58,9 @@ public class Project {
 
     @XmlElement
     private String needs;
+
+    @XmlElement
+    private Integer vacancyNumber;
 
     // Current state of the project
     @XmlElement
@@ -273,11 +278,39 @@ public class Project {
         this.state = state;
     }
 
+    /**
+     * Gets the needs of the project.
+     *
+     * @return A string representing the specific needs of the project.
+     */
     public String getNeeds() {
         return needs;
     }
 
+    /**
+     * Sets the needs of the project.
+     *
+     * @param needs A string representing the specific needs to be set for the project.
+     */
     public void setNeeds(String needs) {
         this.needs = needs;
+    }
+
+    /**
+     * Gets the number of vacancies available in the project.
+     *
+     * @return An Integer representing the number of vacancies available in the project.
+     */
+    public Integer getVacancyNumber() {
+        return vacancyNumber;
+    }
+
+    /**
+     * Sets the number of vacancies available in the project.
+     *
+     * @param vacancyNumber An Integer representing the number of vacancies to be set for the project.
+     */
+    public void setVacancyNumber(Integer vacancyNumber) {
+        this.vacancyNumber = vacancyNumber;
     }
 }

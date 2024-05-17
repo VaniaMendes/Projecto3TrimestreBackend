@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name="user")
-//Querys for the UserEntity
+//Queries for the UserEntity
 @NamedQuery(name="User.findUserById", query = "SELECT u FROM UserEntity u WHERE u.id = :id")
 @NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email")
 @NamedQuery(name = "User.findAllAtiveUsers", query = "SELECT u FROM UserEntity u WHERE u.activeState = true ORDER BY u.firstName")

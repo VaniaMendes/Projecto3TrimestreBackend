@@ -31,6 +31,9 @@ public class UserProjectEntity {
     @Column(name="approved", nullable = false)
     private boolean approved;
 
+    @Column(name="exited", nullable = false)
+    private boolean exited;
+
     @OneToMany(mappedBy = "receiverGroup")
     private Set<MessageEntity> messagesReceived;
 
@@ -83,5 +86,13 @@ public class UserProjectEntity {
 
     public void setMessagesReceived(Set<MessageEntity> messagesReceived) {
         this.messagesReceived = messagesReceived;
+    }
+
+    public boolean isExited() {
+        return exited;
+    }
+
+    public void setExited(boolean exited) {
+        this.exited = exited;
     }
 }

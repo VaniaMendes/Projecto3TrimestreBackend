@@ -2,11 +2,13 @@ package aor.paj.proj_final_aor_backend.dto;
 
 import aor.paj.proj_final_aor_backend.util.enums.Workplace;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * This class represents a Lab in the project.
  * Each lab has an id and a name which is of type Workplace.
  */
+@XmlRootElement
 public class Lab {
 
     // The unique identifier for the lab
