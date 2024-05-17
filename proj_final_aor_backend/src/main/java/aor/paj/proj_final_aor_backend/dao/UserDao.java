@@ -22,10 +22,6 @@ public class UserDao extends AbstractDao<UserEntity> {
     }
 
 
-    public void createAuthenticationToken(UserEntity userEntity, String token) {
-        userEntity.getAuthentication().setAuthenticationToken(token);
-        em.merge(userEntity);
-    }
 
     /**
      * Method to find a user by their ID.
