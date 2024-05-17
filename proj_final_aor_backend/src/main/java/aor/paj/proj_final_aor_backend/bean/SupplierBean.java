@@ -9,6 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class SupplierBean implements Serializable {
@@ -76,6 +78,61 @@ public class SupplierBean implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Retrieves all suppliers from the database.
+     * <p>
+     * This method fetches all {@link SupplierEntity} objects from the database using the {@code findAllSuppliers} method
+     * of the {@code supplierDao}. Each {@link SupplierEntity} is then converted to a {@link Supplier} DTO using the
+     * {@code convertToDto} method. The resulting list of {@link Supplier} DTOs is returned.
+     *
+     * @return a list of {@link Supplier} DTOs representing all suppliers in the database.
+     */
+    public List<Supplier> getAllSuppliers() {
+        List<SupplierEntity> supplierEntities = supplierDao.findAllSuppliers();
+        List<Supplier> suppliers = new ArrayList<>();
+        for (SupplierEntity supplierEntity : supplierEntities) {
+            suppliers.add(convertToDto(supplierEntity));
+        }
+        return suppliers;
+    }
+
+    /**
+     * Updates the details of an existing supplier in the database.
+     *
+     * This method takes in the ID of the supplier to be updated, along with the new name and contact information.
+     * It first retrieves the supplier entity from the database using the provided ID. If no such supplier exists,
+     * it logs an error and returns null.
+     *
+     * If the supplier does exist, it checks if the new name and contact information are not null or empty.
+     * If they are not, it updates the supplier entity's name and contact information with the new values.
+     *
+     * Finally, it calls the `merge` method on the `supplierDao` to persist the changes to the database, and
+     * returns the updated supplier entity.
+     *
+     * @param id The ID of the supplier to be updated.
+     * @param name The new name for the supplier. If null or empty, the supplier's name is not updated.
+     * @param contact The new contact information for the supplier. If null or empty, the supplier's contact information is not updated.
+     * @return The updated supplier entity, or null if no supplier with the provided ID exists.
+     */
+    public SupplierEntity updateSupplier(Long id, String name, String contact) {
+        SupplierEntity supplierEntity = supplierDao.findSupplierById(id);
+        if (supplierEntity == null) {
+            logger.error("Supplier with id " + id + " does not exist");
+            return null;
+        }
+
+        if (name != null && !name.isEmpty()) {
+            supplierEntity.setName(name);
+        }
+
+        if (contact != null && !contact.isEmpty()) {
+            supplierEntity.setContact(contact);
+        }
+
+        supplierDao.merge(supplierEntity);
+        return supplierEntity;
     }
 
     /**
