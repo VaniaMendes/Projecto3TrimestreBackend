@@ -31,12 +31,10 @@ public abstract class AbstractDao<T extends Serializable> implements Serializabl
         return em.find(clazz, id);
     }
 
-
     public void persist(final T entity)
     {
         em.persist(entity);
     }
-
 
     public void merge(final T entity)
     {

@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.dto;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
  * This class represents a Task in the system.
  * It contains various properties related to a task and their getter and setter methods.
  */
+@XmlRootElement
 public class Task {
 
     // Unique identifier for the task

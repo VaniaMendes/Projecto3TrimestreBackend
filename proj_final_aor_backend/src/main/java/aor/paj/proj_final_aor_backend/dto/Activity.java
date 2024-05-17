@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.dto;
 
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
  * This class represents an Activity made in the project.
  * Each activity has an id, creation time, type, author, and associated project.
  */
+@XmlRootElement
 public class Activity {
 
     // The unique identifier for the activity

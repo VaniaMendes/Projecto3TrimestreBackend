@@ -1,0 +1,113 @@
+package aor.paj.proj_final_aor_backend.bean;
+
+import aor.paj.proj_final_aor_backend.dao.SupplierDao;
+import aor.paj.proj_final_aor_backend.dto.Supplier;
+import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.Serializable;
+
+@Stateless
+public class SupplierBean implements Serializable {
+
+    @EJB
+    private SupplierDao supplierDao;
+
+    private static final Logger logger = LogManager.getLogger(SupplierBean.class);
+
+    public SupplierBean() {
+    }
+
+    public SupplierBean (SupplierDao supplierDao) {
+        this.supplierDao = supplierDao;
+    }
+
+    /**
+     * Creates a new supplier in the database.
+     * <p>
+     * This method first checks if the given supplier is valid by calling {@code isInvalidSupplier}.
+     * If the supplier is deemed invalid, the method returns null. Otherwise, it proceeds to convert
+     * the supplier DTO to a {@link SupplierEntity} object, persists it in the database, and returns
+     * the persisted entity.
+     *
+     * @param supplier The supplier DTO to be converted and persisted.
+     * @return The persisted {@link SupplierEntity}, or null if the supplier is invalid.
+     */
+    public SupplierEntity createSupplier(Supplier supplier) {
+
+        if (isInvalidSupplier(supplier)) {
+            return null;
+        }
+
+        SupplierEntity supplierEntity = convertToEntity(supplier);
+
+        supplierDao.persist(supplierEntity);
+        return supplierEntity;
+    }
+
+    /**
+     * Validates the given supplier.
+     * <p>
+     * Checks if the supplier's name and contact information are not null or empty. Additionally,
+     * it verifies if a supplier with the same name does not already exist in the database. If any
+     * of these conditions are met, the method logs an appropriate error and returns true, indicating
+     * the supplier is invalid.
+     *
+     * @param supplier The supplier to validate.
+     * @return true if the supplier is invalid, false otherwise.
+     */
+    private boolean isInvalidSupplier(Supplier supplier) {
+        if (supplier.getName() == null || supplier.getName().isEmpty()) {
+            logger.error("Supplier name is empty");
+            return true;
+        }
+
+        if (supplier.getContact() == null || supplier.getContact().isEmpty()) {
+            logger.error("Supplier contact is empty");
+            return true;
+        }
+
+        if (supplierDao.findSupplierByName(supplier.getName()) != null) {
+            logger.error("Supplier with name " + supplier.getName() + " already exists");
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Converts a {@link Supplier} DTO to a {@link SupplierEntity}.
+     * <p>
+     * This method takes a supplier DTO as input and creates a new {@link SupplierEntity} instance.
+     * It then sets the name and contact information from the DTO to the entity.
+     *
+     * @param supplier The supplier DTO to be converted.
+     * @return The newly created {@link SupplierEntity} with values from the DTO.
+     */
+    public SupplierEntity convertToEntity(Supplier supplier) {
+        SupplierEntity supplierEntity = new SupplierEntity();
+        supplierEntity.setName(supplier.getName());
+        supplierEntity.setContact(supplier.getContact());
+        return supplierEntity;
+    }
+
+    /**
+     * Converts a {@link SupplierEntity} to a {@link Supplier} DTO.
+     * <p>
+     * This method takes a supplier entity as input and creates a new {@link Supplier} DTO instance.
+     * It then sets the ID, name, and contact information from the entity to the DTO.
+     *
+     * @param supplierEntity The supplier entity to be converted.
+     * @return The newly created {@link Supplier} DTO with values from the entity.
+     */
+    public Supplier convertToDto(SupplierEntity supplierEntity) {
+        Supplier supplier = new Supplier();
+        supplier.setId(supplierEntity.getId());
+        supplier.setName(supplierEntity.getName());
+        supplier.setContact(supplierEntity.getContact());
+        return supplier;
+    }
+}
