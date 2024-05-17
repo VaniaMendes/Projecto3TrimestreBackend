@@ -30,10 +30,10 @@ public class UserService {
     public Response registerUser(UserRegistration user, @Context HttpServletRequest request) {
 
         try {
-            User registeredUser = userBean.registerUser(user.getEmail(), user.getPassword(), user.getConfirmPassword());
+            boolean isRegistered = userBean.registerUser(user.getEmail(), user.getPassword(), user.getConfirmPassword());
 
-            if (registeredUser != null) {
-                logger.info("IP Address: " + request.getRemoteAddr() + " - User registered: " + registeredUser.getEmail() + " at " + System.currentTimeMillis());
+            if (isRegistered) {
+                logger.info("IP Address: " + request.getRemoteAddr() + " - User registered: " + user.getEmail() + " at " + System.currentTimeMillis());
                 return Response.status(Response.Status.CREATED).entity("User registered").build();
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
