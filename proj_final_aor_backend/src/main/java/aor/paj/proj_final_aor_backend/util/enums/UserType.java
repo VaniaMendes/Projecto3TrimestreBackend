@@ -15,10 +15,10 @@ public enum UserType {
     /**
      * Represents a user who has authenticated.
      */
-    AUTHENTICATED_USER,
+    LOGGED_IN,
 
     /**
      * Represents a user who has not authenticated.
      */
-    NOT_AUTHENTICATED_USER
+    GUEST
 }

@@ -19,6 +19,8 @@ public class Authentication {
     private String resetPassToken;
     @XmlElement
     private String resetPassTokenExpiricy;
+    @XmlElement
+    private String authenticationToken;
 
     @XmlElement
     private LocalDateTime registerDate;
@@ -92,5 +94,21 @@ public class Authentication {
      */
     public void setRegisterDate(LocalDateTime registerDate) {
         this.registerDate = registerDate;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getAuthenticationToken() {
+        return authenticationToken;
+    }
+
+    public void setAuthenticationToken(String authenticationToken) {
+        this.authenticationToken = authenticationToken;
     }
 }

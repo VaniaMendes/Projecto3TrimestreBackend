@@ -2,15 +2,19 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "authentication")
-public class AuthenticationEntity {
+public class AuthenticationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private long id;
 
     /**
      * Authentication state of the user. Cannot be null.
@@ -28,6 +32,12 @@ public class AuthenticationEntity {
      */
     @Column(name = "resetPassTokenExpiricy")
     private String resetPassTokenExpiricy;
+
+    /**
+     * Authentication token of the user.
+     */
+    @Column(name = "authenticationToken")
+    private String authenticationToken;
 
     /**
      * Register date of the user. Cannot be null.
@@ -88,5 +98,13 @@ public class AuthenticationEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public String getAuthenticationToken() {
+        return authenticationToken;
+    }
+
+    public void setAuthenticationToken(String authenticationToken) {
+        this.authenticationToken = authenticationToken;
     }
 }
