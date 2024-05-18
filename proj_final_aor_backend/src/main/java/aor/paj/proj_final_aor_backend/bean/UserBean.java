@@ -1,10 +1,16 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
+import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
+import aor.paj.proj_final_aor_backend.utils.EmailService;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Singleton;
@@ -13,7 +19,14 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
+/**
+ * This class is responsible for the business logic of the User entity.
+ * It is responsible for the registration of a new user, the verification of the password and email, the encryption of the password and the sending of the confirmation email.
+ */
 @Stateless
 public class UserBean implements Serializable {
     private static final Logger logger = LogManager.getLogger(UserBean.class);
@@ -23,8 +36,16 @@ public class UserBean implements Serializable {
 
     @EJB
     SessionDao sessionDao;
+    @EJB
+    EmailService emailService;
+    @EJB
+    AuthenticationDao authenticationDao;
+    @EJB
+    LabDao labDao;
+
     public UserBean() {
     }
+
 
     public User getUSerByToken(String token) {
         User u = null;
@@ -63,19 +84,109 @@ public class UserBean implements Serializable {
         //Creating a new user
         UserEntity newUser = new UserEntity();
         newUser.setEmail(email);
+
         //Encrypting the password
-         String encryptedPassword = encryptPassword(password);
-         newUser.setPassword(encryptedPassword);
+        String encryptedPassword = encryptPassword(password);
+        newUser.setPassword(encryptedPassword);
         newUser.setActiveState(false);
         newUser.setVisibilityState(false);
-        newUser.setUserType(UserType.AUTHENTICATED_USER);
+        newUser.setUserType(UserType.LOGGED_IN);
 
         ///Save the new user in the database
         userDao.createUser(newUser);
+
+        //Generating a token for the confirmation email
+        String tokenConfirmation = UUID.randomUUID().toString();
+
+        //Save the token and userId in the authentication table
+        AuthenticationEntity authenticationEntity = new AuthenticationEntity();
+        authenticationEntity.setAuthenticationToken(tokenConfirmation);
+
+        // Format LocalDateTime to String
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = LocalDateTime.now().format(formatter);
+        authenticationEntity.setRegisterDate(formattedDate);
+        authenticationEntity.setUser(newUser);
+        authenticationEntity.setAuthState(false);
+        authenticationDao.create(authenticationEntity);
+
+        sendConfirmationEmail("proj_final_aor@outlook.com", tokenConfirmation);
        return true;
     }
 
+    public boolean confirmUser(User user, String token) {
 
+        // Check if the required fields are present
+        if(user.getFirstName() == null || user.getLastName() == null ){
+            return false;
+        }
+
+        /*
+        //Check if the lab is valid
+        if(lab == null){
+            return false;
+        }
+        LabEntity  labEntity = labDao.findLabById(lab.getId());
+
+
+         */
+        //Check if the token is valid
+        UserEntity userConfirm = authenticationDao.findUserByAuthenticationToken(token);
+
+        if(userConfirm == null){
+            return false;
+        }
+
+        userConfirm.setActiveState(true);
+        userConfirm.setFirstName(user.getFirstName());
+        userConfirm.setLastName(user.getLastName());
+        //userConfirm.setLab(labEntity);
+        userConfirm.setVisibilityState(user.isVisibilityState());
+
+        if(user.getBiography() != null){
+            userConfirm.setBiography(user.getBiography());
+        }
+        if(user.getPhoto() != null){
+            userConfirm.setPhoto(user.getPhoto());
+        }
+        if(user.getNickname() != null){
+            userConfirm.setNickname(user.getNickname());
+        }
+
+        userDao.updateUser(userConfirm);
+
+        AuthenticationEntity authentication = authenticationDao.findAuthenticationLineByTokenConfirmation(token);
+        authentication.setAuthState(true);
+        authentication.setAuthenticationToken(null);
+        authenticationDao.update(authentication);
+
+
+        return true;
+    }
+
+
+    public void sendConfirmationEmail(String to, String token){
+        //Sending the confirmation email
+        logger.info("Sending confirmation email to " + to + " with token " + token);
+        String subject = "Account Confirmation ";
+
+
+        // Construct the email body with a professional tone and formatting
+        StringBuilder body = new StringBuilder();
+        body.append("Welcome to Innovation Lab Management!\n");
+        body.append("\n");
+        body.append("Dear User,\n");
+        body.append("Thank you for registering with us. We're excited to have you on board.\n");
+        body.append("To complete your registration, please click the link below to confirm your account:\n");
+        body.append("http://localhost:3000/confirm?token=" + token + "\n");
+        body.append("If you did not register for our service, please ignore this email.\n");
+        body.append("\n");
+        body.append("Best regards,\n");
+        body.append("Critical Software\n");
+
+
+        emailService.sendEmail(to, subject, body.toString());
+    }
     public boolean isValidemail(String email){
         //Verifying if the email is valid
         if(email == null ){
@@ -91,7 +202,7 @@ public class UserBean implements Serializable {
 
     public boolean isPasswordValid(String password, String confirmPassword){
 
-        //Verifying if the password and the confirm password are the same
+        //Verifying if the password and the confirmPassword are the same
         if(!password.equals(confirmPassword)){
             return false;
         }

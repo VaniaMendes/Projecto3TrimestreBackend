@@ -22,6 +22,7 @@ public class UserDao extends AbstractDao<UserEntity> {
     }
 
 
+
     /**
      * Method to find a user by their ID.
      * It uses a named query "User.findUserById" and sets the "id" parameter for the query.

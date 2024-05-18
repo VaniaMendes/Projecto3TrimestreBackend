@@ -1,10 +1,9 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
-import java.time.LocalDateTime;
 
 /**
  * This class represents a user.
@@ -36,9 +35,13 @@ public class User {
 
     @XmlElement
     private String biography;
+    @XmlElement
+    private String photo;
 
     @XmlElement
     private UserType userType;
+    @XmlElement
+    private Lab lab;
 
 
     /**
@@ -211,5 +214,19 @@ public class User {
         this.userType = userType;
     }
 
+    public Lab getLab() {
+        return lab;
+    }
 
+    public void setLab(Lab lab) {
+        this.lab = lab;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 }
