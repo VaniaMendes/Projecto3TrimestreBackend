@@ -151,6 +151,10 @@ public class UserBean implements Serializable {
         if(user.getFirstName() == null || user.getLastName() == null ){
             return false;
         }
+        //Check if the nickname already exists
+        if(nicknameExists(user.getNickname())){
+            return false;
+        }
 
         /*
         //Check if the lab is valid
@@ -201,6 +205,14 @@ public class UserBean implements Serializable {
             session.setEndSession(LocalDateTime.now());
             session.setToken(null);
             sessionDao.update(session);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean nicknameExists(String nickname) {
+        UserEntity user = userDao.findUserByNickname(nickname);
+        if(user != null){
             return true;
         }
         return false;

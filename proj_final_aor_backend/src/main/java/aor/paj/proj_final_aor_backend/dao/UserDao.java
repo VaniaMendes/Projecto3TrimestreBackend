@@ -64,6 +64,14 @@ public class UserDao extends AbstractDao<UserEntity> {
         }
     }
 
+    public UserEntity findUserByNickname(String nickname){
+        try{
+            return (UserEntity) em.createNamedQuery("User.findUserByNickname").setParameter("nickname", nickname).getSingleResult();
+        }catch(NoResultException e){
+            return null;
+        }
+    }
+
     /**
      * Method to find a user by their username.
      * It uses a named query "User.findUserByUsername" and sets the "username" parameter for the query.

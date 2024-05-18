@@ -64,6 +64,7 @@ public class UserService {
                 logger.info("IP Address: " + request.getRemoteAddr() + " - User confirmed: " + user.getEmail() + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.OK).entity("User confirmed").build();
             } else {
+                logger.warn("IP Address: " + request.getRemoteAddr() + " - Failed to confirm user: " + user.getEmail() + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
             }
         } catch (Exception e) {
