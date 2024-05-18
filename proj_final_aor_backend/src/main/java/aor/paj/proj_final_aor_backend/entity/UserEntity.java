@@ -85,7 +85,7 @@ public class UserEntity implements Serializable {
     /**
      * Nickname of the user.
      */
-    @Column(name = "nickname")
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
 
