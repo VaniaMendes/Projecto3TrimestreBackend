@@ -199,6 +199,40 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    public boolean recoveryPassword(String email){
+        UserEntity user = userDao.findUserByEmail(email);
+        if(user != null && user.isActiveState()){
+            String resetPassToken = UUID.randomUUID().toString();
+            AuthenticationEntity authenticationEntity = authenticationDao.findAuthenticationByUser(user);
+            authenticationEntity.setResetPassToken(resetPassToken);
+            authenticationDao.update(authenticationEntity);
+            sendConfirmationEmailToRecoveryPassword("proj_final_aor@outlook.com", resetPassToken);
+            return true;
+        }
+        return false;
+    }
+
+    public void sendConfirmationEmailToRecoveryPassword(String to, String resetPassToken){
+        //Sending the confirmation email
+        String subject = "Password Recovery ";
+
+        // Construct the email body
+        StringBuilder body = new StringBuilder();
+        body.append("Welcome to Innovation Lab Management!\n");
+        body.append("\n");
+        body.append("Dear User,\n");
+        body.append("You requested to recover your password. Please click the link below to recover your password:\n");
+        body.append("http://localhost:3000/recoverypassword?token=" + resetPassToken + "\n");
+        body.append("If you did not request to recover your password, please ignore this email.\n");
+        body.append("\n");
+        body.append("Best regards,\n");
+        body.append("Critical Software\n");
+
+        //Send the email
+        emailService.sendEmail(to, subject, body.toString());
+        logger.info("Sending confirmation email to " + to + " with token " + resetPassToken);
+    }
+
     public boolean logoutUser(String token) {
         SessionEntity session = sessionDao.findSessionByToken(token);
         if (session != null) {

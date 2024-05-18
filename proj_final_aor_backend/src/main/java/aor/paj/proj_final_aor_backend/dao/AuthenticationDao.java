@@ -35,6 +35,17 @@ public class AuthenticationDao extends AbstractDao<AuthenticationEntity> {
         }
     }
 
+    public AuthenticationEntity findAuthenticationByUser(UserEntity user) {
+        try {
+            AuthenticationEntity authentication = (AuthenticationEntity) em.createNamedQuery("Authentication.findByUser")
+                    .setParameter("user", user)
+                    .getSingleResult();
+            return authentication;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
    public void create(AuthenticationEntity authenticationEntity) {

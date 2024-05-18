@@ -134,5 +134,27 @@ public class UserService {
 
     }
 
+    @POST
+    @Path("/recovery-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response recoveryPassword(@QueryParam("email") String email, @Context HttpServletRequest request) {
+
+        try {
+            boolean isRecovered = userBean.recoveryPassword(email);
+
+            if (isRecovered) {
+                logger.info("IP Address: " + request.getRemoteAddr() + " - User request a recovered password for the email: " + email + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.OK).entity("User recovered password").build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to recover password: " + email + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to recover password").build();
+        }
+
+    }
 
 }
