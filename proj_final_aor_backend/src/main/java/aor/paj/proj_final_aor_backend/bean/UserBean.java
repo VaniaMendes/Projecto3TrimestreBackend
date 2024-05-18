@@ -6,9 +6,10 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
+import aor.paj.proj_final_aor_backend.entity.SessionEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
-import aor.paj.proj_final_aor_backend.util.EmailService;
+import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -34,7 +36,7 @@ public class UserBean implements Serializable {
     @EJB
     SessionDao sessionDao;
     @EJB
-    EmailService emailService;
+    EmailServiceHelper emailService;
     @EJB
     AuthenticationDao authenticationDao;
     @EJB
@@ -58,6 +60,20 @@ public class UserBean implements Serializable {
     }
         return u;
     }
+
+    public User getUserByEmail(String email) {
+        User u = null;
+        if (email != null){
+                UserEntity userEntity = userDao.findUserByEmail(email);
+
+                if(userEntity != null) {
+                    u = convertUserEntityToDto(userEntity);
+                }
+
+        }
+        return u;
+    }
+
 
     public boolean registerUser( String email, String password, String confirmPassword) {
 
@@ -109,6 +125,25 @@ public class UserBean implements Serializable {
 
         sendConfirmationEmail("proj_final_aor@outlook.com", tokenConfirmation);
        return true;
+    }
+
+    public String loginUser(String email, String password) {
+        UserEntity user = userDao.findUserByEmail(email);
+        if (user != null && user.isActiveState()) {
+
+            //Library oh Crypt to check if the password is correct
+            //If the password is correct returns true
+            if (BCrypt.checkpw(password, user.getPassword())) {
+                String token = UUID.randomUUID().toString();
+                SessionEntity session = new SessionEntity();
+                session.setUser(user);
+                session.setToken(token);
+                session.setInitSession(LocalDateTime.now());
+                sessionDao.create(session);
+                return token;
+            }
+        }
+        return null;
     }
 
     public boolean confirmUser(User user, String token) {

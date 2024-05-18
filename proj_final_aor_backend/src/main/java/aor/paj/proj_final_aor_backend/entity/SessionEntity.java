@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="sessions")
 @NamedQuery(name = "Session.findUserIDbyToken", query = "SELECT s FROM SessionEntity s WHERE s.token = :token")
+@NamedQuery(name = "Session.findSessionByUserId", query = "SELECT s FROM SessionEntity s WHERE s.user.id = :userId")
 public class SessionEntity implements Serializable {
 
     /**
@@ -133,4 +134,6 @@ public class SessionEntity implements Serializable {
     public void setToken(String token) {
         this.token = token;
     }
+
+
 }

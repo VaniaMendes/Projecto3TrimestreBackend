@@ -2,9 +2,11 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Lab;
+import aor.paj.proj_final_aor_backend.dto.Login;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserRegistration;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -67,6 +69,34 @@ public class UserService {
         } catch (Exception e) {
             logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to confirm user: " + user.getEmail() + " at " + LocalDateTime.now()+ " - " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to confirm user").build();
+        }
+    }
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response loginUser(Login user, @Context HttpServletRequest request) {
+
+        try {
+           User userlogged = userBean.getUserByEmail(user.getEmail());
+           if(userlogged == null){
+               logger.warn("IP Adress " + request.getRemoteAddr() + " - User not found: " + user.getEmail() + " at " + LocalDateTime.now());
+               return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+
+           }
+
+           String token = userBean.loginUser(user.getEmail(), user.getPassword());
+           if(token == null){
+               logger.warn("IP Adress " + request.getRemoteAddr() + " - User failed to login: " + user.getEmail() + " at " + LocalDateTime.now());
+               return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+           }
+           logger.info("IP Address: " + request.getRemoteAddr() + " - User logged in with successfully: " + user.getEmail() + " at " + LocalDateTime.now());
+              return Response.status(Response.Status.OK).entity(token).build();
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to login user: " + user.getEmail() + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to login user").build();
         }
     }
 
