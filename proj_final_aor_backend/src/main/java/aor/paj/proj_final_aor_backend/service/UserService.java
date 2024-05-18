@@ -98,6 +98,39 @@ public class UserService {
             logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to login user: " + user.getEmail() + " at " + LocalDateTime.now() + " - " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to login user").build();
         }
+
+    }
+
+    @POST
+    @Path("/logout")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response logoutUser(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+
+        try {
+
+            User user = userBean.getUSerByToken(token);
+
+            if (user == null) {
+
+                logger.warn("IP Address: " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+                boolean isLoggedOut = userBean.logoutUser(token);
+
+                if (isLoggedOut) {
+                    logger.info("IP Address: " + request.getRemoteAddr() + " - User logged out: " + token + " at " + LocalDateTime.now());
+                    return Response.status(Response.Status.OK).entity("User logged out").build();
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+                }
+
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to logout user: " + token + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to logout user").build();
+        }
+
     }
 
 

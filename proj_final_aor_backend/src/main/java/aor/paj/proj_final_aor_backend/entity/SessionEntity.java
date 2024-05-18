@@ -10,8 +10,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name="sessions")
-@NamedQuery(name = "Session.findUserIDbyToken", query = "SELECT s FROM SessionEntity s WHERE s.token = :token")
+@NamedQuery(name = "Session.findUserIDbyToken", query = "SELECT s.user.id FROM SessionEntity s WHERE s.token = :token")
 @NamedQuery(name = "Session.findSessionByUserId", query = "SELECT s FROM SessionEntity s WHERE s.user.id = :userId")
+@NamedQuery(name = "Session.findSessionByToken", query = "SELECT s FROM SessionEntity s WHERE s.token = :token")
 public class SessionEntity implements Serializable {
 
     /**

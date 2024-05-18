@@ -52,7 +52,6 @@ public class UserBean implements Serializable {
             long id = sessionDao.findUserIDbyToken(token);
             if(id != -1) {
                 UserEntity userEntity = userDao.findUserById(id);
-
                 if(userEntity != null) {
                     u = convertUserEntityToDto(userEntity);
                 }
@@ -196,6 +195,16 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    public boolean logoutUser(String token) {
+        SessionEntity session = sessionDao.findSessionByToken(token);
+        if (session != null) {
+            session.setEndSession(LocalDateTime.now());
+            session.setToken(null);
+            sessionDao.update(session);
+            return true;
+        }
+        return false;
+    }
 
     public void sendConfirmationEmail(String to, String token){
         //Sending the confirmation email

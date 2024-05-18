@@ -28,6 +28,14 @@ public class SessionDao extends AbstractDao<SessionEntity> {
         }
     }
 
+    public SessionEntity findSessionByToken(String token) {
+        try {
+            return (SessionEntity) em.createNamedQuery("Session.findSessionByToken").setParameter("token", token).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void update(SessionEntity session) {
         em.merge(session);
     }
