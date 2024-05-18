@@ -51,15 +51,15 @@ public class ProjectEntity implements Serializable {
 
     // Date and time when the project was created
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
     // Initial date of the project
-    @Column(name = "initial_date", nullable = false)
+    @Column(name = "initial_date", nullable = true)
     private LocalDateTime initialDate;
 
     // Deadline of the project
-    @Column(name = "deadline", nullable = false)
+    @Column(name = "deadline", nullable = true)
     private LocalDateTime deadline;
 
     // Conclusion date of the project
