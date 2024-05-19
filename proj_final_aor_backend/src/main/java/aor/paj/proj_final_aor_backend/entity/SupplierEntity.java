@@ -91,4 +91,17 @@ public class SupplierEntity implements Serializable {
     public void setContact(String contact) {
         this.contact = contact;
     }
+
+    public Set<ResourceEntity> getResources() {
+        return resources;
+    }
+
+    public void setResources(Set<ResourceEntity> resources) {
+        this.resources = resources;
+    }
+
+    public void addResource(ResourceEntity resourceEntity) {
+        this.resources.add(resourceEntity);
+        resourceEntity.getSuppliers().add(this);
+    }
 }

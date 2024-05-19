@@ -1,9 +1,12 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a Resource in the system.
@@ -13,7 +16,7 @@ import java.time.LocalDateTime;
 public class Resource {
     // Unique identifier for the resource
     @XmlElement
-    private int id;
+    private long id;
 
     // Name of the resource
     @XmlElement
@@ -25,13 +28,7 @@ public class Resource {
 
     // Type of the resource
     @XmlElement
-    private int type;
-
-    // Constants representing different types of resources
-    @XmlElement
-    public static final int MATERIAL = 10;
-    @XmlElement
-    public static final int DIGITAL = 20;
+    private ResourceType type;
 
     // Brand of the resource
     @XmlElement
@@ -57,13 +54,9 @@ public class Resource {
     @XmlElement
     private String sourceId;
 
-    // Name of the supplier of the resource
+    // Suppliers of the resource
     @XmlElement
-    private String supplierName;
-
-    // Contact of the supplier of the resource
-    @XmlElement
-    private String supplierContact;
+    private List<Supplier> suppliers;
 
     // Quantity of the resource
     @XmlElement
@@ -77,19 +70,24 @@ public class Resource {
 
     // Getter and setter methods for all the properties
 
+
     /**
-     * Getter for the unique identifier of the resource.
+     * This method is used to get the unique identifier of the resource.
+     * It returns a long value representing the ID of the resource.
+     *
      * @return id of the resource.
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 
     /**
-     * Setter for the unique identifier of the resource.
-     * @param id the new id of the resource.
+     * This method is used to set the unique identifier of the resource.
+     * It takes a long value as a parameter and assigns it to the id variable.
+     *
+     * @param id The new id for the resource.
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -126,18 +124,22 @@ public class Resource {
     }
 
     /**
-     * Getter for the type of the resource.
+     * This method is used to get the type of the resource.
+     * It returns a ResourceType value representing the type of the resource.
+     *
      * @return type of the resource.
      */
-    public int getType() {
+    public ResourceType getType() {
         return type;
     }
 
     /**
-     * Setter for the type of the resource.
-     * @param type the new type of the resource.
+     * This method is used to set the type of the resource.
+     * It takes a ResourceType value as a parameter and assigns it to the type variable.
+     *
+     * @param type The new type for the resource.
      */
-    public void setType(int type) {
+    public void setType(ResourceType type) {
         this.type = type;
     }
 
@@ -241,36 +243,19 @@ public class Resource {
         this.sourceId = sourceId;
     }
 
-    /**
-     * Getter for the name of the supplier of the resource.
-     * @return name of the supplier of the resource.
-     */
-    public String getSupplierName() {
-        return supplierName;
+    public List<Supplier> getSuppliers() {
+        return suppliers;
     }
 
-    /**
-     * Setter for the name of the supplier of the resource.
-     * @param supplierName the new name of the supplier of the resource.
-     */
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public void setSuppliers(List<Supplier> suppliers) {
+        this.suppliers = suppliers;
     }
 
-    /**
-     * Getter for the contact of the supplier of the resource.
-     * @return contact of the supplier of the resource.
-     */
-    public String getSupplierContact() {
-        return supplierContact;
-    }
-
-    /**
-     * Setter for the contact of the supplier of the resource.
-     * @param supplierContact the new contact of the supplier of the resource.
-     */
-    public void setSupplierContact(String supplierContact) {
-        this.supplierContact = supplierContact;
+    public void addSupplier(Supplier supplier) {
+        if (this.suppliers == null) {
+            this.suppliers = new ArrayList<>();
+        }
+        this.suppliers.add(supplier);
     }
 
     /**

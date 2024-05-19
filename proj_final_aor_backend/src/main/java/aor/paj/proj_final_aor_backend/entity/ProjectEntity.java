@@ -93,7 +93,7 @@ public class ProjectEntity implements Serializable {
 
     // Set of resources associated with the project
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<ProjectResource> resources = new HashSet<>();
+    private Set<ProjectResourceEntity> resources = new HashSet<>();
 
     // Set of tasks associated with the user
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -318,7 +318,7 @@ public class ProjectEntity implements Serializable {
      * Getter for the resources associated with the project.
      * @return resources associated with the project.
      */
-    public Set<ProjectResource> getResources() {
+    public Set<ProjectResourceEntity> getResources() {
         return resources;
     }
 
@@ -326,7 +326,7 @@ public class ProjectEntity implements Serializable {
      * Setter for the resources associated with the project.
      * @param resources the new resources associated with the project.
      */
-    public void setResources(Set<ProjectResource> resources) {
+    public void setResources(Set<ProjectResourceEntity> resources) {
         this.resources = resources;
     }
 
