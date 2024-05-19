@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "project_resource")
 @IdClass(ProjectResourceId.class)
-public class ProjectResource  {
+public class ProjectResourceEntity {
 
     // Project associated with the resource
     @Id
@@ -30,7 +30,7 @@ public class ProjectResource  {
     /**
      * Default constructor for the ProjectResource class.
      */
-    public ProjectResource() {
+    public ProjectResourceEntity() {
     }
 
     /**

@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.entity;
 
+import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -53,14 +54,15 @@ public class ResourceEntity implements Serializable {
     /**
      * The description of the resource.
      */
-    @Column(name = "description", nullable = true, unique = false, updatable = true)
+    @Column(name = "description", nullable = false)
     private String description;
 
     /**
      * The type of the resource.
      */
-    @Column(name = "type", nullable = false, unique = false, updatable = false)
-    private int type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, updatable = false)
+    private ResourceType type;
 
     /**
      * The brand of the resource. It is a many-to-one relationship with the BrandEntity.
@@ -100,12 +102,6 @@ public class ResourceEntity implements Serializable {
     private String sourceId;
 
     /**
-     * The quantity of the resource.
-     */
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
-
-    /**
      * The suppliers of the resource. It is a many-to-many relationship with the SupplierEntity.
      */
     @ManyToMany
@@ -119,7 +115,7 @@ public class ResourceEntity implements Serializable {
      * The projects that use the resource. It is a one-to-many relationship with the ProjectResource.
      */
     @OneToMany(mappedBy = "resource")
-    private Set<ProjectResource> projects = new HashSet<>();
+    private Set<ProjectResourceEntity> projects = new HashSet<>();
 
     /**
      * Default constructor.
@@ -179,7 +175,7 @@ public class ResourceEntity implements Serializable {
      * Returns the type of the resource.
      * @return type of the resource
      */
-    public int getType() {
+    public ResourceType getType() {
         return type;
     }
 
@@ -187,7 +183,7 @@ public class ResourceEntity implements Serializable {
      * Sets the type of the resource.
      * @param type the new type of the resource
      */
-    public void setType(int type) {
+    public void setType(ResourceType type) {
         this.type = type;
     }
 
@@ -271,21 +267,6 @@ public class ResourceEntity implements Serializable {
         this.sourceId = sourceId;
     }
 
-    /**
-     * Returns the quantity of the resource.
-     * @return quantity of the resource
-     */
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    /**
-     * Sets the quantity of the resource.
-     * @param quantity the new quantity of the resource
-     */
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
     /**
      * Returns the suppliers of the resource.
@@ -303,6 +284,12 @@ public class ResourceEntity implements Serializable {
         this.suppliers = suppliers;
     }
 
+    public void addSupplier(SupplierEntity supplierEntity) {
+        this.suppliers.add(supplierEntity);
+        supplierEntity.getResources().add(this);
+    }
+
+
     /**
      * Returns the projects that use the resource.
      * This is a getter method for retrieving the projects associated with the resource.
@@ -310,7 +297,7 @@ public class ResourceEntity implements Serializable {
      *
      * @return a Set of ProjectResource objects that are associated with the resource
      */
-    public Set<ProjectResource> getProjects() {
+    public Set<ProjectResourceEntity> getProjects() {
         return projects;
     }
 
@@ -321,7 +308,7 @@ public class ResourceEntity implements Serializable {
      *
      * @param projects a Set of ProjectResource objects to be associated with the resource
      */
-    public void setProjects(Set<ProjectResource> projects) {
+    public void setProjects(Set<ProjectResourceEntity> projects) {
         this.projects = projects;
     }
 

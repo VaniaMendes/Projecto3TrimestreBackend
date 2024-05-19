@@ -15,10 +15,10 @@ import java.util.List;
 @Stateless
 public class SupplierBean implements Serializable {
 
+    private static final Logger logger = LogManager.getLogger(SupplierBean.class);
+
     @EJB
     private SupplierDao supplierDao;
-
-    private static final Logger logger = LogManager.getLogger(SupplierBean.class);
 
     public SupplierBean() {
     }
@@ -80,6 +80,14 @@ public class SupplierBean implements Serializable {
         return false;
     }
 
+    public boolean exists(String name) {
+        return supplierDao.findSupplierByName(name) != null;
+    }
+
+    public SupplierEntity findSupplierByName(String name) {
+        return supplierDao.findSupplierByName(name);
+    }
+
     /**
      * Retrieves all suppliers from the database.
      * <p>
@@ -93,7 +101,7 @@ public class SupplierBean implements Serializable {
         List<SupplierEntity> supplierEntities = supplierDao.findAllSuppliers();
         List<Supplier> suppliers = new ArrayList<>();
         for (SupplierEntity supplierEntity : supplierEntities) {
-            suppliers.add(convertToDto(supplierEntity));
+            suppliers.add(convertToDTO(supplierEntity));
         }
         return suppliers;
     }
@@ -160,7 +168,7 @@ public class SupplierBean implements Serializable {
      * @param supplierEntity The supplier entity to be converted.
      * @return The newly created {@link Supplier} DTO with values from the entity.
      */
-    public Supplier convertToDto(SupplierEntity supplierEntity) {
+    public Supplier convertToDTO(SupplierEntity supplierEntity) {
         Supplier supplier = new Supplier();
         supplier.setId(supplierEntity.getId());
         supplier.setName(supplierEntity.getName());
