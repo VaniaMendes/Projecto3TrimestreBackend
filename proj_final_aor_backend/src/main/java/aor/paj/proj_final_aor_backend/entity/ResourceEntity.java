@@ -24,7 +24,7 @@ import java.util.Set;
 @NamedQuery(name = "Resource.findResourcesByType", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type")
 @NamedQuery(name = "Resource.findResourcesByBrand", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand")
 @NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE s.name = :supplierName")
-@NamedQuery(name = "Resource.findResourceBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
+@NamedQuery(name = "Resource.findResourcesBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
 
 //Combinations
 @NamedQuery(name = "Resource.findResourcesByTypeAndBrand", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand")

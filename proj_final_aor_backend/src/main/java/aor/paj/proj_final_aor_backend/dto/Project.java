@@ -38,7 +38,7 @@ public class Project {
 
     // Final date of the project
     @XmlElement
-    private LocalDateTime finalDate;
+    private LocalDateTime deadline;
 
     // Date and time when the project was concluded
     @XmlElement
@@ -64,7 +64,7 @@ public class Project {
 
     // Current state of the project
     @XmlElement
-    private String state;
+    private int stateId;
 
     // Constants representing different states of the project
     @XmlElement
@@ -90,7 +90,7 @@ public class Project {
      * Getter for the unique identifier of the project.
      * @return id of the project.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -98,7 +98,7 @@ public class Project {
      * Setter for the unique identifier of the project.
      * @param id the new id of the project.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -186,16 +186,16 @@ public class Project {
      * Getter for the final date of the project.
      * @return final date of the project.
      */
-    public LocalDateTime getFinalDate() {
-        return finalDate;
+    public LocalDateTime getDeadline() {
+        return deadline;
     }
 
     /**
      * Setter for the final date of the project.
-     * @param finalDate the new final date of the project.
+     * @param deadline the new final date of the project.
      */
-    public void setFinalDate(LocalDateTime finalDate) {
-        this.finalDate = finalDate;
+    public void setDeadline(LocalDateTime deadline) {
+        this.deadline = deadline;
     }
 
     /**
@@ -266,16 +266,16 @@ public class Project {
      * Getter for the current state of the project.
      * @return current state of the project.
      */
-    public String getState() {
-        return state;
+    public int getStateId() {
+        return stateId;
     }
 
     /**
      * Setter for the current state of the project.
-     * @param state the new current state of the project.
+     * @param stateId the new current state of the project.
      */
-    public void setState(String state) {
-        this.state = state;
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
     }
 
     /**

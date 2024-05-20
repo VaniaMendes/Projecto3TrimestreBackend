@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.dao;
 
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
+import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 
@@ -81,7 +82,7 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * @param type the type of the resources.
      * @return a list of resources with the given type, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByType(int type) {
+    public List<ResourceEntity> findResourcesByType(ResourceType type) {
         try {
             return em.createNamedQuery("Resource.findResourcesByType", ResourceEntity.class).setParameter("type", type)
                     .getResultList();
@@ -123,13 +124,12 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * @param sourceId the source ID of the resource.
      * @return the resource with the given source ID, or null if no such resource is found.
      */
-    public ResourceEntity findResourcesBySourceId(String sourceId) {
+    public List<ResourceEntity> findResourcesBySourceId(String sourceId) {
         try {
-            return (ResourceEntity) em.createNamedQuery("Resource.findResourceBySourceId").setParameter("sourceId", sourceId)
-                    .getSingleResult();
-
+            return em.createNamedQuery("Resource.findResourcesBySourceId", ResourceEntity.class).setParameter("sourceId", sourceId)
+                    .getResultList();
         } catch (NoResultException e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -139,7 +139,7 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * @param brand the brand of the resources.
      * @return a list of resources with the given type and brand, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByTypeAndBrand(int type, String brand) {
+    public List<ResourceEntity> findResourcesByTypeAndBrand(ResourceType type, String brand) {
         try {
             return em.createNamedQuery("Resource.findResourcesByTypeAndBrand", ResourceEntity.class).setParameter("type", type)
                     .setParameter("brand", brand).getResultList();
@@ -154,7 +154,7 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * @param supplierName the name of the supplier.
      * @return a list of resources with the given type and supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByTypeAndSupplier(int type, String supplierName) {
+    public List<ResourceEntity> findResourcesByTypeAndSupplier(ResourceType type, String supplierName) {
         try {
             return em.createNamedQuery("Resource.findResourcesByTypeAndSupplier", ResourceEntity.class).setParameter("type", type)
                     .setParameter("supplierName", supplierName).getResultList();
@@ -185,7 +185,7 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * @param supplierName the name of the supplier.
      * @return a list of resources with the given type, brand, and supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByTypeAndBrandAndSupplier(int type, String brand, String supplierName) {
+    public List<ResourceEntity> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, String supplierName) {
         try {
             return em.createNamedQuery("Resource.findResourcesByTypeAndBrandAndSupplier", ResourceEntity.class).setParameter("type", type)
                     .setParameter("brand", brand).setParameter("supplierName", supplierName).getResultList();
