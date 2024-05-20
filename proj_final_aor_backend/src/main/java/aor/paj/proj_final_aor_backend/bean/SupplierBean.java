@@ -80,10 +80,30 @@ public class SupplierBean implements Serializable {
         return false;
     }
 
+    /**
+     * Checks if a supplier with the given name exists in the database.
+     *
+     * This method uses the {@code findSupplierByName} method of the {@code supplierDao} to retrieve a supplier entity
+     * with the given name from the database. If a supplier entity with the given name is found, the method returns true.
+     * If no such supplier entity is found, the method returns false.
+     *
+     * @param name The name of the supplier to check.
+     * @return true if a supplier with the given name exists in the database, false otherwise.
+     */
     public boolean exists(String name) {
         return supplierDao.findSupplierByName(name) != null;
     }
 
+    /**
+     * Retrieves a supplier from the database by its name.
+     *
+     * This method uses the {@code findSupplierByName} method of the {@code supplierDao} to retrieve a supplier entity
+     * with the given name from the database. If a supplier entity with the given name is found, the method returns the entity.
+     * If no such supplier entity is found, the method returns null.
+     *
+     * @param name The name of the supplier to retrieve.
+     * @return The SupplierEntity with the given name, or null if no such supplier exists.
+     */
     public SupplierEntity findSupplierByName(String name) {
         return supplierDao.findSupplierByName(name);
     }
