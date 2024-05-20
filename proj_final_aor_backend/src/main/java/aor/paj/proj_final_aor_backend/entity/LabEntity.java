@@ -24,7 +24,7 @@ public class LabEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private Integer id;
 
     // Name of the lab
     @Enumerated(EnumType.STRING)
@@ -49,7 +49,7 @@ public class LabEntity implements Serializable {
      * Getter for the unique identifier of the lab.
      * @return id of the lab.
      */
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -57,7 +57,7 @@ public class LabEntity implements Serializable {
      * Setter for the unique identifier of the lab.
      * @param id the new id of the lab.
      */
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

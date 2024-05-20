@@ -8,13 +8,11 @@ import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -338,7 +336,7 @@ public class ResourceBean implements Serializable {
      * @param resource The Resource object to be converted.
      * @return The newly created ResourceEntity object.
      */
-    public ResourceEntity convertToEntity(Resource resource) {
+    private ResourceEntity convertToEntity(Resource resource) {
         ResourceEntity resourceEntity = new ResourceEntity();
         resourceEntity.setName(resource.getName());
         resourceEntity.setDescription(resource.getDescription());
@@ -366,7 +364,7 @@ public class ResourceBean implements Serializable {
      * @param resourceEntity The ResourceEntity object to be converted.
      * @return The newly created Resource object.
      */
-    public Resource convertToDTO(ResourceEntity resourceEntity) {
+    private Resource convertToDTO(ResourceEntity resourceEntity) {
         Resource resource = new Resource();
         resource.setId(resourceEntity.getId());
         resource.setName(resourceEntity.getName());

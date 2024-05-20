@@ -54,12 +54,16 @@ public class ProjectEntity implements Serializable {
     @Column(name = "created_at", nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
+    // Date and time when the project was last updated
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     // Initial date of the project
-    @Column(name = "initial_date", nullable = true)
+    @Column(name = "initial_date")
     private LocalDateTime initialDate;
 
     // Deadline of the project
-    @Column(name = "deadline", nullable = true)
+    @Column(name = "deadline")
     private LocalDateTime deadline;
 
     // Conclusion date of the project
@@ -392,5 +396,13 @@ public class ProjectEntity implements Serializable {
      */
     public void setSkills(Set<SkillEntity> skills) {
         this.skills = skills;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
