@@ -111,12 +111,8 @@ public class UserEntity implements Serializable {
     /**
      * Skills of the user.
      */
-    @ManyToMany
-    @JoinTable(
-            name = "user_skill",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private Set<SkillEntity> skills;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserSkillEntity> skills = new HashSet<>();
 
     /**
      * Notifications of the user.
@@ -337,21 +333,7 @@ public class UserEntity implements Serializable {
         this.interests = interests;
     }
 
-    /**
-     * Getter for the skills.
-     * @return skills of the user.
-     */
-    public Set<SkillEntity> getSkills() {
-        return skills;
-    }
 
-    /**
-     * Setter for the skills.
-     * @param skills new skills of the user.
-     */
-    public void setSkills(Set<SkillEntity> skills) {
-        this.skills = skills;
-    }
 
     /**
      * Getter for the messages sent.

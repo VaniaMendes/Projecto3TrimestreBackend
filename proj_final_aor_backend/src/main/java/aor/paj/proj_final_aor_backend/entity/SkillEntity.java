@@ -39,6 +39,11 @@ public class SkillEntity implements Serializable {
     @ManyToMany(mappedBy = "skills")
     private Set<ProjectEntity> projects = new HashSet<>();
 
+    // Set of users associated with the skill
+    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserSkillEntity> users = new HashSet<>();
+
+
     /**
      * Default constructor of the SkillEntity class.
      */

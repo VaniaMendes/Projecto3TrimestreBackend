@@ -59,7 +59,6 @@ public class UserService {
 
         try {
             boolean isConfirmed = userBean.confirmUser(user, tokenConfirmation);
-            System.out.println(isConfirmed);
 
             if (isConfirmed) {
                 logger.info("IP Address: " + request.getRemoteAddr() + " - User confirmed: " + user.getEmail() + " at " + LocalDateTime.now());
@@ -179,6 +178,39 @@ public class UserService {
         } catch (Exception e) {
             logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to change password: " + resetPassToken + " at " + LocalDateTime.now() + " - " + e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to change password").build();
+        }
+
+    }
+
+    @PATCH
+    @Path("/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response updateUser(@HeaderParam("token") String token, @PathParam("userId") int userId, User user, @Context HttpServletRequest request) {
+
+        try {
+            //Authentication and authorization
+            User userlogged = userBean.getUSerByToken(token);
+            if(userlogged == null || userlogged.getId() != userId){
+                logger.warn("IP Adress " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+
+            }
+
+            //Validation of the user and update
+            boolean isUpdated = userBean.updateUser(user, userId);
+            System.out.println(isUpdated);
+            if(isUpdated){
+                logger.info("IP Address: " + request.getRemoteAddr() + " - User updated with successfully: " + user.getEmail() + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.OK).entity("User updated").build();
+            }else{
+                logger.warn("IP Adress " + request.getRemoteAddr() + " - User failed to update: " + user.getEmail() + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to update user: " + user.getEmail() + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to update user").build();
         }
 
     }
