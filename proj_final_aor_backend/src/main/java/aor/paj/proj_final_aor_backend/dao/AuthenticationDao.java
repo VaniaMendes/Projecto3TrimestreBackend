@@ -35,6 +35,38 @@ public class AuthenticationDao extends AbstractDao<AuthenticationEntity> {
         }
     }
 
+    public AuthenticationEntity findAuthenticationLineByrestPassToken(String resetPassToken) {
+        try {
+            AuthenticationEntity authentication = (AuthenticationEntity) em.createNamedQuery("Authentication.findByresetPassToken")
+                    .setParameter("resetPassToken", resetPassToken)
+                    .getSingleResult();
+            return authentication;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public UserEntity findUserByresetPassToken(String resetPassToken) {
+        try {
+            UserEntity user = (UserEntity) em.createNamedQuery("Authentication.findUserByresetPassToken")
+                    .setParameter("resetPassToken", resetPassToken)
+                    .getSingleResult();
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public AuthenticationEntity findAuthenticationByUser(UserEntity user) {
+        try {
+            AuthenticationEntity authentication = (AuthenticationEntity) em.createNamedQuery("Authentication.findByUser")
+                    .setParameter("user", user)
+                    .getSingleResult();
+            return authentication;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 
    public void create(AuthenticationEntity authenticationEntity) {

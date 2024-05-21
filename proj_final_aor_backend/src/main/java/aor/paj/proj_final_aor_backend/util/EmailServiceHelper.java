@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.Properties;
 
 @Stateless
-public class EmailService {
-    private static final Logger logger = LogManager.getLogger(EmailService.class);
+public class EmailServiceHelper {
+    private static final Logger logger = LogManager.getLogger(EmailServiceHelper.class);
 
     private final String email = "proj_final_aor@outlook.com";
     private final String password = "Password1234%";
@@ -23,7 +23,7 @@ public class EmailService {
     private Session session;
 
 
-    public EmailService(){
+    public EmailServiceHelper(){
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -45,7 +45,7 @@ public class EmailService {
             message.setFrom(new InternetAddress(email));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html");
 
             Transport.send(message);
 

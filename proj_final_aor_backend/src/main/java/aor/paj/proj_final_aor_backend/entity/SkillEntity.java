@@ -20,6 +20,7 @@ public class SkillEntity implements Serializable {
      */
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
@@ -38,6 +39,11 @@ public class SkillEntity implements Serializable {
     // Set of projects associated with the skill
     @ManyToMany(mappedBy = "skills")
     private Set<ProjectEntity> projects = new HashSet<>();
+
+    // Set of users associated with the skill
+    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserSkillEntity> usersSkills = new HashSet<>();
+
 
     /**
      * Default constructor of the SkillEntity class.

@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -10,6 +11,9 @@ import java.time.LocalDateTime;
 //Querys to table authentication
 @NamedQuery(name= "Authentication.findUserByToken", query = "SELECT a.user FROM AuthenticationEntity a WHERE a.authenticationToken = :authenticationToken")
 @NamedQuery(name= "Authentication.findByToken", query = "SELECT a FROM AuthenticationEntity a WHERE a.authenticationToken = :authenticationToken")
+@NamedQuery(name= "Authentication.findByUser", query = "SELECT a FROM AuthenticationEntity a WHERE a.user = :user")
+@NamedQuery(name= "Authentication.findByresetPassToken", query = "SELECT a FROM AuthenticationEntity a WHERE a.resetPassToken = :resetPassToken")
+@NamedQuery(name= "Authentication.findUserByresetPassToken", query = "SELECT a.user FROM AuthenticationEntity a WHERE a.resetPassToken = :resetPassToken")
 public class AuthenticationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
