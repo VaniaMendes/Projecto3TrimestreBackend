@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectDao;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -26,6 +27,63 @@ public class ProjectBean implements Serializable {
 
     public ProjectBean(ProjectDao projectDao) {
         this.projectDao = projectDao;
+    }
+
+    public ProjectEntity createProject(Project project) {
+        if (isInvalidProject(project)) {
+            return null;
+        }
+
+        project.setStateId(100);
+
+        ProjectEntity projectEntity = convertToEntity(project);
+
+        // Fetch the existing LabEntity
+        LabEntity labEntity = labBean.findLabByName(String.valueOf(project.getLab().getName()));
+        if (labEntity == null) {
+            logger.error("Lab does not exist: " + project.getLab().getName());
+            return null;
+        }
+
+        // Set the existing LabEntity to the ProjectEntity
+        projectEntity.setLab(labEntity);
+
+        projectDao.persist(projectEntity);
+        return projectEntity;
+    }
+
+    private boolean isInvalidProject(Project project) {
+        if (project == null) {
+            logger.error("Project is null.");
+            return true;
+        }
+
+        if (project.getName() == null || project.getName().isEmpty()) {
+            logger.error("Project name is null or empty.");
+            return true;
+        }
+
+        if (project.getDescription() == null || project.getDescription().isEmpty()) {
+            logger.error("Project description is null or empty.");
+            return true;
+        }
+
+        if (project.getKeywords() == null || project.getKeywords().isEmpty()) {
+            logger.error("Project keywords are null or empty.");
+            return true;
+        }
+
+        if (project.getMaxMembers() <= 0) {
+            logger.error("Project max members is less than or equal to 0.");
+            return true;
+        }
+
+        if (project.getLab() == null) {
+            logger.error("Project lab is null.");
+            return true;
+        }
+
+        return false;
     }
 
     private ProjectEntity convertToEntity(Project project) {

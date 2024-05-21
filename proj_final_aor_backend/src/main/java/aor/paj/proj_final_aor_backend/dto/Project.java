@@ -266,7 +266,7 @@ public class Project {
      * Getter for the current state of the project.
      * @return current state of the project.
      */
-    public int getStateId() {
+    public Integer getStateId() {
         return stateId;
     }
 
