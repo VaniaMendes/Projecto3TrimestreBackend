@@ -55,11 +55,11 @@ public class UserService {
     @Path("/confirm")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response confirmUser(@QueryParam("tokenConfirmation") String tokenConfirmation, User user,  @Context HttpServletRequest request) {
-
+    public Response confirmUser(@QueryParam("tokenConfirmation") String tokenConfirmation, User user, @Context HttpServletRequest request) {
 
         try {
             boolean isConfirmed = userBean.confirmUser(user, tokenConfirmation);
+            System.out.println(isConfirmed);
 
             if (isConfirmed) {
                 logger.info("IP Address: " + request.getRemoteAddr() + " - User confirmed: " + user.getEmail() + " at " + LocalDateTime.now());

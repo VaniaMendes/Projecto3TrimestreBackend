@@ -4,8 +4,10 @@ import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.SessionEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
@@ -155,15 +157,15 @@ public class UserBean implements Serializable {
             return false;
         }
 
-        /*
+
         //Check if the lab is valid
-        if(lab == null){
+        if(user.getLab() == null){
             return false;
         }
-        LabEntity  labEntity = labDao.findLabById(lab.getId());
+        LabEntity labEntity = labDao.findLabById(user.getLab().getId());
+        System.out.println(labEntity.getName());
 
 
-         */
         //Check if the token is valid
         UserEntity userConfirm = authenticationDao.findUserByAuthenticationToken(token);
 
@@ -174,7 +176,7 @@ public class UserBean implements Serializable {
         userConfirm.setActiveState(true);
         userConfirm.setFirstName(user.getFirstName());
         userConfirm.setLastName(user.getLastName());
-        //userConfirm.setLab(labEntity);
+        userConfirm.setLab(labEntity);
         userConfirm.setVisibilityState(user.isVisibilityState());
 
         if(user.getBiography() != null){
@@ -193,7 +195,6 @@ public class UserBean implements Serializable {
         authentication.setAuthState(true);
         authentication.setAuthenticationToken(null);
         authenticationDao.update(authentication);
-
 
         return true;
     }
