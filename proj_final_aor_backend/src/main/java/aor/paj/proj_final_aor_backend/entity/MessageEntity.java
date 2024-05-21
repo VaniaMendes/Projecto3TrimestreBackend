@@ -67,7 +67,10 @@ public class MessageEntity implements Serializable {
      * Group Receiver of the message
      */
     @ManyToOne
-    @JoinColumn(name="receiver_group_id", nullable = true)
+    @JoinColumns({
+            @JoinColumn(name="receiver_user_id", referencedColumnName="user_id", nullable = true),
+            @JoinColumn(name="receiver_project_id", referencedColumnName="project_id", nullable = true)
+    })
     private UserProjectEntity receiverGroup;
 
 
