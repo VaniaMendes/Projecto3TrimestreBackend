@@ -40,8 +40,9 @@ public class SkillEntity implements Serializable {
     private SkillType type;
 
     // Set of projects associated with the skill
-    @ManyToMany(mappedBy = "skills")
-    private Set<ProjectEntity> projects = new HashSet<>();
+    @OneToMany(mappedBy = "skill")
+    private Set<ProjectSkillEntity> projectSkill = new HashSet<>();
+
 
     // Set of users associated with the skill
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -94,18 +95,46 @@ public class SkillEntity implements Serializable {
         this.type = type;
     }
 
-    public Set<ProjectEntity> getProjects() {
-        return projects;
+    /**
+     * This method is a getter for the projectSkill field.
+     * It returns a Set of ProjectSkillEntity objects that are associated with the skill.
+     * Each ProjectSkillEntity object represents a project that requires this skill.
+     *
+     * @return a Set of ProjectSkillEntity objects that are associated with the skill
+     */
+    public Set<ProjectSkillEntity> getProjectSkill() {
+        return projectSkill;
     }
 
-    public void setProjects(Set<ProjectEntity> projects) {
-        this.projects = projects;
+    /**
+     * This method is a setter for the projectSkill field.
+     * It takes a Set of ProjectSkillEntity objects and assigns it to the projectSkill field.
+     * Each ProjectSkillEntity object in the Set represents a project that requires this skill.
+     *
+     * @param projectSkill a Set of ProjectSkillEntity objects to be associated with the skill
+     */
+    public void setProjectSkill(Set<ProjectSkillEntity> projectSkill) {
+        this.projectSkill = projectSkill;
     }
 
+    /**
+     * This method is a getter for the usersSkills field.
+     * It returns a Set of UserSkillEntity objects that are associated with the skill.
+     * Each UserSkillEntity object represents a user that possesses this skill.
+     *
+     * @return a Set of UserSkillEntity objects that are associated with the skill
+     */
     public Set<UserSkillEntity> getUsersSkills() {
         return usersSkills;
     }
 
+    /**
+     * This method is a setter for the usersSkills field.
+     * It takes a Set of UserSkillEntity objects and assigns it to the usersSkills field.
+     * Each UserSkillEntity object in the Set represents a user that possesses this skill.
+     *
+     * @param usersSkills a Set of UserSkillEntity objects to be associated with the skill
+     */
     public void setUsersSkills(Set<UserSkillEntity> usersSkills) {
         this.usersSkills = usersSkills;
     }

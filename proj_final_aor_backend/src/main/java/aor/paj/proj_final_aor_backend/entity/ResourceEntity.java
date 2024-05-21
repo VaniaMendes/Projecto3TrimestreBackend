@@ -23,14 +23,14 @@ import java.util.Set;
 @NamedQuery(name = "Resource.findResourceByName", query = "SELECT r FROM ResourceEntity r WHERE r.name = :name")
 @NamedQuery(name = "Resource.findResourcesByType", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type")
 @NamedQuery(name = "Resource.findResourcesByBrand", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand")
-@NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.name = :supplierName")
 @NamedQuery(name = "Resource.findResourcesBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
 
 //Combinations
 @NamedQuery(name = "Resource.findResourcesByTypeAndBrand", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand")
-@NamedQuery(name = "Resource.findResourcesByTypeAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.type = :type AND s.name = :supplierName")
-@NamedQuery(name = "Resource.findResourcesByBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.brand = :brand AND s.name = :supplierName")
-@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers s WHERE r.type = :type AND r.brand = :brand AND s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.name = :supplierName")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.name = :supplierName")
 
 
 public class ResourceEntity implements Serializable {
@@ -101,15 +101,9 @@ public class ResourceEntity implements Serializable {
     @Column(name = "source_id", nullable = false)
     private String sourceId;
 
-    /**
-     * The suppliers of the resource. It is a many-to-many relationship with the SupplierEntity.
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "resource_supplier",
-            joinColumns = @JoinColumn(name = "resource_id"),
-            inverseJoinColumns = @JoinColumn(name = "supplier_id"))
-    private Set<SupplierEntity> suppliers = new HashSet<>();
+
+    @OneToMany(mappedBy = "resource")
+    private Set<ResourceSupplierEntity> suppliers = new HashSet<>();
 
     /**
      * The projects that use the resource. It is a one-to-many relationship with the ProjectResource.
@@ -267,28 +261,27 @@ public class ResourceEntity implements Serializable {
         this.sourceId = sourceId;
     }
 
-
     /**
-     * Returns the suppliers of the resource.
-     * @return suppliers of the resource
+     * This method is a getter for the suppliers field.
+     * It returns a Set of ResourceSupplierEntity objects that are associated with the resource.
+     * Each ResourceSupplierEntity object represents a supplier that provides this resource.
+     *
+     * @return a Set of ResourceSupplierEntity objects that are associated with the resource
      */
-    public Set<SupplierEntity> getSuppliers() {
+    public Set<ResourceSupplierEntity> getSuppliers() {
         return suppliers;
     }
 
     /**
-     * Sets the suppliers of the resource.
-     * @param suppliers the new suppliers of the resource
+     * This method is a setter for the suppliers field.
+     * It takes a Set of ResourceSupplierEntity objects and assigns it to the suppliers field.
+     * Each ResourceSupplierEntity object in the Set represents a supplier that provides this resource.
+     *
+     * @param suppliers a Set of ResourceSupplierEntity objects to be associated with the resource
      */
-    public void setSuppliers(Set<SupplierEntity> suppliers) {
+    public void setSuppliers(Set<ResourceSupplierEntity> suppliers) {
         this.suppliers = suppliers;
     }
-
-    public void addSupplier(SupplierEntity supplierEntity) {
-        this.suppliers.add(supplierEntity);
-        supplierEntity.getResources().add(this);
-    }
-
 
     /**
      * Returns the projects that use the resource.
