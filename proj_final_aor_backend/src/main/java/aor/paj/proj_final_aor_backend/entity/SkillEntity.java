@@ -20,6 +20,7 @@ public class SkillEntity implements Serializable {
      */
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
@@ -41,7 +42,7 @@ public class SkillEntity implements Serializable {
 
     // Set of users associated with the skill
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserSkillEntity> users = new HashSet<>();
+    private Set<UserSkillEntity> usersSkills = new HashSet<>();
 
 
     /**
