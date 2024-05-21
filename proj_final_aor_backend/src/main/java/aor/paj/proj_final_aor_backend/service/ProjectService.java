@@ -5,10 +5,7 @@ import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -27,10 +24,10 @@ public class ProjectService {
     private HttpServletRequest request;
 
     @POST
-    @Path("/create")
+    @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createProject(Project project) {
+    public Response registerProject(Project project) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to create project from IP: " + ip);
 
@@ -45,6 +42,17 @@ public class ProjectService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to create project").build();
         }
 
+    }
+
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllProjects() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get all projects from IP: " + ip);
+
+        // Get all projects
+        return Response.status(Response.Status.OK).entity(projectBean.getAllProjectsLatesteToOldest()).build();
     }
 
 }
