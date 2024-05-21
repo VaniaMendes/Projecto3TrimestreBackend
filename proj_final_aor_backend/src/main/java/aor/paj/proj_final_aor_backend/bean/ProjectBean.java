@@ -39,7 +39,9 @@ public class ProjectBean implements Serializable {
         ProjectEntity projectEntity = convertToEntity(project);
 
         // Fetch the existing LabEntity
+        logger.info("Project lab: " + project.getLab().getName());
         LabEntity labEntity = labBean.findLabByName(String.valueOf(project.getLab().getName()));
+        logger.info("LabEntity: " + labEntity);
         if (labEntity == null) {
             logger.error("Lab does not exist: " + project.getLab().getName());
             return null;
@@ -107,7 +109,7 @@ public class ProjectBean implements Serializable {
         project.setStateId(projectEntity.getStateId());
         project.setKeywords(projectEntity.getKeywords());
         project.setMaxMembers(projectEntity.getMaxMembers());
-        project.setLab(labBean.convertToDto(projectEntity.getLab()));
+        project.setLab(labBean.convertToDTO(projectEntity.getLab()));
         project.setNeeds(projectEntity.getNeeds());
         project.setCreatedAt(projectEntity.getCreatedAt());
         project.setUpdatedAt(projectEntity.getUpdatedAt());

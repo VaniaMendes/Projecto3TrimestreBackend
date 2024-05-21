@@ -2,7 +2,9 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dto.Lab;
+import aor.paj.proj_final_aor_backend.dto.Supplier;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
+import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import aor.paj.proj_final_aor_backend.util.enums.Workplace;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -10,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a Stateless Session Bean for Lab operations.
@@ -45,7 +49,7 @@ public class LabBean implements Serializable {
      */
     public void createAllLabs() {
         for (Workplace workplace : Workplace.values()) {
-            if (labDao.findLabByName(workplace.name()) != null) {
+            if (labDao.findLabByName(workplace.name()) == null) {
                 synchronized (this) {
                     Lab lab = new Lab();
                     lab.setName(workplace);
@@ -71,7 +75,21 @@ public class LabBean implements Serializable {
     }
 
     public LabEntity findLabByName(String name) {
-        return labDao.findLabByName(name);
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        // Convert the name to the case used in the database before searching
+        String formattedName = name.toUpperCase();
+        return labDao.findLabByName(formattedName);
+    }
+
+    public List<Lab> getAllLabs() {
+        List<LabEntity> labEntities = labDao.findAllLabs();
+        List<Lab> labs = new ArrayList<>();
+        for (LabEntity labEntity : labEntities) {
+            labs.add(convertToDTO(labEntity));
+        }
+        return labs;
     }
 
     /**
@@ -92,7 +110,7 @@ public class LabBean implements Serializable {
      * @param labEntity LabEntity
      * @return The converted Lab DTO
      */
-    public Lab convertToDto(LabEntity labEntity) {
+    public Lab convertToDTO(LabEntity labEntity) {
         Lab lab = new Lab();
 
         lab.setId(labEntity.getId());
