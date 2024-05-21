@@ -1,10 +1,13 @@
 package aor.paj.proj_final_aor_backend.entity;
 
+import aor.paj.proj_final_aor_backend.util.enums.SkillType;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 /**
  * SkillEntity is a JPA entity that represents the skills of the users.
@@ -27,14 +30,14 @@ public class SkillEntity implements Serializable {
     /**
      * Name of the skill. It is unique and cannot be updated.
      */
-    @Column(name = "name", nullable = false, unique = true, updatable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     /**
      * Type of the skill. It is unique and cannot be updated.
      */
-    @Column(name = "type", nullable = false, unique = true, updatable = false)
-    private String type;
+    @Column(name = "type", nullable = false, updatable = false)
+    private SkillType type;
 
     // Set of projects associated with the skill
     @OneToMany(mappedBy = "skill")
@@ -84,19 +87,11 @@ public class SkillEntity implements Serializable {
         this.name = name;
     }
 
-    /**
-     * Getter for the type of the skill.
-     * @return type of the skill.
-     */
-    public String getType() {
+    public SkillType getType() {
         return type;
     }
 
-    /**
-     * Setter for the type of the skill.
-     * @param type the new type of the skill.
-     */
-    public void setType(String type) {
+    public void setType(SkillType type) {
         this.type = type;
     }
 

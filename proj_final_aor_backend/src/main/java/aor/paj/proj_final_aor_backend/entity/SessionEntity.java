@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NamedQuery(name = "Session.findSessionByToken", query = "SELECT s FROM SessionEntity s WHERE s.token = :token")
 public class SessionEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     /**
      * Unique identifier for session
      */

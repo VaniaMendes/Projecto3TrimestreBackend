@@ -26,6 +26,11 @@ public class UserSkillEntity implements Serializable {
     @JoinColumn(name = "skill_id", nullable = false)
     private SkillEntity skill;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+
+
 
 
     public UserSkillEntity() {
