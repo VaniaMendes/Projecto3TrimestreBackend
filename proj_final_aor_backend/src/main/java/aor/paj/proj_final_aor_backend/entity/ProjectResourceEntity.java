@@ -2,6 +2,8 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 /**
  * This class represents a ProjectResource in the system.
  * It contains various properties related to a project resource and their getter and setter methods.
@@ -9,7 +11,10 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "project_resource")
 @IdClass(ProjectResourceId.class)
-public class ProjectResourceEntity {
+
+@NamedQuery(name = "ProjectResource.findAllResourcesFromProject", query = "SELECT pr FROM ProjectResourceEntity pr WHERE pr.project.id = :projectId")
+@NamedQuery(name = "ProjectResource.findAllProjectsFromResource", query = "SELECT pr FROM ProjectResourceEntity pr WHERE pr.resource.id = :resourceId")
+public class ProjectResourceEntity implements Serializable {
 
     // Project associated with the resource
     @Id

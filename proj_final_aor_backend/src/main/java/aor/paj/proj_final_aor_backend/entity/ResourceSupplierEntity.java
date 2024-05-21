@@ -39,7 +39,7 @@ public class ResourceSupplierEntity implements Serializable {
      * It is a boolean value where true indicates that the resource supplier is active.
      */
     @Column(name = "active_status", nullable = false)
-    private boolean activeStatus;
+    private Boolean activeStatus;
 
     /**
      * Default constructor for the ResourceSupplierEntity class.
