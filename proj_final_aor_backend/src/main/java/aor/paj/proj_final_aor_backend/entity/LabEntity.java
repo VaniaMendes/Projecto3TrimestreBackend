@@ -28,7 +28,7 @@ public class LabEntity implements Serializable {
 
     // Name of the lab
     @Enumerated(EnumType.STRING)
-    @Column(name = "name", nullable = false, unique = false, updatable = false)
+    @Column(name = "name", nullable = false, unique = true, updatable = false)
     private Workplace name;
 
     // Set of projects associated with the lab

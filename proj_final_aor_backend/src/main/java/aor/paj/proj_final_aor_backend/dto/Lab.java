@@ -41,6 +41,7 @@ public class Lab {
 
     /**
      * Returns the name of the lab.
+     *
      * @return the name of the lab
      */
     public Workplace getName() {
