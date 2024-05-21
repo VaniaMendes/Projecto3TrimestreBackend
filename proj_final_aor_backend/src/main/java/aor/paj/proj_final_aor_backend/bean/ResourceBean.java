@@ -333,6 +333,14 @@ public class ResourceBean implements Serializable {
         return resourceEntity;
     }
 
+    /**
+     * This method is used to create a new ResourceSupplierEntity object and persist it in the database.
+     * It sets the provided ResourceEntity and SupplierEntity objects to the new ResourceSupplierEntity object,
+     * sets the active status to true, and then persists the new ResourceSupplierEntity object in the database.
+     *
+     * @param resourceEntity The ResourceEntity object to be set in the new ResourceSupplierEntity object.
+     * @param supplierEntity The SupplierEntity object to be set in the new ResourceSupplierEntity object.
+     */
     private void persistResourceSupplierConnection(ResourceEntity resourceEntity, SupplierEntity supplierEntity) {
         ResourceSupplierEntity resourceSupplier = new ResourceSupplierEntity();
         resourceSupplier.setResource(resourceEntity);

@@ -22,7 +22,7 @@ import java.util.Set;
 @NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
-@NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.skills s WHERE s.name = :skillName")
+@NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
 @NamedQuery(name = "Project.findUsersByProjectId", query = "SELECT up.user FROM UserProjectEntity up WHERE up.project.id = :projectId")
 @NamedQuery(name = "Project.findProjectsByUserId", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :userId")
 @NamedQuery(name = "Project.findAllProjectsOrderedByVacancy", query = "SELECT p FROM ProjectEntity p ORDER BY (p.maxMembers - (SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = p.id)) DESC")
@@ -110,12 +110,8 @@ public class ProjectEntity implements Serializable {
     /**
      * The skills associated with the projects. It is a many-to-many relationship with the SkillEntity.
      */
-    @ManyToMany
-    @JoinTable(
-            name = "project_skill",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private Set<SkillEntity> skills = new HashSet<>();
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectSkillEntity> projectSkill = new HashSet<>();
 
 
     /**
@@ -381,27 +377,55 @@ public class ProjectEntity implements Serializable {
     }
 
     /**
-     * Getter for the skills associated with the project.
-     * This is a many-to-many relationship with the SkillEntity.
-     * @return skills associated with the project.
+     * Setter for the tasks associated with the project.
+     * It takes a Set of TaskEntity objects and assigns it to the tasks field.
+     * Each TaskEntity object in the Set represents a task that is part of this project.
+     *
+     * @param tasks a Set of TaskEntity objects to be associated with the project
      */
-    public Set<SkillEntity> getSkills() {
-        return skills;
+    public void setTasks(Set<TaskEntity> tasks) {
+        this.tasks = tasks;
     }
 
     /**
-     * Setter for the skills associated with the project.
-     * This is a many-to-many relationship with the SkillEntity.
-     * @param skills the new skills associated with the project.
+     * Getter for the project skills associated with the project.
+     * It returns a Set of ProjectSkillEntity objects that are associated with the project.
+     * Each ProjectSkillEntity object represents a skill that is required for this project.
+     *
+     * @return a Set of ProjectSkillEntity objects that are associated with the project
      */
-    public void setSkills(Set<SkillEntity> skills) {
-        this.skills = skills;
+    public Set<ProjectSkillEntity> getProjectSkill() {
+        return projectSkill;
     }
 
+    /**
+     * Setter for the project skills associated with the project.
+     * It takes a Set of ProjectSkillEntity objects and assigns it to the projectSkill field.
+     * Each ProjectSkillEntity object in the Set represents a skill that is required for this project.
+     *
+     * @param projectSkill a Set of ProjectSkillEntity objects to be associated with the project
+     */
+    public void setProjectSkill(Set<ProjectSkillEntity> projectSkill) {
+        this.projectSkill = projectSkill;
+    }
+
+    /**
+     * Getter for the updated at timestamp of the project.
+     * It returns the LocalDateTime object that represents the last time the project was updated.
+     *
+     * @return the LocalDateTime object that represents the last time the project was updated
+     */
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
+    /**
+     * Setter for the updated at timestamp of the project.
+     * It takes a LocalDateTime object and assigns it to the updatedAt field.
+     * The LocalDateTime object represents the new last update time of the project.
+     *
+     * @param updatedAt the LocalDateTime object that represents the new last update time of the project
+     */
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }

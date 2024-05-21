@@ -56,24 +56,6 @@ class ResourceBeanTest {
     }
 
     @Test
-    void addSupplierToResourceReturnsUpdatedResourceWhenResourceAndSupplierExist() {
-        String resourceName = "resource1";
-        String supplierName = "supplier1";
-
-        ResourceEntity resourceEntity = mock(ResourceEntity.class);
-        SupplierEntity supplierEntity = new SupplierEntity();
-
-        when(resourceDao.findResourceByName(resourceName)).thenReturn(resourceEntity);
-        when(supplierBean.findSupplierByName(supplierName)).thenReturn(supplierEntity);
-
-        ResourceEntity result = resourceBean.addSupplierToResource(resourceName, supplierName);
-
-        assertNotNull(result);
-        verify(resourceEntity).addSupplier(supplierEntity);
-        verify(resourceDao).merge(resourceEntity);
-    }
-
-    @Test
     void addSupplierToResourceReturnsNullWhenResourceDoesNotExist() {
         String resourceName = "resource1";
         String supplierName = "supplier1";

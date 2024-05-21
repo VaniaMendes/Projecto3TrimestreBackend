@@ -261,21 +261,26 @@ public class ResourceEntity implements Serializable {
         this.sourceId = sourceId;
     }
 
-
+    /**
+     * This method is a getter for the suppliers field.
+     * It returns a Set of ResourceSupplierEntity objects that are associated with the resource.
+     * Each ResourceSupplierEntity object represents a supplier that provides this resource.
+     *
+     * @return a Set of ResourceSupplierEntity objects that are associated with the resource
+     */
     public Set<ResourceSupplierEntity> getSuppliers() {
         return suppliers;
     }
 
+    /**
+     * This method is a setter for the suppliers field.
+     * It takes a Set of ResourceSupplierEntity objects and assigns it to the suppliers field.
+     * Each ResourceSupplierEntity object in the Set represents a supplier that provides this resource.
+     *
+     * @param suppliers a Set of ResourceSupplierEntity objects to be associated with the resource
+     */
     public void setSuppliers(Set<ResourceSupplierEntity> suppliers) {
         this.suppliers = suppliers;
-    }
-
-    public void addSupplier(SupplierEntity supplier) {
-        ResourceSupplierEntity resourceSupplier = new ResourceSupplierEntity();
-        resourceSupplier.setResource(this);
-        resourceSupplier.setSupplier(supplier);
-
-        this.suppliers.add(resourceSupplier);
     }
 
     /**
