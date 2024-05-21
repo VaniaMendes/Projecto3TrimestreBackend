@@ -1,9 +1,11 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ResourceDao;
+import aor.paj.proj_final_aor_backend.dao.ResourceSupplierDao;
 import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
+import aor.paj.proj_final_aor_backend.entity.ResourceSupplierEntity;
 import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.ejb.EJB;
@@ -29,6 +31,9 @@ public class ResourceBean implements Serializable {
     // Injected ResourceDao EJB
     @EJB
     private ResourceDao resourceDao;
+
+    @EJB
+    private ResourceSupplierDao resourceSupplierDao;
 
     // Injected SupplierBean EJB
     @EJB
@@ -77,7 +82,7 @@ public class ResourceBean implements Serializable {
         for (Supplier supplier : resource.getSuppliers()) {
             SupplierEntity supplierEntity = supplierBean.findSupplierByName(supplier.getName());
             if (supplierEntity != null) {
-                resourceEntity.addSupplier(supplierEntity);
+                persistResourceSupplierConnection(resourceEntity, supplierEntity);
             } else {
                 logger.error("Supplier does not exist: " + supplier.getName());
                 return null;
@@ -321,17 +326,26 @@ public class ResourceBean implements Serializable {
             return null;
         }
 
-        resourceEntity.addSupplier(supplierEntity);
+        persistResourceSupplierConnection(resourceEntity, supplierEntity);
+
         resourceEntity.setUpdatedAt(LocalDateTime.now());
         resourceDao.merge(resourceEntity);
         return resourceEntity;
+    }
+
+    private void persistResourceSupplierConnection(ResourceEntity resourceEntity, SupplierEntity supplierEntity) {
+        ResourceSupplierEntity resourceSupplier = new ResourceSupplierEntity();
+        resourceSupplier.setResource(resourceEntity);
+        resourceSupplier.setSupplier(supplierEntity);
+        resourceSupplier.setActiveStatus(true);
+
+        resourceSupplierDao.persist(resourceSupplier);
     }
 
 
     /**
      * This method is used to convert a Resource object into a ResourceEntity object.
      * It copies the properties of the Resource object into a new ResourceEntity object.
-     * If the Resource object has any suppliers, it also adds them to the ResourceEntity object.
      *
      * @param resource The Resource object to be converted.
      * @return The newly created ResourceEntity object.
@@ -345,14 +359,6 @@ public class ResourceBean implements Serializable {
         resourceEntity.setObservation(resource.getObservation());
         resourceEntity.setPhoto(resource.getPhoto());
         resourceEntity.setSourceId(resource.getSourceId());
-        if (resource.getSuppliers() != null){
-            for (Supplier supplier : resource.getSuppliers()) {
-                SupplierEntity supplierEntity = supplierBean.findSupplierByName(supplier.getName());
-                if (supplierEntity != null) {
-                    resourceEntity.addSupplier(supplierEntity);
-                }
-            }
-        }
         return resourceEntity;
     }
 
@@ -378,6 +384,7 @@ public class ResourceBean implements Serializable {
         resource.setSourceId(resourceEntity.getSourceId());
         if (!resourceEntity.getSuppliers().isEmpty()){
             resource.setSuppliers(resourceEntity.getSuppliers().stream()
+                    .map(ResourceSupplierEntity::getSupplier)
                     .map(supplierBean::convertToDTO)
                     .collect(Collectors.toList()));
         }

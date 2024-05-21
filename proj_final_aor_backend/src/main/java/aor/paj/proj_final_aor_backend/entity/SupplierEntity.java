@@ -35,8 +35,8 @@ public class SupplierEntity implements Serializable {
     private String contact;
 
     // Set of resources associated with the supplier
-    @ManyToMany(mappedBy = "suppliers")
-    private Set<ResourceEntity> resources = new HashSet<>();
+    @OneToMany(mappedBy = "supplier")
+    private Set<ResourceSupplierEntity> resources = new HashSet<>();
 
     /**
      * Default constructor for the SupplierEntity class.
@@ -92,16 +92,11 @@ public class SupplierEntity implements Serializable {
         this.contact = contact;
     }
 
-    public Set<ResourceEntity> getResources() {
+    public Set<ResourceSupplierEntity> getResources() {
         return resources;
     }
 
-    public void setResources(Set<ResourceEntity> resources) {
+    public void setResources(Set<ResourceSupplierEntity> resources) {
         this.resources = resources;
-    }
-
-    public void addResource(ResourceEntity resourceEntity) {
-        this.resources.add(resourceEntity);
-        resourceEntity.getSuppliers().add(this);
     }
 }
