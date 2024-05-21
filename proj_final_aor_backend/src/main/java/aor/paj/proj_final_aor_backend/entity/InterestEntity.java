@@ -1,9 +1,6 @@
 package aor.paj.proj_final_aor_backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 
@@ -23,6 +20,7 @@ public class InterestEntity implements Serializable {
      * Unique identifier for interest.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
