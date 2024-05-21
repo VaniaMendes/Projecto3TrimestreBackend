@@ -6,6 +6,7 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.SessionEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
@@ -45,6 +46,11 @@ public class UserBean implements Serializable {
     }
 
 
+    /**
+     * This method is responsible by find one user by token
+     * @param token the token of the user
+     * @return the user
+     */
     public User getUSerByToken(String token) {
         User u = null;
         if (token != null){
@@ -59,6 +65,11 @@ public class UserBean implements Serializable {
         return u;
     }
 
+    /**
+     * This method is responsible by find one user by email
+     * @param email the email of the user
+     * @return the user
+     */
     public User getUserByEmail(String email) {
         User u = null;
         if (email != null){
@@ -73,6 +84,14 @@ public class UserBean implements Serializable {
     }
 
 
+    /**
+     * This method is responsible by register a new user.
+     * It verifies if the email already exists, if the password is valid and if the email is valid.
+     * @param email the email of the user.
+     * @param password the password of the user.
+     * @param confirmPassword the confirmation of the password. It should match the password parameter.
+     * @return A boolean value indicating whether the registration was successful.Returns false if the email already exists, the password is not valid, or the email is not valid. Returns true if the user was successfully registered.
+     */
     public boolean registerUser( String email, String password, String confirmPassword) {
 
         //Verifying if the email already exists
@@ -125,6 +144,12 @@ public class UserBean implements Serializable {
        return true;
     }
 
+    /**
+     * This method is responsible for logging in a user.
+     * @param email The email of the user trying to login. It should be a valid email.
+     * @param password The password of the user trying to login. It should be a valid password.
+     * @return A string value representing the token of the user. Returns null if the email does not exist, the user is not active, or the password is incorrect.
+     */
     public String loginUser(String email, String password) {
         UserEntity user = userDao.findUserByEmail(email);
         if (user != null && user.isActiveState()) {
@@ -133,6 +158,7 @@ public class UserBean implements Serializable {
             //If the password is correct returns true
             if (BCrypt.checkpw(password, user.getPassword())) {
                 String token = UUID.randomUUID().toString();
+                //Create a new session
                 SessionEntity session = new SessionEntity();
                 session.setUser(user);
                 session.setToken(token);
@@ -144,6 +170,12 @@ public class UserBean implements Serializable {
         return null;
     }
 
+    /**
+     * This method is responsible for confirming a user´s account.
+     * @param user The user to be confirmed. It should have the first name, last name, lab, and visibility state fields filled.
+     * @param token The confirmation token of the user. It should be a valid token.
+     * @return A boolean value indicating whether the confirmation was successful. Returns false if the required fields are not present, the nickname already exists, the lab is not valid, or the token is not valid. Returns true if the user was successfully confirmed.
+     */
     public boolean confirmUser(User user, String token) {
 
         // Check if the required fields are present
@@ -155,15 +187,15 @@ public class UserBean implements Serializable {
             return false;
         }
 
-        /*
+
         //Check if the lab is valid
-        if(lab == null){
+        if(user.getLab() == null){
             return false;
         }
-        LabEntity  labEntity = labDao.findLabById(lab.getId());
+        LabEntity labEntity = labDao.findLabById(user.getLab().getId());
+        System.out.println(labEntity.getName());
 
 
-         */
         //Check if the token is valid
         UserEntity userConfirm = authenticationDao.findUserByAuthenticationToken(token);
 
@@ -171,12 +203,15 @@ public class UserBean implements Serializable {
             return false;
         }
 
+        //Update the user´s fields
         userConfirm.setActiveState(true);
         userConfirm.setFirstName(user.getFirstName());
         userConfirm.setLastName(user.getLastName());
-        //userConfirm.setLab(labEntity);
+        userConfirm.setLab(labEntity);
         userConfirm.setVisibilityState(user.isVisibilityState());
 
+        //Check if the biography, photo and nickname are present
+        //If they are present, update the user´s fields
         if(user.getBiography() != null){
             userConfirm.setBiography(user.getBiography());
         }
@@ -187,72 +222,118 @@ public class UserBean implements Serializable {
             userConfirm.setNickname(user.getNickname());
         }
 
+        //Update the user in the database
         userDao.updateUser(userConfirm);
 
+        //Update the authentication in the database
         AuthenticationEntity authentication = authenticationDao.findAuthenticationLineByTokenConfirmation(token);
         authentication.setAuthState(true);
         authentication.setAuthenticationToken(null);
         authenticationDao.update(authentication);
 
-
         return true;
     }
 
+    /**
+     * This method is responsible for changing a user´s password.
+     * @param resetPassToken The reset password token of the user. It should be a valid token that was previously sent to the user's email.
+     * @param password The new password of the user. It should be a valid password according to the system's password policy.
+     * @param confirmPassword The confirmation of the new password. It should match the password parameter.
+     * @return A boolean value indicating whether the password change was successful. Returns false if the reset password token is not valid, the password is not valid, or the confirmation password does not match the password. Returns true if the password was successfully changed.
+     */
     public boolean changePassword(String resetPassToken, String password, String confirmPassword){
+        //Retrieve the authentication entity associated with the provided resetPassToken
         AuthenticationEntity authenticationEntity = authenticationDao.findAuthenticationLineByrestPassToken(resetPassToken);
         System.out.println(authenticationEntity.getResetPassToken());
+
+        // Check if the authentication entity exists
         if(authenticationEntity != null){
+            //Retrieve the user associated with the provided resetPassToken
             UserEntity user = authenticationDao.findUserByresetPassToken(resetPassToken);
             System.out.println(user.getEmail());
+            //Check if the provided password is valid and matches the confirmation password
             if(isPasswordValid(password, confirmPassword)){
+                //Encrypt the new password
                 String encryptedPassword = encryptPassword(password);
+                //Set the new password for the user
                 user.setPassword(encryptedPassword);
+                //Update the user in the database
                 userDao.updateUser(user);
+                //Nullify the resetPassToken in the authentication table
                 authenticationEntity.setResetPassToken(null);
+                //Update the authentication in the database
                 authenticationDao.update(authenticationEntity);
                 return true;
             }
         }
         return false;
     }
+
+    /**
+     * This method is responsible for initiating the password recovery process for a user.
+     * @param email The email of the user who wants to recover their password. It should be a valid email that exists in the system.
+     * @return A boolean value indicating whether the password recovery process was successfully initiated. Returns false if the email does not exist or the user is not active. Returns true if the password recovery process was successfully initiated.
+     */
     public boolean recoveryPassword(String email){
+        //Retrive the user associated with the provided email
         UserEntity user = userDao.findUserByEmail(email);
+        //Check if the user exists and is active
         if(user != null && user.isActiveState()){
+            //Generate a reset password token
             String resetPassToken = UUID.randomUUID().toString();
+            //Retrieve the aithentication entity associated with the user
             AuthenticationEntity authenticationEntity = authenticationDao.findAuthenticationByUser(user);
+            //Set the reset password token in the authentication entity
             authenticationEntity.setResetPassToken(resetPassToken);
+            //Update the authentication in the database
             authenticationDao.update(authenticationEntity);
+            //Send the confirmation email to the user
             sendConfirmationEmailToRecoveryPassword("proj_final_aor@outlook.com", resetPassToken);
             return true;
         }
         return false;
     }
 
+    /**
+     * This method is responsible for sending a confirmation email to a user who wants to recover their password.
+     * @param to The email of the user who wants to recover their password. It should be a valid email that exists in the system.
+     * @param resetPassToken The reset password token of the user. It should be a valid token that was previously sent to the user's email.
+     */
     public void sendConfirmationEmailToRecoveryPassword(String to, String resetPassToken){
         //Sending the confirmation email
         String subject = "Password Recovery ";
 
-        // Construct the email body
+        // Construct the email body with HTML for a professional tone and formatting
         StringBuilder body = new StringBuilder();
-        body.append("Welcome to Innovation Lab Management!\n");
-        body.append("\n");
-        body.append("Dear User,\n");
-        body.append("You requested to recover your password. Please click the link below to recover your password:\n");
-        body.append("http://localhost:3000/recoverypassword?token=" + resetPassToken + "\n");
-        body.append("If you did not request to recover your password, please ignore this email.\n");
-        body.append("\n");
-        body.append("Best regards,\n");
-        body.append("Critical Software\n");
+        body.append("<html>");
+        body.append("<body>");
+        body.append("<h1>Welcome to Innovation Lab Management!</h1>");
+        body.append("<p>Dear User,</p>");
+        body.append("<p>You requested to recover your password. Please click the link below to recover your password:</p>");
+        body.append("<p><a href=\"http://localhost:3000/recoverypassword?token=" + resetPassToken + "\">Recover Password</a></p>");
+        body.append("<p>If you did not request to recover your password, please ignore this email.</p>");
+        body.append("<p>Best regards,<br>Critical Software</p>");
+        body.append("</body>");
+        body.append("</html>");
 
         //Send the email
         emailService.sendEmail(to, subject, body.toString());
         logger.info("Sending confirmation email to " + to + " with token " + resetPassToken);
     }
 
+    /**
+     * This method is responsible for logging out a user.
+     * @param token The session token of the user trying to log out. It should be a valid token that was previously assigned to the user upon login.
+     * @return A boolean value indicating whether the logout was successful. Returns false if the session token does not exist. Returns true if the user was successfully logged out.
+     */
     public boolean logoutUser(String token) {
+        //Retrieve the session associated with the provided token
         SessionEntity session = sessionDao.findSessionByToken(token);
+        //Check if the session exists
         if (session != null) {
+            //Set the end session time to the current time
             session.setEndSession(LocalDateTime.now());
+            //Nullify the session token in the database
             session.setToken(null);
             sessionDao.update(session);
             return true;
@@ -260,6 +341,11 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    /**
+     * This method is responsible for verifying if a nickname already exists in the system.
+     * @param nickname The nickname to verify. It should be a valid nickname.
+     * @return A boolean value indicating whether the nickname already exists. Returns true if the nickname already exists. Returns false if the nickname does not exist.
+     */
     public boolean nicknameExists(String nickname) {
         UserEntity user = userDao.findUserByNickname(nickname);
         if(user != null){
@@ -268,28 +354,41 @@ public class UserBean implements Serializable {
         return false;
     }
 
+    /**
+     * This method is responsible for sending a confirmation email to a user.
+     * @param to The email of the user to send the confirmation email. It should be a valid email.
+     * @param token The confirmation token of the user. It should be a valid token.
+     */
     public void sendConfirmationEmail(String to, String token){
         //Sending the confirmation email
         logger.info("Sending confirmation email to " + to + " with token " + token);
         String subject = "Account Confirmation ";
 
 
-        // Construct the email body with a professional tone and formatting
+        // Construct the email body with HTML
         StringBuilder body = new StringBuilder();
-        body.append("Welcome to Innovation Lab Management!\n");
-        body.append("\n");
-        body.append("Dear User,\n");
-        body.append("Thank you for registering with us. We're excited to have you on board.\n");
-        body.append("To complete your registration, please click the link below to confirm your account:\n");
-        body.append("http://localhost:3000/confirm?token=" + token + "\n");
-        body.append("If you did not register for our service, please ignore this email.\n");
-        body.append("\n");
-        body.append("Best regards,\n");
-        body.append("Critical Software\n");
+        body.append("<html>");
+        body.append("<body>");
+        body.append("<h1>Welcome to Innovation Lab Management!</h1>");
+        body.append("<p>Dear User,</p>");
+        body.append("<p>Thank you for registering with us. We're excited to have you on board.</p>");
+        body.append("<p>To complete your registration, please click the link below to confirm your account:</p>");
+        body.append("<p><a href=\"http://localhost:3000/confirm?token=" + token + "\">Confirm Account</a></p>");
+        body.append("<p>If you did not register for our service, please ignore this email.</p>");
+        body.append("<p>Best regards,<br>Critical Software</p>");
+        body.append("</body>");
+        body.append("</html>");
 
-
+        //Send the email
         emailService.sendEmail(to, subject, body.toString());
+
     }
+
+    /**
+     * This method is responsible for verifying if an email is valid.
+     * @param email The email to verify. It should be a valid email.
+     * @return A boolean value indicating whether the email is valid. Returns true if the email is valid. Returns false if the email is not valid.
+     */
     public boolean isValidemail(String email){
         //Verifying if the email is valid
         if(email == null ){
@@ -302,7 +401,13 @@ public class UserBean implements Serializable {
     }
 
 
-
+    /**
+     * This method is responsible for verifying if a password is valid.
+     * It verifies if the password and the confirmPassword are the same, if the password has at least 8 characters, if the password has at least one uppercase letter, one lowercase letter, one number, and one special character.
+     * @param password The password to verify. It should be a valid password.
+     * @param confirmPassword The confirmation of the password. It should match the password parameter.
+     * @return
+     */
     public boolean isPasswordValid(String password, String confirmPassword){
 
         //Verifying if the password and the confirmPassword are the same
@@ -330,12 +435,91 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    /**
+     * This method is responsible for encrypting a password.
+     * It uses the BCrypt library to encrypt the password. The encrypted password is a string value.
+     * @param password The password to encrypt. It should be a valid password.
+     * @return A string value representing the encrypted password.
+     */
     public String encryptPassword(String password) {
         String salt = BCrypt.gensalt(12);
         String hashedPassword = BCrypt.hashpw(password, salt);
         return hashedPassword;
     }
 
+
+
+    //Methods for update user´s fields
+
+
+    /**
+     * This method is responsible for updating a user´s fields.
+     * It verifies if the user exists, if the fields are valid, and if the nickname already exists.
+     * @param user The user to update. It should be a valid user.
+     * @param userId The id of the user to update. It should be a valid id.
+     * @return A boolean value indicating whether the update was successful. Returns false if the user does not exist, the nickname already exists, or the fields are not valid. Returns true if the user was successfully updated.
+     */
+    public boolean updateUser(User user, long userId){
+         UserEntity userEntity = userDao.findUserById(userId);
+        //Check if the user exists
+        if(userEntity == null){
+            logger.warn("User not found with ID: " + user.getId());
+            return false;
+        }
+
+        //Check if the first name is not null
+        if(user.getFirstName() != null){
+            logger.info("Updating first name to: " + user.getFirstName());
+            userEntity.setFirstName(user.getFirstName());
+        }
+        //Check if the biography is not null
+        if(user.getBiography() != null){
+            userEntity.setBiography(user.getBiography());
+        }
+        //Check if the last name is not null
+        if (user.getLastName() != null){
+            logger.info("Updating last name to: " + user.getLastName());
+            userEntity.setLastName(user.getLastName());
+        }
+        //Check if the lab is valid
+        if(user.getLab() != null && user.getLab().getId() != 0){
+            LabEntity labEntity = labDao.findLabById(user.getLab().getId());
+            userEntity.setLab(labEntity);
+        }
+        //Check if the biography field is not null
+        if(user.getBiography() != null){
+            userEntity.setBiography(user.getBiography());
+        }
+        //Check if the photo field is not null
+        if(user.getPhoto() != null){
+            userEntity.setPhoto(user.getPhoto());
+        }
+        //Check if the nickname is not null and if is a valid nickname
+        if(user.getNickname() != null){
+            if(nicknameExists(user.getNickname())){
+                logger.warn("Nickname already exists: " + user.getNickname());
+                return false;
+            } else {
+                userEntity.setNickname(user.getNickname());
+            }
+        }
+
+        try {
+            //Update the user in the database
+            userDao.updateUser(userEntity);
+            logger.info("User updated successfully: " + user.getId());
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to update user: " + user.getId(), e);
+            return false;
+        }
+    }
+
+    /**
+     * This method is responsible for converting a UserDto object to a UserEntity object.
+     * @param user The UserDto object to convert. It should be a valid UserDto object.
+     * @return A UserEntity object representing the converted UserDto object.
+     */
     public UserEntity convertUserDtoToEntity(User user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(user.getId());
@@ -348,6 +532,11 @@ public class UserBean implements Serializable {
         return userEntity;
     }
 
+    /**
+     * This method is responsible for converting a UserEntity object to a UserDto object.
+     * @param userEntity The UserEntity object to convert. It should be a valid UserEntity object.
+     * @return A UserDto object representing the converted UserEntity object.
+     */
     public User convertUserEntityToDto(UserEntity userEntity) {
         User user = new User();
         user.setId(userEntity.getId());
