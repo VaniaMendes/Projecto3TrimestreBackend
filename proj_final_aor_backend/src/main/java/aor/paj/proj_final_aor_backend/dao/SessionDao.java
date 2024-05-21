@@ -18,4 +18,29 @@ public class SessionDao extends AbstractDao<SessionEntity> {
             return -1;
         }
     }
+
+
+    public SessionEntity findSessionByUserId(long userId) {
+        try {
+            return (SessionEntity) em.createNamedQuery("Session.findSessionByUserId").setParameter("userId", userId).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public SessionEntity findSessionByToken(String token) {
+        try {
+            return (SessionEntity) em.createNamedQuery("Session.findSessionByToken").setParameter("token", token).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void update(SessionEntity session) {
+        em.merge(session);
+    }
+
+    public void create(SessionEntity session) {
+        em.persist(session);
+    }
 }

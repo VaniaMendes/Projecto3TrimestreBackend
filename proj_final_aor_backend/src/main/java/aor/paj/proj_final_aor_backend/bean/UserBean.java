@@ -6,9 +6,10 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
+import aor.paj.proj_final_aor_backend.entity.SessionEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
-import aor.paj.proj_final_aor_backend.util.EmailService;
+import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -34,7 +36,7 @@ public class UserBean implements Serializable {
     @EJB
     SessionDao sessionDao;
     @EJB
-    EmailService emailService;
+    EmailServiceHelper emailService;
     @EJB
     AuthenticationDao authenticationDao;
     @EJB
@@ -50,7 +52,6 @@ public class UserBean implements Serializable {
             long id = sessionDao.findUserIDbyToken(token);
             if(id != -1) {
                 UserEntity userEntity = userDao.findUserById(id);
-
                 if(userEntity != null) {
                     u = convertUserEntityToDto(userEntity);
                 }
@@ -58,6 +59,20 @@ public class UserBean implements Serializable {
     }
         return u;
     }
+
+    public User getUserByEmail(String email) {
+        User u = null;
+        if (email != null){
+                UserEntity userEntity = userDao.findUserByEmail(email);
+
+                if(userEntity != null) {
+                    u = convertUserEntityToDto(userEntity);
+                }
+
+        }
+        return u;
+    }
+
 
     public boolean registerUser( String email, String password, String confirmPassword) {
 
@@ -111,10 +126,33 @@ public class UserBean implements Serializable {
        return true;
     }
 
+    public String loginUser(String email, String password) {
+        UserEntity user = userDao.findUserByEmail(email);
+        if (user != null && user.isActiveState()) {
+
+            //Library oh Crypt to check if the password is correct
+            //If the password is correct returns true
+            if (BCrypt.checkpw(password, user.getPassword())) {
+                String token = UUID.randomUUID().toString();
+                SessionEntity session = new SessionEntity();
+                session.setUser(user);
+                session.setToken(token);
+                session.setInitSession(LocalDateTime.now());
+                sessionDao.create(session);
+                return token;
+            }
+        }
+        return null;
+    }
+
     public boolean confirmUser(User user, String token) {
 
         // Check if the required fields are present
         if(user.getFirstName() == null || user.getLastName() == null ){
+            return false;
+        }
+        //Check if the nickname already exists
+        if(nicknameExists(user.getNickname())){
             return false;
         }
 
@@ -161,6 +199,58 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    public boolean recoveryPassword(String email){
+        UserEntity user = userDao.findUserByEmail(email);
+        if(user != null && user.isActiveState()){
+            String resetPassToken = UUID.randomUUID().toString();
+            AuthenticationEntity authenticationEntity = authenticationDao.findAuthenticationByUser(user);
+            authenticationEntity.setResetPassToken(resetPassToken);
+            authenticationDao.update(authenticationEntity);
+            sendConfirmationEmailToRecoveryPassword("proj_final_aor@outlook.com", resetPassToken);
+            return true;
+        }
+        return false;
+    }
+
+    public void sendConfirmationEmailToRecoveryPassword(String to, String resetPassToken){
+        //Sending the confirmation email
+        String subject = "Password Recovery ";
+
+        // Construct the email body
+        StringBuilder body = new StringBuilder();
+        body.append("Welcome to Innovation Lab Management!\n");
+        body.append("\n");
+        body.append("Dear User,\n");
+        body.append("You requested to recover your password. Please click the link below to recover your password:\n");
+        body.append("http://localhost:3000/recoverypassword?token=" + resetPassToken + "\n");
+        body.append("If you did not request to recover your password, please ignore this email.\n");
+        body.append("\n");
+        body.append("Best regards,\n");
+        body.append("Critical Software\n");
+
+        //Send the email
+        emailService.sendEmail(to, subject, body.toString());
+        logger.info("Sending confirmation email to " + to + " with token " + resetPassToken);
+    }
+
+    public boolean logoutUser(String token) {
+        SessionEntity session = sessionDao.findSessionByToken(token);
+        if (session != null) {
+            session.setEndSession(LocalDateTime.now());
+            session.setToken(null);
+            sessionDao.update(session);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean nicknameExists(String nickname) {
+        UserEntity user = userDao.findUserByNickname(nickname);
+        if(user != null){
+            return true;
+        }
+        return false;
+    }
 
     public void sendConfirmationEmail(String to, String token){
         //Sending the confirmation email
