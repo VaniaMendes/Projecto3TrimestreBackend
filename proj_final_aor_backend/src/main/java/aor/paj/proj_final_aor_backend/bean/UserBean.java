@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -199,6 +198,23 @@ public class UserBean implements Serializable {
         return true;
     }
 
+    public boolean changePassword(String resetPassToken, String password, String confirmPassword){
+        AuthenticationEntity authenticationEntity = authenticationDao.findAuthenticationLineByrestPassToken(resetPassToken);
+        System.out.println(authenticationEntity.getResetPassToken());
+        if(authenticationEntity != null){
+            UserEntity user = authenticationDao.findUserByresetPassToken(resetPassToken);
+            System.out.println(user.getEmail());
+            if(isPasswordValid(password, confirmPassword)){
+                String encryptedPassword = encryptPassword(password);
+                user.setPassword(encryptedPassword);
+                userDao.updateUser(user);
+                authenticationEntity.setResetPassToken(null);
+                authenticationDao.update(authenticationEntity);
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean recoveryPassword(String email){
         UserEntity user = userDao.findUserByEmail(email);
         if(user != null && user.isActiveState()){

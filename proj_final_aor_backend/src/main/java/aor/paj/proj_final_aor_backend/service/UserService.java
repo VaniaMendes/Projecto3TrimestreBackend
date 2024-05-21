@@ -36,6 +36,7 @@ public class UserService {
         try {
             boolean isRegistered = userBean.registerUser(user.getEmail(), user.getPassword(), user.getConfirmPassword());
 
+            System.out.println(isRegistered);
             if (isRegistered) {
                 logger.info("IP Address: " + request.getRemoteAddr() + " - User registered: " + user.getEmail() + " at " + System.currentTimeMillis());
                 return Response.status(Response.Status.CREATED).entity("User registered").build();
@@ -156,5 +157,31 @@ public class UserService {
         }
 
     }
+
+    @PUT
+    @Path("/change-password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response changePassword(@HeaderParam("resetPassToken") String resetPassToken, @QueryParam("password") String password, @QueryParam("confirmPassword") String confirmPassword, @Context HttpServletRequest request) {
+
+        try {
+            boolean isChanged = userBean.changePassword(resetPassToken, password, confirmPassword);
+            System.out.println(isChanged);
+
+            if (isChanged) {
+                logger.info("IP Address: " + request.getRemoteAddr() + " - User changed password: " + resetPassToken + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.OK).entity("User changed password").build();
+            } else {
+                logger.warn("IP Address: " + request.getRemoteAddr() + " - Failed to change password: " + resetPassToken + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to change password: " + resetPassToken + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to change password").build();
+        }
+
+    }
+
 
 }
