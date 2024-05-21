@@ -45,7 +45,7 @@ public class EmailServiceHelper {
             message.setFrom(new InternetAddress(email));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html");
 
             Transport.send(message);
 
