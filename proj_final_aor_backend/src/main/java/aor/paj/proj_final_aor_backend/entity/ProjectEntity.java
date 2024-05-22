@@ -23,8 +23,6 @@ import java.util.Set;
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
 @NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
-@NamedQuery(name = "Project.findUsersByProjectId", query = "SELECT up.user FROM UserProjectEntity up WHERE up.project.id = :projectId")
-@NamedQuery(name = "Project.findProjectsByUserId", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :userId")
 @NamedQuery(name = "Project.findAllProjectsOrderedByVacancy", query = "SELECT p FROM ProjectEntity p ORDER BY (p.maxMembers - (SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = p.id)) DESC")
 
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")

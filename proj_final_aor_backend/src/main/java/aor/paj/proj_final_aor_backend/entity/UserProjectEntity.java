@@ -2,28 +2,28 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Table(name = "user_project")
+@IdClass(UserProjectId.class)
 
-public class UserProjectEntity {
-
-    private static final long serialVersionUID = 1L;
+@NamedQuery(name = "UserProject.findUserProjectByProjectId", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id")
+@NamedQuery(name = "UserProject.findUserProjectByUserId", query = "SELECT up FROM UserProjectEntity up WHERE up.user.id = :id")
+@NamedQuery(name = "UserProject.findActiveUsersByProjectId", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
+@NamedQuery(name = "UserProject.findActiveProjectsFromAUserByUserId", query = "SELECT up FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
+public class UserProjectEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private long id;
-
     @ManyToOne
     @JoinColumn(name = "project_id")
     private ProjectEntity project;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
 
     @Column(name="userType", nullable = false)
     private String userType;
@@ -38,14 +38,6 @@ public class UserProjectEntity {
     private Set<MessageEntity> messagesReceived;
 
     public UserProjectEntity() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public ProjectEntity getProject() {

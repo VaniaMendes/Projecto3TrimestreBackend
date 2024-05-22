@@ -2,7 +2,6 @@ package aor.paj.proj_final_aor_backend.dao;
 
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
-import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 
@@ -53,7 +52,7 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
      * @param id the ID of the project to retrieve.
      * @return the project with the given ID, or null if no such project is found.
      */
-    public ProjectEntity findProjectById(String id) {
+    public ProjectEntity findProjectById(Long id) {
         try {
             return (ProjectEntity) em.createNamedQuery("Project.findProjectById").setParameter("id", id)
                     .getSingleResult();
@@ -153,53 +152,6 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         try {
             return em.createNamedQuery("Project.findProjectsBySkill", ProjectEntity.class)
                     .setParameter("skillName", skill)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Retrieves all users associated with a given project.
-     *
-     * This method uses a named query "Project.findUsersByProjectId" defined in the UserEntity class.
-     * The query is expected to select users from the database where the project ID matches the provided parameter.
-     * The project ID is set as a parameter in the query using the setParameter method.
-     *
-     * If the query returns results, a list of UserEntity objects is returned.
-     * If the query does not return any results (i.e., there are no users associated with the given project),
-     * a NoResultException is caught and an empty list is returned.
-     *
-     * @param projectId the ID of the project to retrieve users for.
-     * @return a list of users associated with the given project, or an empty list if no such users are found.
-     */
-    public List<UserEntity> findUsersByProjectId(Long projectId) {
-        try {
-            return em.createNamedQuery("Project.findUsersByProjectId", UserEntity.class)
-                    .setParameter("projectId", projectId)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * Retrieves all projects associated with a given user.
-     *
-     * This method uses a named query "Project.findProjectsByUserId" defined in the ProjectEntity class.
-     * The query is expected to select projects from the database where the user ID matches the provided parameter.
-     * The user ID is set as a parameter in the query using the setParameter method.
-     *
-     * If the query returns results, a list of ProjectEntity objects is returned.
-     * If the query does not return any results (i.e., there are no projects associated with the given user),
-     * a NoResultException is caught and an empty list is returned.
-     *
-     * @param userId the ID of the user to retrieve projects for.
-     * @return a list of projects associated with the given user, or an empty list if no such projects are found.
-     */
-    public List<ProjectEntity> findProjectsByUser(Long userId) {
-        try {
-            return em.createNamedQuery("Project.findProjectsByUserId", ProjectEntity.class).setParameter("userId", userId)
                     .getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();

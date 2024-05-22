@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectDao;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import jakarta.ejb.EJB;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Stateless
 public class ProjectBean implements Serializable {
@@ -88,6 +91,30 @@ public class ProjectBean implements Serializable {
         return false;
     }
 
+    public boolean updateState(long id, int stateId) {
+        ProjectEntity projectEntity = projectDao.findProjectById(id);
+        if (projectEntity == null || !isValidStateId(stateId)) {
+            return false;
+        }
+        projectEntity.setStateId(stateId);
+        projectDao.merge(projectEntity);
+        return true;
+    }
+
+    private boolean isValidStateId(int stateId) {
+        return stateId == 100 || stateId == 200 || stateId == 300 || stateId == 400 || stateId == 500 || stateId == 600;
+    }
+
+    public ProjectEntity findProjectById(long id) {
+        return projectDao.findProjectById(id);
+    }
+
+    public List<Project> getAllProjectsLatesteToOldest() {
+        return projectDao.findAllProjectsOrderedDESC().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private ProjectEntity convertToEntity(Project project) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setName(project.getName());
@@ -101,7 +128,7 @@ public class ProjectBean implements Serializable {
         return projectEntity;
     }
 
-    private Project convertToDto(ProjectEntity projectEntity) {
+    private Project convertToDTO(ProjectEntity projectEntity) {
         Project project = new Project();
         project.setId(projectEntity.getId());
         project.setName(projectEntity.getName());
