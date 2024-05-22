@@ -422,4 +422,12 @@ public class UserEntity implements Serializable {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public Set<UserSkillEntity> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(Set<UserSkillEntity> skills) {
+        this.skills = skills;
+    }
 }
