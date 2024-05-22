@@ -101,12 +101,8 @@ public class UserEntity implements Serializable {
     /**
      * Interests of the user.
      */
-    @ManyToMany
-    @JoinTable(
-            name = "user_interest",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "interest_id"))
-    private Set<InterestEntity> interests;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserInterestEntity> interests = new HashSet<>();
 
     /**
      * Skills of the user.
@@ -317,22 +313,6 @@ public class UserEntity implements Serializable {
         this.userType = userType;
     }
 
-    /**
-     * Getter for the interests.
-     * @return interests of the user.
-     */
-    public Set<InterestEntity> getInterests() {
-        return interests;
-    }
-
-    /**
-     * Setter for the interests.
-     * @param interests new interests of the user.
-     */
-    public void setInterests(Set<InterestEntity> interests) {
-        this.interests = interests;
-    }
-
 
 
     /**
@@ -429,5 +409,13 @@ public class UserEntity implements Serializable {
 
     public void setSkills(Set<UserSkillEntity> skills) {
         this.skills = skills;
+    }
+
+    public Set<UserInterestEntity> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(Set<UserInterestEntity> interests) {
+        this.interests = interests;
     }
 }

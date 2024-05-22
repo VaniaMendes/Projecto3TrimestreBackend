@@ -51,7 +51,7 @@ public class SkillService {
     }
 
     @POST
-    @Path("/associate-skill")
+    @Path("/associate-user")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response associateSkillToUser(@HeaderParam("token") String token, @QueryParam("userId") Long userId, @QueryParam("skillId") Long skillId) {
@@ -78,6 +78,35 @@ public class SkillService {
         }
     }
 
+    @PUT
+    @Path("/softDelete-skill")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateSkill(@HeaderParam("token") String token, @QueryParam("skillId") long skillId,
+                                @QueryParam("userId") long userId, @Context HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to update skill from IP: " + ip);
+
+        // Authentication and authorization
+        User user = userBean.getUSerByToken(token);
+        if(user == null) {
+            logger.error("IP Adress: " + ip +  "User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Update the skill
+        boolean isUpdated = skillBean.softDeleteSkill(userId, skillId);
+
+        System.out.println("isUpdated: " + isUpdated);
+        // Check if the skill was updated successfully
+        if (isUpdated) {
+            logger.info("IP Adress: " + ip + "Skill updated successfully with the id: " + skillId + "by user with id: " + user.getId());
+            return Response.status(Response.Status.OK).entity("Skill updated successfully").build();
+        } else {
+            logger.error("IP Adress: " + ip + "Failed to update skill with the id: " + skillId + "by user with id: " + user.getId());
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update skill").build();
+        }
+    }
 
 
 }
