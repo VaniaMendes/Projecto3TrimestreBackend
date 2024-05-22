@@ -33,4 +33,15 @@ public class ProjectSkillDao extends AbstractDao<ProjectSkillEntity>{
             return new ArrayList<>();
         }
     }
+
+    public ProjectSkillEntity findSkillFromProject(Long projectId, Long skillId) {
+        try {
+            return em.createNamedQuery("ProjectSkill.findSkillFromProject", ProjectSkillEntity.class)
+                    .setParameter("projectId", projectId)
+                    .setParameter("skillId", skillId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

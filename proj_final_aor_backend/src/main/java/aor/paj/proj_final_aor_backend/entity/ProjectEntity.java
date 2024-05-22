@@ -5,8 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class represents a ProjectEntity in the system.
@@ -59,10 +58,6 @@ public class ProjectEntity implements Serializable {
     // Initial date of the project
     @Column(name = "initial_date")
     private LocalDateTime initialDate;
-
-    // Deadline of the project
-    @Column(name = "deadline")
-    private LocalDateTime deadline;
 
     // Conclusion date of the project
     @Column(name = "conclusion_date")
@@ -200,21 +195,6 @@ public class ProjectEntity implements Serializable {
         this.initialDate = initialDate;
     }
 
-    /**
-     * Getter for the deadline of the project.
-     * @return deadline of the project.
-     */
-    public LocalDateTime getDeadline() {
-        return deadline;
-    }
-
-    /**
-     * Setter for the deadline of the project.
-     * @param deadline the new deadline of the project.
-     */
-    public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
-    }
 
     /**
      * Getter for the conclusion date of the project.
@@ -262,6 +242,55 @@ public class ProjectEntity implements Serializable {
      */
     public void setKeywords(String keywords) {
         this.keywords = keywords;
+    }
+
+    /**
+     * This method is used to add a new keyword to the project's keywords.
+     * It first splits the existing keywords string into a list, checks if the new keyword already exists in the list,
+     * and if it doesn't, adds the new keyword to the list. The list is then joined back into a string and set as the project's keywords.
+     *
+     * @param keyword The new keyword to be added to the project's keywords.
+     */
+    public void addKeyword(String keyword) {
+        // Ensure the first letter is uppercase and the rest are lowercase
+        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        if (!keywordsList.contains(keyword)) {
+            keywordsList.add(keyword);
+            this.keywords = String.join(" ", keywordsList);
+        }
+    }
+
+    /**
+     * This method is used to remove a keyword from the project's keywords.
+     * It first splits the existing keywords string into a list, removes the specified keyword from the list,
+     * and then joins the list back into a string and sets it as the project's keywords.
+     *
+     * @param keyword The keyword to be removed from the project's keywords.
+     */
+    public void removeKeyword(String keyword) {
+        // Ensure the first letter is uppercase and the rest are lowercase
+        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        keywordsList.remove(keyword);
+        this.keywords = String.join(" ", keywordsList);
+    }
+
+    /**
+     * This method is used to check if a keyword already exists in the project's keywords.
+     * It first splits the existing keywords string into a list, then checks if the specified keyword is in the list.
+     *
+     * @param keyword The keyword to be checked.
+     * @return true if the keyword exists, false otherwise.
+     */
+    public boolean keywordExists(String keyword) {
+        // Ensure the first letter is uppercase and the rest are lowercase
+        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        return keywordsList.contains(keyword);
     }
 
     /**

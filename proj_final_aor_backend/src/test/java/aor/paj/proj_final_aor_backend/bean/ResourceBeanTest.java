@@ -57,31 +57,31 @@ class ResourceBeanTest {
 
     @Test
     void addSupplierToResourceReturnsNullWhenResourceDoesNotExist() {
-        String resourceName = "resource1";
-        String supplierName = "supplier1";
+        Long resourceId = 1L;
+        Long supplierId = 1L;
 
-        when(resourceDao.findResourceByName(resourceName)).thenReturn(null);
+        when(resourceDao.findResourceById(resourceId)).thenReturn(null);
 
-        ResourceEntity result = resourceBean.addSupplierToResource(resourceName, supplierName);
+        boolean result = resourceBean.addSupplierToResource(resourceId, supplierId);
 
-        assertNull(result);
-        verify(logger).error("Resource with name '" + resourceName + "' does not exist");
+        assertFalse(result);
+        verify(logger).error("Resource with id '" + resourceId + "' does not exist");
     }
 
     @Test
     void addSupplierToResourceReturnsNullWhenSupplierDoesNotExist() {
-        String resourceName = "resource1";
-        String supplierName = "supplier1";
+        Long resourceId = 1L;
+        Long supplierId = 1L;
 
         ResourceEntity resourceEntity = new ResourceEntity();
 
-        when(resourceDao.findResourceByName(resourceName)).thenReturn(resourceEntity);
-        when(supplierBean.findSupplierByName(supplierName)).thenReturn(null);
+        when(resourceDao.findResourceById(resourceId)).thenReturn(resourceEntity);
+        when(supplierBean.findSupplierById(supplierId)).thenReturn(null);
 
-        ResourceEntity result = resourceBean.addSupplierToResource(resourceName, supplierName);
+        boolean result = resourceBean.addSupplierToResource(resourceId, supplierId);
 
-        assertNull(result);
-        verify(logger).error("Supplier does not exist: " + supplierName);
+        assertFalse(result);
+        verify(logger).error("Supplier does not exist: " + supplierId);
     }
 
     @Test

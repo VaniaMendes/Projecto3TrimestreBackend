@@ -263,7 +263,7 @@ public class ResourceBean implements Serializable {
      * If the resource is found, it updates its properties with the non-null values from the parameters.
      * Finally, it persists the updated resource back to the database.
      *
-     * @param name The name of the resource to be updated.
+     * @param id The id of the resource to be updated.
      * @param description The new description of the resource. If null, the description is not updated.
      * @param brand The new brand of the resource. If null, the brand is not updated.
      * @param observation The new observation of the resource. If null, the observation is not updated.
@@ -271,10 +271,10 @@ public class ResourceBean implements Serializable {
      * @param sourceId The new sourceId of the resource. If null, the sourceId is not updated.
      * @return The updated ResourceEntity, or null if the resource does not exist.
      */
-    public ResourceEntity updateResource(String name, String description, String brand, String observation, String photo, String sourceId) {
-        ResourceEntity resourceEntity = resourceDao.findResourceByName(name);
+    public ResourceEntity updateResource(Long id, String description, String brand, String observation, String photo, String sourceId) {
+        ResourceEntity resourceEntity = resourceDao.findResourceById(id);
         if (resourceEntity == null) {
-            logger.error("Resource with name '" + name + "' does not exist");
+            logger.error("Resource with id '" + id + "' does not exist");
             return null;
         }
 
@@ -309,28 +309,28 @@ public class ResourceBean implements Serializable {
      * If both the resource and the supplier are found, it adds the supplier to the resource's suppliers set.
      * Finally, it persists the updated resource back to the database.
      *
-     * @param resourceName The name of the Resource object to which the supplier should be added.
-     * @param supplierName The name of the supplier to be added.
+     * @param resourceId The ID of the Resource object to which the supplier should be added.
+     * @param supplierId The ID of the supplier to be added.
      * @return The updated ResourceEntity, or null if the resource or the supplier does not exist.
      */
-    public ResourceEntity addSupplierToResource(String resourceName, String supplierName) {
-        ResourceEntity resourceEntity = resourceDao.findResourceByName(resourceName);
+    public boolean addSupplierToResource(Long resourceId, Long supplierId) {
+        ResourceEntity resourceEntity = resourceDao.findResourceById(resourceId);
         if (resourceEntity == null) {
-            logger.error("Resource with name '" + resourceName + "' does not exist");
-            return null;
+            logger.error("Resource with id '" + resourceId + "' does not exist");
+            return false;
         }
 
-        SupplierEntity supplierEntity = supplierBean.findSupplierByName(supplierName);
+        SupplierEntity supplierEntity = supplierBean.findSupplierById(supplierId);
         if (supplierEntity == null) {
-            logger.error("Supplier does not exist: " + supplierName);
-            return null;
+            logger.error("Supplier does not exist: " + supplierId);
+            return false;
         }
 
         persistResourceSupplierConnection(resourceEntity, supplierEntity);
 
         resourceEntity.setUpdatedAt(LocalDateTime.now());
         resourceDao.merge(resourceEntity);
-        return resourceEntity;
+        return true;
     }
 
     /**

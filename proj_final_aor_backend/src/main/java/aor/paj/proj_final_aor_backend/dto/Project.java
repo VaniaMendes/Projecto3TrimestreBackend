@@ -36,9 +36,6 @@ public class Project {
     @XmlElement
     private LocalDateTime initialDate;
 
-    // Final date of the project
-    @XmlElement
-    private LocalDateTime deadline;
 
     // Date and time when the project was concluded
     @XmlElement
@@ -182,21 +179,6 @@ public class Project {
         this.initialDate = initialDate;
     }
 
-    /**
-     * Getter for the final date of the project.
-     * @return final date of the project.
-     */
-    public LocalDateTime getDeadline() {
-        return deadline;
-    }
-
-    /**
-     * Setter for the final date of the project.
-     * @param deadline the new final date of the project.
-     */
-    public void setDeadline(LocalDateTime deadline) {
-        this.deadline = deadline;
-    }
 
     /**
      * Getter for the conclusion date of the project.

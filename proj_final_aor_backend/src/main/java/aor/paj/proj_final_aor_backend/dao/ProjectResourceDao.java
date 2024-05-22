@@ -33,4 +33,15 @@ public class ProjectResourceDao extends AbstractDao<ProjectResourceEntity>{
             return new ArrayList<>();
         }
     }
+
+    public ProjectResourceEntity findResourceFromProject(Long projectId, Long resourceId) {
+        try {
+            return em.createNamedQuery("ProjectResource.findResourceFromProject", ProjectResourceEntity.class)
+                    .setParameter("projectId", projectId)
+                    .setParameter("resourceId", resourceId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
