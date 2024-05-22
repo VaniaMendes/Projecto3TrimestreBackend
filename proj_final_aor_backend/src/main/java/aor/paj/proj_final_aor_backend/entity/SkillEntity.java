@@ -14,6 +14,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
  */
 @Entity
 @Table(name="skill")
+@NamedQuery(name = "Skill.findSkillById", query = "SELECT s FROM SkillEntity s WHERE s.id = :id")
 public class SkillEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -109,6 +109,20 @@ public class SupplierBean implements Serializable {
     }
 
     /**
+     * Retrieves a supplier from the database by its ID.
+     *
+     * This method uses the {@code findSupplierById} method of the {@code supplierDao} to retrieve a supplier entity
+     * with the given ID from the database. If a supplier entity with the given ID is found, the method returns the entity.
+     * If no such supplier entity is found, the method returns null.
+     *
+     * @param id The ID of the supplier to retrieve.
+     * @return The SupplierEntity with the given ID, or null if no such supplier exists.
+     */
+    public SupplierEntity findSupplierById(Long id) {
+        return supplierDao.findSupplierById(id);
+    }
+
+    /**
      * Retrieves all suppliers from the database.
      * <p>
      * This method fetches all {@link SupplierEntity} objects from the database using the {@code findAllSuppliers} method

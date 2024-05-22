@@ -111,27 +111,32 @@ public class ResourceService {
     }
 
     @PUT
-    @Path("/update")
+    @Path("/{id}/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateResource(@QueryParam("name") String name,
-                                   @QueryParam("description") String description,
-                                   @QueryParam("brand") String brand,
-                                   @QueryParam("observation") String observation,
-                                   @QueryParam("photo") String photo,
-                                   @QueryParam("sourceId") String sourceId,
-                                   @QueryParam("supplier") String supplierName) {
-        if (supplierName != null) {
-            resourceBean.addSupplierToResource(name, supplierName);
-            return Response.status(Response.Status.OK).entity("Resource supplier updated successfully").build();
-        }
+    public Response updateResource(@PathParam("id") long id, Resource resource) {
 
-        if (resourceBean.updateResource(name, description, brand, observation, photo, sourceId) != null) {
+        if (resourceBean.updateResource(id, resource.getDescription(), resource.getBrand(), resource.getObservation(), resource.getPhoto(), resource.getSourceId()) != null) {
             return Response.status(Response.Status.OK).entity("Resource updated successfully").build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update resource").build();
     }
+
+    @PUT
+    @Path("/{id}/supplier")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateResourceSupplier(@PathParam("id") Long resourceId, @HeaderParam("supplierId") Long supplierId) {
+
+        if (supplierId != null) {
+            resourceBean.addSupplierToResource(resourceId, supplierId);
+            return Response.status(Response.Status.OK).entity("Resource supplier updated successfully").build();
+        }
+
+        return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update resource supplier").build();
+    }
+
 
 
 }
