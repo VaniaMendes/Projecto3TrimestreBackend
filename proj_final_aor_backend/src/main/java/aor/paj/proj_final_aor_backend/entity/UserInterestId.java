@@ -68,7 +68,7 @@ public class UserInterestId implements Serializable {
      * Overridden hashCode method for the composite key.
      * @return the hash code of the composite key.
      */
-     
+
     @Override
     public int hashCode() {
         return Objects.hash(user, interest);

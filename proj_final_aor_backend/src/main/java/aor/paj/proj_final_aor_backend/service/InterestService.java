@@ -50,4 +50,31 @@ public class InterestService {
         }
     }
 
+    @POST
+    @Path("/associate-user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response associateSkillToUser(@HeaderParam("token") String token, @QueryParam("userId") Long userId, @QueryParam("interestId") Long interestId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to associate interest to user from IP: " + ip);
+
+        // Authentication and authorization
+        User user = userBean.getUSerByToken(token);
+        if(user == null || user.getId() != userId) {
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Associate the skill to the user
+        boolean isAssociated = interestBean.associateInterestToUser(userId, interestId);
+
+        // Check if the skill was associated successfully
+        if (isAssociated) {
+            logger.info("Interest associated successfully to user: " + userId);
+            return Response.status(Response.Status.OK).entity("Skill associated successfully").build();
+        } else {
+            logger.error("Failed to associate interest to user: " + userId);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to associate interest").build();
+        }
+    }
 }

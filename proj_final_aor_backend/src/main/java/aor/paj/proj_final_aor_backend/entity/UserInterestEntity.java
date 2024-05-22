@@ -7,6 +7,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "user_interest")
 @IdClass(UserInterestId.class)
+
+@NamedQuery(name = "UserInterestEntity.findUserInterest", query = "SELECT u FROM UserSkillEntity u WHERE u.user.id = :user AND u.id = :interest")
 public class UserInterestEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
