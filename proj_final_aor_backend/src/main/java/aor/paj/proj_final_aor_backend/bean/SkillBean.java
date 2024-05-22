@@ -68,6 +68,4 @@ public class SkillBean implements Serializable {
     }
 
 
-
-
 }
