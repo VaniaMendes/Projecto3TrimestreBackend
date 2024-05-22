@@ -7,9 +7,8 @@ import java.io.Serializable;
 @Entity
 @Table(name = "user_skill")
 @IdClass(UserSkillId.class)
-@NamedQuery(name = "UserSkillEntity.findAllSkillsFromAUser", query = "SELECT u FROM UserSkillEntity u WHERE u.user = :user")
-@NamedQuery(name = "UserSkillEntity.findUserSkill", query = "SELECT u FROM UserSkillEntity u WHERE u.user = :user AND u.skill = :skill")
-@NamedQuery(name= "UserSkillEntity.findAllUsersWithSkill", query = "SELECT u FROM UserSkillEntity u WHERE u.skill = :skill")
+@NamedQuery(name = "UserSkillEntity.findAllUsersWithSkillAndActive", query = "SELECT u FROM UserSkillEntity u WHERE u.skill = :skill AND u.active = :active")
+@NamedQuery(name= "UserSkillEntity.findAllSkillsForUser", query = "SELECT u FROM UserSkillEntity u WHERE u.user = :user")
 
 
 public class UserSkillEntity implements Serializable {
@@ -51,5 +50,13 @@ public class UserSkillEntity implements Serializable {
 
     public void setSkill(SkillEntity skill) {
         this.skill = skill;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

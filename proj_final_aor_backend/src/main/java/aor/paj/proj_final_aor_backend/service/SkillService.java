@@ -50,6 +50,34 @@ public class SkillService {
         }
     }
 
+    @POST
+    @Path("/associate-skill")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response associateSkillToUser(@HeaderParam("token") String token, @QueryParam("userId") Long userId, @QueryParam("skillId") Long skillId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to associate skill to user from IP: " + ip);
+
+        // Authentication and authorization
+        User user = userBean.getUSerByToken(token);
+        if(user == null || user.getId() != userId) {
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Associate the skill to the user
+        boolean isAssociated = skillBean.associateSkillToUser(userId, skillId);
+
+        // Check if the skill was associated successfully
+        if (isAssociated) {
+            logger.info("Skill associated successfully to user: " + userId);
+            return Response.status(Response.Status.OK).entity("Skill associated successfully").build();
+        } else {
+            logger.error("Failed to associate skill to user: " + userId);
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to associate skill").build();
+        }
+    }
+
 
 
 }

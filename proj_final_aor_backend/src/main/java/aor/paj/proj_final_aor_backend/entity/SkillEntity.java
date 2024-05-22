@@ -36,6 +36,7 @@ public class SkillEntity implements Serializable {
     /**
      * Type of the skill. It is unique and cannot be updated.
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, updatable = false)
     private SkillType type;
 
