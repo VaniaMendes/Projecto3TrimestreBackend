@@ -52,4 +52,12 @@ public class UserSkillEntity implements Serializable {
     public void setSkill(SkillEntity skill) {
         this.skill = skill;
     }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }
