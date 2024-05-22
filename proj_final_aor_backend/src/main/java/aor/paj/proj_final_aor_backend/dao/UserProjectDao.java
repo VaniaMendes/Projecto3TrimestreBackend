@@ -14,7 +14,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         super(UserProjectEntity.class);
     }
 
-    public List<UserProjectEntity> findUserProjectByProjectId(String id) {
+    public List<UserProjectEntity> findUserProjectByProjectId(Long id) {
         try {
             return em.createNamedQuery("UserProject.findUserProjectByProjectId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
@@ -22,7 +22,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
-    public List<UserProjectEntity> findUserProjectByUserId(String id) {
+    public List<UserProjectEntity> findUserProjectByUserId(Long id) {
         try {
             return em.createNamedQuery("UserProject.findUserProjectByUserId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
@@ -30,5 +30,20 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
+    public List<UserProjectEntity> findActiveUsersByProjectId(Long id) {
+        try {
+            return em.createNamedQuery("UserProject.findActiveUsersByProjectId", UserProjectEntity.class).setParameter("id", id).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<UserProjectEntity> findActiveProjectsFromAUserByUserId(Long id) {
+        try {
+            return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserId", UserProjectEntity.class).setParameter("id", id).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }

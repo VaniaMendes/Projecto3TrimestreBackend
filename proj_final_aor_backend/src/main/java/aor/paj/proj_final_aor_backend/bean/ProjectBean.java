@@ -91,7 +91,21 @@ public class ProjectBean implements Serializable {
         return false;
     }
 
-    public ProjectEntity findProjectById(String id) {
+    public boolean updateState(long id, int stateId) {
+        ProjectEntity projectEntity = projectDao.findProjectById(id);
+        if (projectEntity == null || !isValidStateId(stateId)) {
+            return false;
+        }
+        projectEntity.setStateId(stateId);
+        projectDao.merge(projectEntity);
+        return true;
+    }
+
+    private boolean isValidStateId(int stateId) {
+        return stateId == 100 || stateId == 200 || stateId == 300 || stateId == 400 || stateId == 500 || stateId == 600;
+    }
+
+    public ProjectEntity findProjectById(long id) {
         return projectDao.findProjectById(id);
     }
 

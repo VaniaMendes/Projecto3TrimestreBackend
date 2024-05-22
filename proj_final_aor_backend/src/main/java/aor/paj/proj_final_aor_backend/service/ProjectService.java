@@ -55,4 +55,23 @@ public class ProjectService {
         return Response.status(Response.Status.OK).entity(projectBean.getAllProjectsLatesteToOldest()).build();
     }
 
+    @PUT
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateProject(@QueryParam("id") long projectId,
+                                  @QueryParam("stateId") int stateId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to update project from IP: " + ip);
+
+        if (projectBean.updateState(projectId, stateId)) {
+            logger.info("Project updated successfully");
+            return Response.status(Response.Status.OK).entity("Project updated successfully").build();
+        } else {
+            logger.error("Failed to update project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update project").build();
+        }
+
+    }
+
 }

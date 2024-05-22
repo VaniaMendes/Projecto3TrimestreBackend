@@ -11,6 +11,8 @@ import java.util.Set;
 
 @NamedQuery(name = "UserProject.findUserProjectByProjectId", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id")
 @NamedQuery(name = "UserProject.findUserProjectByUserId", query = "SELECT up FROM UserProjectEntity up WHERE up.user.id = :id")
+@NamedQuery(name = "UserProject.findActiveUsersByProjectId", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
+@NamedQuery(name = "UserProject.findActiveProjectsFromAUserByUserId", query = "SELECT up FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 public class UserProjectEntity implements Serializable {
 
     @Id

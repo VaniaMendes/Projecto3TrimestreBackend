@@ -515,6 +515,10 @@ public class UserBean implements Serializable {
         }
     }
 
+    public UserEntity findUserById(long id) {
+        return userDao.findUserById(id);
+    }
+
     /**
      * This method is responsible for converting a UserDto object to a UserEntity object.
      * @param user The UserDto object to convert. It should be a valid UserDto object.
