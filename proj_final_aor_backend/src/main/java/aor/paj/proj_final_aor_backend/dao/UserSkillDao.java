@@ -32,8 +32,21 @@ public class UserSkillDao extends AbstractDao<UserSkillEntity>{
         }
     }
 
+
+
+    public UserSkillEntity findUserSkillByUserAndSkill(long userId, long skillId) {
+        try {
+            return (UserSkillEntity) em.createNamedQuery("UserSkillEntity.findUserSkill").setParameter("user", userId).setParameter("skill", skillId).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     public void createUserSkill(UserSkillEntity userSkill) {
         persist(userSkill);
+    }
+
+    public void updateUserSkill(UserSkillEntity userSkill) {
+        merge(userSkill);
     }
 
 }

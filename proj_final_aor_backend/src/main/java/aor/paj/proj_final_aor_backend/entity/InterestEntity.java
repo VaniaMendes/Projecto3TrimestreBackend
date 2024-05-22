@@ -3,6 +3,8 @@ package aor.paj.proj_final_aor_backend.entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * InterestEntity is a JPA entity that represents the interests of the users.
@@ -29,6 +31,13 @@ public class InterestEntity implements Serializable {
      */
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
+
+    /**
+     * Set of users associated with the interest.
+     */
+    @OneToMany(mappedBy = "interest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserInterestEntity> interests = new HashSet<>();
+
 
     /**
      * Default constructor for InterestEntity.
@@ -71,5 +80,22 @@ public class InterestEntity implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Getter for the 'interests' field.
+     *
+     * @return Set<UserInterestEntity> - The set of users associated with the interest.
+     */
+    public Set<UserInterestEntity> getInterests() {
+        return interests;
+    }
+
+    /**
+     * Setter for the 'interests' field.
+     * @param interests - The set of users to set for the interest.
+     */
+    public void setInterests(Set<UserInterestEntity> interests) {
+        this.interests = interests;
     }
 }

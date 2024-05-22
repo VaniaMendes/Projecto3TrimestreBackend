@@ -68,4 +68,24 @@ public class SkillBean implements Serializable {
     }
 
 
+    public boolean softDeleteSkill(long userId, long skillId) {
+        // Fetch the user and skill from the database
+        UserEntity user = userDao.findUserById(userId);
+        SkillEntity skill = skillDao.find(skillId);
+
+
+        if (user == null || skill == null) {
+            // Either the user or the skill does not exist
+            System.out.println("User or skill does not exist");
+            return false;
+        }
+        UserSkillEntity userSkill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
+        if (userSkill == null) {
+            System.out.println("userSkill entity does not exist");
+            return false;
+        }
+        userSkill.setActive(false); // Soft delete the skill
+        userSkillDao.updateUserSkill(userSkill);
+        return true;
+    }
 }
