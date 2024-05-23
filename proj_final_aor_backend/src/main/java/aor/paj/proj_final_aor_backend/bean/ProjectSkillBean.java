@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectSkillDao;
+import aor.paj.proj_final_aor_backend.dto.Skill;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectSkillEntity;
 import aor.paj.proj_final_aor_backend.entity.SkillEntity;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class ProjectSkillBean implements Serializable {
@@ -18,6 +21,9 @@ public class ProjectSkillBean implements Serializable {
 
     @EJB
     private ProjectSkillDao projectSkillDao;
+
+    @EJB
+    private SkillBean skillBean;
 
     public ProjectSkillBean() {
     }
@@ -60,6 +66,16 @@ public class ProjectSkillBean implements Serializable {
         projectSkillDao.merge(projectSkillEntity);
         logger.info("Project and Skill connection updated");
         return true;
+    }
+
+    public ArrayList<Skill> getSkillsOfProject(Long projectId) {
+        List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllSkillsFromProject(projectId);
+        ArrayList<Skill> skills = new ArrayList<>();
+        for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
+            SkillEntity skillEntity = projectSkillEntity.getSkill();
+            skills.add(skillBean.convertToDTO(skillEntity));
+        }
+        return skills;
     }
 
 

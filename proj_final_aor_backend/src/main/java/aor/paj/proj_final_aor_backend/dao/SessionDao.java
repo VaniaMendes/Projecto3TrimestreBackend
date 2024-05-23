@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.dao;
 
 import aor.paj.proj_final_aor_backend.entity.SessionEntity;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
 
 @Stateless
@@ -31,6 +32,14 @@ public class SessionDao extends AbstractDao<SessionEntity> {
     public SessionEntity findSessionByToken(String token) {
         try {
             return (SessionEntity) em.createNamedQuery("Session.findSessionByToken").setParameter("token", token).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public UserEntity findUserByToken(String token) {
+        try {
+            return (UserEntity) em.createNamedQuery("Session.findUserByToken").setParameter("token", token).getSingleResult();
         } catch (Exception e) {
             return null;
         }

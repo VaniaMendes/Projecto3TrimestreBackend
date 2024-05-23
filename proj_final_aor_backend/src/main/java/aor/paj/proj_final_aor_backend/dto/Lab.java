@@ -23,6 +23,10 @@ public class Lab {
     public Lab() {
     }
 
+    public Lab(String name) {
+        this.name = Workplace.valueOf(name);
+    }
+
     /**
      * Returns the id of the lab.
      * @return the id of the lab

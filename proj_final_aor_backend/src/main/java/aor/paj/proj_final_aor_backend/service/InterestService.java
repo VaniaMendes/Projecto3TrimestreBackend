@@ -42,7 +42,7 @@ public class InterestService {
 
         // Check if the skill was created successfully
         if (created) {
-            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + interest.getName() + "by user with ");
+            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + interest.getName() + " by user with ");
             return Response.status(Response.Status.CREATED).entity("Skill created successfully").build();
         } else {
             logger.error("Failed to create skill: " + interest.getName());

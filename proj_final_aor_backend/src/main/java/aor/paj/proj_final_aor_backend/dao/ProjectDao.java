@@ -158,14 +158,6 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
-    public List<ProjectEntity> findAllProjectsOrderedByVacancy() {
-        try {
-            return em.createNamedQuery("Project.findAllProjectsOrderedByVacancy", ProjectEntity.class).getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
     public Integer countAllProjects() {
         try {
             return ((Number) em.createNamedQuery("Project.countAllProjects").getSingleResult()).intValue();

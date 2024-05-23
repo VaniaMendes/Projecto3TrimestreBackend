@@ -22,10 +22,10 @@ import java.util.*;
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
 @NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
-@NamedQuery(name = "Project.findAllProjectsOrderedByVacancy", query = "SELECT p FROM ProjectEntity p ORDER BY (p.maxMembers - (SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = p.id)) DESC")
-
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
-@NamedQuery(name = "Project.countProjectVacancyNumber", query = "SELECT (p.maxMembers - (SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = p.id)) FROM ProjectEntity p WHERE p.id = :projectId")
+
+//Queries para saber vagas
+
 
 public class ProjectEntity implements Serializable {
 
@@ -71,9 +71,6 @@ public class ProjectEntity implements Serializable {
     @Column(name = "keywords", nullable = false)
     private String keywords;
 
-    // Maximum number of members in the project
-    @Column(name = "max_members", nullable = false)
-    private int maxMembers;
 
     // Needs of the project
     @Column(name = "needs")
@@ -236,12 +233,28 @@ public class ProjectEntity implements Serializable {
         return keywords;
     }
 
+
     /**
-     * Setter for the keywords related to the project.
-     * @param keywords the new keywords related to the project.
+     * Sets the keywords for the project.
+     * The input string is split into individual words, and each word is transformed such that
+     * it begins with an uppercase letter and the rest of the letters are in lowercase.
+     * The transformed words are then joined back into a single string with spaces in between,
+     * and this string is set as the project's keywords.
+     *
+     * @param keywords A string of keywords for the project. The keywords should be separated by spaces.
      */
     public void setKeywords(String keywords) {
-        this.keywords = keywords;
+        // Split the input string into individual words
+        String[] words = keywords.split(" ");
+
+        // Loop through each word
+        for (int i = 0; i < words.length; i++) {
+            // Transform the word so that it begins with an uppercase letter and the rest of the letters are in lowercase
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+
+        // Join the transformed words back into a single string with spaces in between
+        this.keywords = String.join(" ", words);
     }
 
     /**
@@ -274,8 +287,12 @@ public class ProjectEntity implements Serializable {
         keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
 
         List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
-        keywordsList.remove(keyword);
-        this.keywords = String.join(" ", keywordsList);
+
+        // Only remove the keyword if there's more than one keyword
+        if (keywordsList.size() > 1) {
+            keywordsList.remove(keyword);
+            this.keywords = String.join(" ", keywordsList);
+        }
     }
 
     /**
@@ -294,19 +311,18 @@ public class ProjectEntity implements Serializable {
     }
 
     /**
-     * Getter for the maximum number of members in the project.
-     * @return maximum number of members in the project.
+     * This method checks if the provided keyword is the only keyword associated with the project.
+     * It first splits the existing keywords string into a list, then checks if the list contains only the specified keyword.
+     *
+     * @param keyword The keyword to be checked.
+     * @return true if the keyword is the only one, false otherwise.
      */
-    public int getMaxMembers() {
-        return maxMembers;
-    }
+    public boolean isKeywordOnly(String keyword) {
+        // Ensure the first letter is uppercase and the rest are lowercase
+        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
 
-    /**
-     * Setter for the maximum number of members in the project.
-     * @param maxMembers the new maximum number of members in the project.
-     */
-    public void setMaxMembers(int maxMembers) {
-        this.maxMembers = maxMembers;
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        return keywordsList.size() == 1 && keywordsList.contains(keyword);
     }
 
     /**
