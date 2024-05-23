@@ -88,4 +88,12 @@ public class SkillBean implements Serializable {
         userSkillDao.updateUserSkill(userSkill);
         return true;
     }
+
+    public Skill convertToDTO(SkillEntity skillEntity) {
+        Skill skill = new Skill();
+        skill.setId(skillEntity.getId());
+        skill.setName(skillEntity.getName());
+        skill.setType(skillEntity.getType());
+        return skill;
+    }
 }

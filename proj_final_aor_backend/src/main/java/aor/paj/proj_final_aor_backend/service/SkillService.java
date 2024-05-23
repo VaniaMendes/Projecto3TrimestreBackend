@@ -42,7 +42,7 @@ public class SkillService {
 
         // Check if the skill was created successfully
         if (created) {
-            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + skill.getName() + "by user with ");
+            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + skill.getName() + " by user with ");
             return Response.status(Response.Status.CREATED).entity("Skill created successfully").build();
         } else {
             logger.error("Failed to create skill: " + skill.getName());
@@ -100,10 +100,10 @@ public class SkillService {
         System.out.println("isUpdated: " + isUpdated);
         // Check if the skill was updated successfully
         if (isUpdated) {
-            logger.info("IP Adress: " + ip + "Skill updated successfully with the id: " + skillId + "by user with id: " + user.getId());
+            logger.info("IP Adress: " + ip + "Skill updated successfully with the id: " + skillId + " by user with id: " + user.getId());
             return Response.status(Response.Status.OK).entity("Skill updated successfully").build();
         } else {
-            logger.error("IP Adress: " + ip + "Failed to update skill with the id: " + skillId + "by user with id: " + user.getId());
+            logger.error("IP Adress: " + ip + "Failed to update skill with the id: " + skillId + " by user with id: " + user.getId());
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update skill").build();
         }
     }

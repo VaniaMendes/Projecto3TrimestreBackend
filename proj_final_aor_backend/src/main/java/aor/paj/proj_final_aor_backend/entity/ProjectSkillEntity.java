@@ -8,8 +8,8 @@ import java.io.Serializable;
 @Table(name = "project_skill")
 @IdClass(ProjectSkillId.class)
 
-@NamedQuery(name = "ProjectSkill.findAllSkillsFromProject", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId")
-@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkill", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId")
+@NamedQuery(name = "ProjectSkill.findAllSkillsFromProject", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId AND ps.activeStatus = true")
+@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkill", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true")
 @NamedQuery(name = "ProjectSkill.findSkillFromProject", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId AND ps.skill.id = :skillId")
 public class ProjectSkillEntity implements Serializable {
 
