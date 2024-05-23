@@ -13,6 +13,7 @@ import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
@@ -35,7 +36,7 @@ public class UserBean implements Serializable {
 
     @EJB
     SessionDao sessionDao;
-    @EJB
+    @Inject
     EmailServiceHelper emailService;
     @EJB
     AuthenticationDao authenticationDao;
@@ -187,14 +188,12 @@ public class UserBean implements Serializable {
             return false;
         }
 
-
         //Check if the lab is valid
         if(user.getLab() == null){
             return false;
         }
         LabEntity labEntity = labDao.findLabById(user.getLab().getId());
         System.out.println(labEntity.getName());
-
 
         //Check if the token is valid
         UserEntity userConfirm = authenticationDao.findUserByAuthenticationToken(token);
@@ -450,8 +449,6 @@ public class UserBean implements Serializable {
 
 
     //Methods for update user´s fields
-
-
     /**
      * This method is responsible for updating a user´s fields.
      * It verifies if the user exists, if the fields are valid, and if the nickname already exists.

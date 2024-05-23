@@ -139,7 +139,7 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response recoveryPassword(@QueryParam("email") String email, @Context HttpServletRequest request) {
+    public Response recoveryPassword(@HeaderParam("email") String email, @Context HttpServletRequest request) {
 
         try {
             boolean isRecovered = userBean.recoveryPassword(email);

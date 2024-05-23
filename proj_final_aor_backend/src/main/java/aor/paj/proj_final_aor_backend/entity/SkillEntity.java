@@ -1,7 +1,9 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import aor.paj.proj_final_aor_backend.util.enums.SkillType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -15,6 +17,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name="skill")
 @NamedQuery(name = "Skill.findSkillById", query = "SELECT s FROM SkillEntity s WHERE s.id = :id")
+@NamedQuery(name = "Skill.findAllSkills", query = "SELECT s FROM SkillEntity s")
+@NamedQuery(name = "Skill.findSkillByName", query = "SELECT s FROM SkillEntity s WHERE s.name = :name")
+@JsonIgnoreProperties({"projectSkill", "usersSkills"})
 public class SkillEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,12 +47,12 @@ public class SkillEntity implements Serializable {
     private SkillType type;
 
     // Set of projects associated with the skill
-    @OneToMany(mappedBy = "skill")
+    @OneToMany(mappedBy = "skill", fetch = FetchType.EAGER)
     private Set<ProjectSkillEntity> projectSkill = new HashSet<>();
 
 
     // Set of users associated with the skill
-    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "skill", fetch = FetchType.EAGER)
     private Set<UserSkillEntity> usersSkills = new HashSet<>();
 
 
