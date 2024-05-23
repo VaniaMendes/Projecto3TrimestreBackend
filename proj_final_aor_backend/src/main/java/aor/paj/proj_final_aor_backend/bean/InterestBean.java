@@ -50,6 +50,9 @@ public class InterestBean {
             return false;
         }
 
+        if(verifyInterestExists(interestId)){
+            return false;
+        }
         // Associate the skill to the user
         UserInterestEntity userInterest = new UserInterestEntity();
         userInterest.setUser(user);
@@ -59,6 +62,11 @@ public class InterestBean {
         userInterestDao.persist(userInterest);
 
         return true;
+    }
+
+    public boolean verifyInterestExists(Long interestId){
+        InterestEntity interest = interestDao.find(interestId);
+        return interest != null;
     }
     public boolean softDeleteInterest(Long userId, Long interestId){
         // Fetch the user and skill from the database

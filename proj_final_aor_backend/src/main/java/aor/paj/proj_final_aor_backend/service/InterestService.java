@@ -70,10 +70,10 @@ public class InterestService {
 
         // Check if the skill was associated successfully
         if (isAssociated) {
-            logger.info("Interest associated successfully to user: " + userId);
+            logger.info("Interest with the id: " + interestId + " associated successfully to user: " + userId);
             return Response.status(Response.Status.OK).entity("Skill associated successfully").build();
         } else {
-            logger.error("Failed to associate interest to user: " + userId);
+            logger.error("Failed to associate interest with id:" + interestId + " to user: " + userId);
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to associate interest").build();
         }
     }
