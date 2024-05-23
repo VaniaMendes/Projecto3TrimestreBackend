@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -13,6 +14,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name="interest")
+@NamedQuery(name= "InterestEntity.findInterestByName", query ="SELECT i FROM InterestEntity i WHERE i.name=:name")
+@NamedQuery(name= "InterestEntity.findAllInterests", query ="SELECT i FROM InterestEntity i ORDER BY i.name ASC")
+@JsonIgnoreProperties({"interests"})
 public class InterestEntity implements Serializable {
 
 
@@ -35,7 +39,7 @@ public class InterestEntity implements Serializable {
     /**
      * Set of users associated with the interest.
      */
-    @OneToMany(mappedBy = "interest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "interest", fetch = FetchType.EAGER)
     private Set<UserInterestEntity> interests = new HashSet<>();
 
 
