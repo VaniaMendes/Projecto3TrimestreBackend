@@ -20,7 +20,7 @@ public class UserInterestDao extends AbstractDao<UserInterestEntity>{
         merge(userInterest);
     }
 
-    public UserInterestEntity findUserInterestByUserAndSkill(long userId, long interestId) {
+    public UserInterestEntity findUserInterestByUserAndInterest(long userId, long interestId) {
         try {
             return (UserInterestEntity) em.createNamedQuery("UserInterestEntity.findUserInterest").setParameter("user", userId).setParameter("interest", interestId).getSingleResult();
         } catch (Exception e) {

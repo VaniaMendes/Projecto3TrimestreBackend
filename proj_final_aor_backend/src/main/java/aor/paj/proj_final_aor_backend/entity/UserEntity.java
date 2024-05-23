@@ -101,13 +101,13 @@ public class UserEntity implements Serializable {
     /**
      * Interests of the user.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL)
     private Set<UserInterestEntity> interests = new HashSet<>();
 
     /**
      * Skills of the user.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserSkillEntity> skills = new HashSet<>();
 
     /**

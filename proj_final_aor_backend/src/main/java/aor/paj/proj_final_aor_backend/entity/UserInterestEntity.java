@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Table(name = "user_interest")
 @IdClass(UserInterestId.class)
 
-@NamedQuery(name = "UserInterestEntity.findUserInterest", query = "SELECT u FROM UserSkillEntity u WHERE u.user.id = :user AND u.id = :interest")
+@NamedQuery(name = "UserInterestEntity.findUserInterest", query = "SELECT u FROM UserInterestEntity u WHERE u.user.id = :user AND u.interest.id = :interest")
 public class UserInterestEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -16,7 +16,7 @@ public class UserInterestEntity implements Serializable {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id",  nullable = false)
     private UserEntity user;
 
     @Id
