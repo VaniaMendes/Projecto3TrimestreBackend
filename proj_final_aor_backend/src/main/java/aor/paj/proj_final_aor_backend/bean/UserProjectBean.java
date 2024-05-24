@@ -1,7 +1,9 @@
 package aor.paj.proj_final_aor_backend.bean;
 
-import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.UserProjectDao;
+import aor.paj.proj_final_aor_backend.dto.Skill;
+import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
 import aor.paj.proj_final_aor_backend.dto.UserProject;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
@@ -15,44 +17,68 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stateless EJB bean for managing user-project associations.
+ */
 @Stateless
 public class UserProjectBean implements Serializable {
 
     // Logger instance for logging events, info, errors etc.
     private static final Logger logger = LogManager.getLogger(UserProjectBean.class);
 
+    // EJB injection for UserProjectDao
     @EJB
     private UserProjectDao userProjectDao;
 
+    // EJB injection for UserBean
     @EJB
     private UserBean userBean;
 
+    // EJB injection for ProjectBean
     @EJB
     private ProjectBean projectBean;
 
+    /**
+     * Default constructor for UserProjectBean.
+     */
     public UserProjectBean() {
     }
 
+    /**
+     * Overloaded constructor for UserProjectBean.
+     * @param userProjectDao UserProjectDao instance
+     */
     public UserProjectBean(UserProjectDao userProjectDao) {
         this.userProjectDao = userProjectDao;
     }
 
+    /**
+     * Method to add a user to a project.
+     * @param userEntity UserEntity instance representing the user to be added
+     * @param projectEntity ProjectEntity instance representing the project to which the user is to be added
+     * @param userType UserTypeInProject enum value representing the type of user in the project
+     * @return boolean value indicating whether the user was successfully added to the project
+     */
     public boolean addUserToProject(UserEntity userEntity, ProjectEntity projectEntity, UserTypeInProject userType) {
 
+        // If the user type is EXITED, return false
         if (userType == UserTypeInProject.EXITED) {
             return false;
         }
 
+        // If the user already exists in the project, return false
         if (userProjectExists(userEntity.getId(), projectEntity.getId())) {
             return false;
         }
 
+        // Create a new UserProjectEntity instance
         UserProjectEntity userProjectEntity = new UserProjectEntity();
         userProjectEntity.setProject(projectEntity);
         userProjectEntity.setUser(userEntity);
         userProjectEntity.setUserType(userType);
         userProjectEntity.setExited(false);
 
+        // If the user type is CANDIDATE, set approved to false, else set it to true and set the joinedAt time
         if (userType == UserTypeInProject.CANDIDATE) {
             userProjectEntity.setApproved(false);
         } else {
@@ -60,38 +86,113 @@ public class UserProjectBean implements Serializable {
             userProjectEntity.setJoinedAt(LocalDateTime.now());
         }
 
+        // Persist the UserProjectEntity instance
         userProjectDao.persist(userProjectEntity);
         logger.info("User added to Project");
         return true;
     }
 
+    /**
+     * Method to remove a user from a project.
+     * @param userId The ID of the user to be removed.
+     * @param projectId The ID of the project from which the user is to be removed.
+     * @return boolean value indicating whether the user was successfully removed from the project.
+     */
     public boolean removeUserFromProject(Long userId, Long projectId) {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
+        // If the user does not exist in the project or is the creator of the project, return false
         if (!userProjectExists(userId, projectId) || isCreator(userId, projectId)) {
             return false;
         }
 
+        // Set the user's status to exited and update the time they left the project
         userProjectEntity.setExited(true);
+        userProjectEntity.setUserType(UserTypeInProject.EXITED);
+        userProjectEntity.setLeftAt(LocalDateTime.now());
         userProjectDao.merge(userProjectEntity);
         logger.info("User removed from Project");
         return true;
     }
 
-    private boolean userProjectExists(Long userId, Long projectId) {
+    /**
+     * Method to approve a user in a project.
+     * @param userId The ID of the user to be approved.
+     * @param projectId The ID of the project in which the user is to be approved.
+     * @return boolean value indicating whether the user was successfully approved in the project.
+     */
+    public boolean approveUserInProject(Long userId, Long projectId, UserTypeInProject userType) {
+        if (userType == UserTypeInProject.EXITED || userType == UserTypeInProject.CREATOR || userType == UserTypeInProject.CANDIDATE) {
+            logger.warn("Cannot approve user type EXITED, CREATOR or CANDIDATE");
+            return false;
+        }
+
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
+        // If the user does not exist in the project or has already been approved, return false
+        if (userProjectEntity == null || userProjectEntity.isApproved()) {
+            logger.warn("User not found or approved in Project at some point");
+            return false;
+        }
+
+        // Set the user's status to approved and update the time they joined the project
+        userProjectEntity.setApproved(true);
+        userProjectEntity.setUserType(userType);
+        userProjectEntity.setJoinedAt(LocalDateTime.now());
+        userProjectDao.merge(userProjectEntity);
+        logger.info("User approved in Project");
+        return true;
+    }
+
+    public boolean updateUserTypeInProject(Long userId, Long projectId, UserTypeInProject userType) {
+        if (userType == UserTypeInProject.EXITED || userType == UserTypeInProject.CREATOR || userType == UserTypeInProject.CANDIDATE) {
+            logger.warn("Cannot update user type to EXITED, CREATOR or CANDIDATE");
+            return false;
+        }
+
+        UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
+
+        // If the user does not exist in the project, return false
+        if (userProjectEntity == null || userProjectEntity.isExited() || isCreator(userId, projectId)) {
+            logger.warn("Cannot update user type in Project as user does not exist in Project, has exited the Project or is the Creator");
+            return false;
+        }
+
+        // Set the user's type to the new type
+        userProjectEntity.setUserType(userType);
+        userProjectDao.merge(userProjectEntity);
+        logger.info("User type updated in Project");
+        return true;
+    }
+
+    /**
+     * Method to check if a user exists in a project.
+     * @param userId The ID of the user to be checked.
+     * @param projectId The ID of the project to be checked.
+     * @return boolean value indicating whether the user exists in the project.
+     */
+    public boolean userProjectExists(Long userId, Long projectId) {
+        UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
+
+        // If the user exists in the project, return true
         if(userProjectEntity != null){
-            logger.info("User '" + userId + "' already exists in project: " + projectId);
+            logger.info("User '" + userId + "' exists in project: " + projectId);
             return true;
         }
 
         return false;
     }
 
+    /**
+     * Method to check if a user is the creator of a project.
+     * @param userId The ID of the user to be checked.
+     * @param projectId The ID of the project to be checked.
+     * @return boolean value indicating whether the user is the creator of the project.
+     */
     public boolean isCreator(Long userId, Long projectId) {
         UserProjectEntity userProjectEntity = userProjectDao.findProjectCreator(projectId);
 
+        // If the user is the creator of the project, return true
         if(userProjectEntity != null && userProjectEntity.getUser().getId() == userId){
             logger.info("User '" + userId + "' is the creator of project: " + projectId);
             return true;
@@ -100,6 +201,11 @@ public class UserProjectBean implements Serializable {
         return false;
     }
 
+    /**
+     * Method to get a list of UserProject objects associated with a specific project.
+     * @param projectId The ID of the project.
+     * @return List of UserProject objects associated with the project.
+     */
     public List<UserProject> getUsersAssociatedWithAProject(Long projectId) {
         List<UserProjectEntity> userProjectEntities = userProjectDao.findUserProjectByProjectId(projectId);
         List<UserProject> userProjects = new ArrayList<>();
@@ -109,15 +215,33 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
-    public List<UserProject> getUsersInAProject(Long projectId){
+
+    /**
+     * Retrieves a list of active users in a specific project.
+     *
+     * This method first retrieves a list of UserProjectEntity objects associated with the provided project ID.
+     * It then iterates over each UserProjectEntity, retrieves the associated UserEntity, and converts it to a User DTO object.
+     * The converted User DTO objects are added to a list which is then returned.
+     *
+     * @param projectId The ID of the project for which to retrieve the active users.
+     * @return A list of User DTO objects representing the active users in the specified project.
+     */
+    public List<UserInfoInProject> getUsersInAProject(Long projectId){
         List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveUsersByProjectId(projectId);
-        List<UserProject> userProjects = new ArrayList<>();
+        List<UserInfoInProject> users = new ArrayList<>();
         for (UserProjectEntity userProjectEntity : userProjectEntities) {
-            userProjects.add(convertToDTO(userProjectEntity));
+            UserEntity userEntity = userProjectEntity.getUser();
+            users.add(userBean.convertToDTO(userEntity, userProjectEntity.getUserType()));
         }
-        return userProjects;
+        return users;
     }
 
+
+    /**
+     * Method to get a list of UserProject objects associated with a specific user.
+     * @param userId The ID of the user.
+     * @return List of UserProject objects associated with the user.
+     */
     public List<UserProject> getProjectsAssociatedWithAUser(Long userId) {
         List<UserProjectEntity> userProjectEntities = userProjectDao.findUserProjectByUserId(userId);
         List<UserProject> userProjects = new ArrayList<>();
@@ -127,6 +251,11 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
+    /**
+     * Method to get a list of active UserProject objects associated with a specific user.
+     * @param userId The ID of the user.
+     * @return List of active UserProject objects associated with the user.
+     */
     public List<UserProject> getActiveProjectsOfAUser(Long userId){
         List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveProjectsFromAUserByUserId(userId);
         List<UserProject> userProjects = new ArrayList<>();
@@ -136,6 +265,11 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
+    /**
+     * Method to convert a UserProject object to a UserProjectEntity object.
+     * @param userProject The UserProject object to be converted.
+     * @return The converted UserProjectEntity object.
+     */
     private UserProjectEntity convertToEntity(UserProject userProject) {
         UserProjectEntity userProjectEntity = new UserProjectEntity();
         userProjectEntity.setProject(projectBean.findProject(userProject.getProjectId()));
@@ -146,6 +280,11 @@ public class UserProjectBean implements Serializable {
         return userProjectEntity;
     }
 
+    /**
+     * Method to convert a UserProjectEntity object to a UserProject object.
+     * @param userProjectEntity The UserProjectEntity object to be converted.
+     * @return The converted UserProject object.
+     */
     private UserProject convertToDTO(UserProjectEntity userProjectEntity) {
         UserProject userProject = new UserProject();
         userProject.setProjectId(userProjectEntity.getProject().getId());

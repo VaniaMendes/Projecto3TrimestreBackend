@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.bean.ProjectBean;
 import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
+import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -189,6 +190,25 @@ public class ProjectService {
 
     }
 
+    @POST
+    @Path("/{id}/user/{userId}/add/{userType}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addUserToProject(@PathParam("id") long projectId,
+                                     @PathParam("userId") long userId,
+                                     @PathParam("userType") String userType){
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to add user to project from IP: " + ip);
+
+        if (projectBean.addUser(projectId, userId, UserTypeInProject.valueOf(userType))){
+            logger.info("User added to Project with id '" + projectId + "' successfully");
+            return Response.status(Response.Status.OK).entity("User added successfully").build();
+        } else {
+            logger.error("Failed to add user to project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add user to project").build();
+        }
+    }
+
     @PUT
     @Path("/{id}/user/{userId}/remove")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -204,6 +224,46 @@ public class ProjectService {
         } else {
             logger.error("Failed to remove user from project");
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to remove user from project").build();
+        }
+
+    }
+
+    @PUT
+    @Path("/{id}/user/{userId}/approve/{userType}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response approveUserInProject(@PathParam("id") long projectId,
+                                         @PathParam("userId") long userId,
+                                         @PathParam("userType") String userType){
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to approve user in project from IP: " + ip);
+
+        if (projectBean.approveUser(userId, projectId, UserTypeInProject.valueOf(userType))){
+            logger.info("User approved in Project with id '" + projectId + "' successfully");
+            return Response.status(Response.Status.OK).entity("User approved successfully").build();
+        } else {
+            logger.error("Failed to approve user in project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to approve user in project").build();
+        }
+
+    }
+
+    @PUT
+    @Path("/{id}/user/{userId}/update/{userType}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserTypeInProject(@PathParam("id") long projectId,
+                                           @PathParam("userId") long userId,
+                                           @PathParam("userType") String userType) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to update user type in project from IP: " + ip);
+
+        if (userProjectBean.updateUserTypeInProject(userId, projectId, UserTypeInProject.valueOf(userType))){
+            logger.info("User type updated in Project with id '" + projectId + "' successfully");
+            return Response.status(Response.Status.OK).entity("User type updated successfully").build();
+        } else {
+            logger.error("Failed to update user type in project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update user type in project").build();
         }
 
     }
