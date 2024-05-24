@@ -148,6 +148,14 @@ public class SkillBean implements Serializable {
         return true;
     }
 
+    public Skill convertToDTO(SkillEntity skillEntity) {
+        Skill skill = new Skill();
+        skill.setId(skillEntity.getId());
+        skill.setName(skillEntity.getName());
+        skill.setType(skillEntity.getType());
+        return skill;
+    }
+
     /**
      * This method verifies if a skill already exists in the database.
      * @param skillId The id of the skill to verify.

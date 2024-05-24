@@ -46,4 +46,20 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
+    public UserProjectEntity findProjectCreator(Long id) {
+        try {
+            return em.createNamedQuery("UserProject.findProjectCreator", UserProjectEntity.class).setParameter("id", id).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public UserProjectEntity findUserInProject(Long projectId, Long userId) {
+        try {
+            return em.createNamedQuery("UserProject.findUserInProject", UserProjectEntity.class).setParameter("projectId", projectId).setParameter("userId", userId).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

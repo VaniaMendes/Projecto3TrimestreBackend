@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.ProjectBean;
+import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import jakarta.ejb.EJB;
@@ -20,6 +21,9 @@ public class ProjectService {
     @EJB
     private ProjectBean projectBean;
 
+    @EJB
+    private UserProjectBean userProjectBean;
+
     @Context
     private HttpServletRequest request;
 
@@ -27,14 +31,11 @@ public class ProjectService {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerProject(Project project) {
+    public Response registerProject(@HeaderParam("token") String token, Project project) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to create project from IP: " + ip);
 
-        // Create the project
-        ProjectEntity createdProject=projectBean.createProject(project);
-
-        if (createdProject != null) {
+        if (projectBean.createProject(project, token)) {
             logger.info("Project created successfully: " + project.getName());
             return Response.status(Response.Status.CREATED).entity("Project created successfully").build();
         } else {
@@ -92,7 +93,7 @@ public class ProjectService {
 
     }
 
-    @PUT
+    @POST
     @Path("/{id}/resource")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -112,7 +113,7 @@ public class ProjectService {
 
     }
 
-    @PUT
+    @POST
     @Path("/{id}/skill")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -184,6 +185,25 @@ public class ProjectService {
         } else {
             logger.error("Failed to remove keyword from project");
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to remove keyword from project").build();
+        }
+
+    }
+
+    @PUT
+    @Path("/{id}/user/{userId}/remove")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeUserFromProject(@PathParam("id") long projectId,
+                                          @PathParam("userId") long userId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to remove user from project from IP: " + ip);
+
+        if (userProjectBean.removeUserFromProject(userId, projectId)){
+            logger.info("User removed from Project with id '" + projectId + "' successfully");
+            return Response.status(Response.Status.OK).entity("User removed successfully").build();
+        } else {
+            logger.error("Failed to remove user from project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to remove user from project").build();
         }
 
     }

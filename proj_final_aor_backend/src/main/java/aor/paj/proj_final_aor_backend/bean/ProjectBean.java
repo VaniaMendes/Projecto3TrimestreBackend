@@ -1,13 +1,9 @@
 package aor.paj.proj_final_aor_backend.bean;
 
-import aor.paj.proj_final_aor_backend.dao.ProjectDao;
-import aor.paj.proj_final_aor_backend.dao.ResourceDao;
-import aor.paj.proj_final_aor_backend.dao.SkillDao;
+import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
-import aor.paj.proj_final_aor_backend.entity.LabEntity;
-import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
-import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
-import aor.paj.proj_final_aor_backend.entity.SkillEntity;
+import aor.paj.proj_final_aor_backend.entity.*;
+import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +29,9 @@ public class ProjectBean implements Serializable {
     @EJB
     private ProjectDao projectDao;
 
+    @EJB
+    private SessionDao sessionDao;
+
     // EJB reference for ResourceDao to perform operations related to Resource entities.
     @EJB
     private ResourceDao resourceDao;
@@ -41,6 +40,9 @@ public class ProjectBean implements Serializable {
     // This bean is used to interact with the database for CRUD operations on Skill entities.
     @EJB
     private SkillDao skillDao;
+
+    @EJB
+    private UserDao userDao;
 
     // EJB reference for ProjectSkillBean to perform operations related to ProjectSkill entities.
     // This bean is used to manage the relationship between Project and Skill entities,
@@ -55,6 +57,9 @@ public class ProjectBean implements Serializable {
     // EJB reference for ProjectResourceBean to perform operations related to ProjectResource entities.
     @EJB
     private ProjectResourceBean projectResourceBean;
+
+    @EJB
+    private UserProjectBean userProjectBean;
 
     // Default constructor
     public ProjectBean() {
@@ -72,9 +77,15 @@ public class ProjectBean implements Serializable {
      * @param project The Project DTO to be converted to an entity and persisted.
      * @return The persisted ProjectEntity, or null if the project is invalid or the associated Lab does not exist.
      */
-    public ProjectEntity createProject(Project project) {
+    public boolean createProject(Project project, String token) {
+        UserEntity creator = sessionDao.findUserByToken(token);
+        if (creator == null) {
+            logger.error("User does not exist");
+            return false;
+        }
+
         if (isInvalidProject(project)) {
-            return null;
+            return false;
         }
 
         project.setStateId(100);
@@ -87,20 +98,26 @@ public class ProjectBean implements Serializable {
         logger.info("LabEntity: " + labEntity);
         if (labEntity == null) {
             logger.error("Lab does not exist: " + project.getLab().getName());
-            return null;
+            return false;
         }
 
         // Set the existing LabEntity to the ProjectEntity
         projectEntity.setLab(labEntity);
 
+        userProjectBean.addUserToProject(creator, projectEntity, UserTypeInProject.CREATOR);
+
         projectDao.persist(projectEntity);
-        return projectEntity;
+
+        return true;
+    }
+
+    private boolean addCreatorToProject(ProjectEntity projectEntity, UserEntity userEntity) {
+        return userProjectBean.addUserToProject(userEntity, projectEntity, UserTypeInProject.CREATOR);
     }
 
     /**
      * This method validates a Project.
      * It checks if the project is null, if its name, description, keywords are null or empty,
-     * if its maxMembers is less than or equal to 0, and if its lab is null.
      * @param project The Project to be validated.
      * @return true if the project is invalid, false otherwise.
      */
@@ -125,11 +142,6 @@ public class ProjectBean implements Serializable {
             return true;
         }
 
-        if (project.getMaxMembers() <= 0) {
-            logger.error("Project max members is less than or equal to 0.");
-            return true;
-        }
-
         if (project.getLab() == null) {
             logger.error("Project lab is null.");
             return true;
@@ -145,7 +157,7 @@ public class ProjectBean implements Serializable {
      * @return true if the update was successful, false otherwise.
      */
     public boolean updateState(long id, int stateId) {
-        ProjectEntity projectEntity = projectDao.findProjectById(id);
+        ProjectEntity projectEntity = findProject(id);
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
@@ -162,13 +174,41 @@ public class ProjectBean implements Serializable {
      * @return true if the update was successful, false otherwise.
      */
     public boolean updateDescription(long id, String description) {
-        ProjectEntity projectEntity = projectDao.findProjectById(id);
+        ProjectEntity projectEntity = findProject(id);
         if (projectEntity == null || description == null || description.isEmpty()) {
             return false;
         }
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
         projectDao.merge(projectEntity);
+        return true;
+    }
+
+    /**
+     * Adds a user to a project with a specified role.
+     *
+     * This method first retrieves the ProjectEntity and UserEntity from the database using the provided IDs.
+     * If either entity does not exist, it returns false.
+     * If both entities exist, it adds the user to the project with the specified role using the UserProjectBean and returns true.
+     *
+     * @param projectId The ID of the project to which the user will be added.
+     * @param userId The ID of the user to be added to the project.
+     * @param userType The role of the user in the project.
+     * @return true if the user was successfully added to the project, false otherwise.
+     */
+    public boolean addUser(Long projectId, Long userId, UserTypeInProject userType) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return false;
+        }
+
+        UserEntity userEntity = findUser(userId);
+        if (userEntity == null) {
+            return false;
+        }
+
+        userProjectBean.addUserToProject(userEntity, projectEntity, userType);
+
         return true;
     }
 
@@ -180,15 +220,13 @@ public class ProjectBean implements Serializable {
      * @return true if the addition was successful, false otherwise.
      */
     public boolean addResource(Long projectId, Long resourceId, int quantity) {
-        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
-            logger.error("Project does not exist: " + projectId);
             return false;
         }
 
-        ResourceEntity resourceEntity = resourceDao.findResourceById(resourceId);
+        ResourceEntity resourceEntity = findResource(resourceId);
         if (resourceEntity == null) {
-            logger.error("Resource does not exist: " + resourceId);
             return false;
         }
 
@@ -217,15 +255,13 @@ public class ProjectBean implements Serializable {
      * @return true if the skill was successfully added to the project, false otherwise.
      */
     public boolean addSkill(Long projectId, Long skillId) {
-        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
-            logger.error("Project does not exist: " + projectId);
             return false;
         }
 
-        SkillEntity skillEntity = skillDao.findSkillById(skillId);
+        SkillEntity skillEntity = findSkill(skillId);
         if (skillEntity == null) {
-            logger.error("Skill does not exist: " + skillId);
             return false;
         }
 
@@ -245,15 +281,13 @@ public class ProjectBean implements Serializable {
      * @return true if the skill was successfully removed from the project, false otherwise.
      */
     public boolean removeSkill(Long projectId, Long skillId) {
-        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
-            logger.error("Project does not exist: " + projectId);
             return false;
         }
 
-        SkillEntity skillEntity = skillDao.findSkillById(skillId);
+        SkillEntity skillEntity = findSkill(skillId);
         if (skillEntity == null) {
-            logger.error("Skill does not exist: " + skillId);
             return false;
         }
 
@@ -262,9 +296,8 @@ public class ProjectBean implements Serializable {
     }
 
     public boolean addKeyword(Long projectId, String keyword) {
-        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
-            logger.error("Project does not exist: " + projectId);
             return false;
         }
 
@@ -281,7 +314,7 @@ public class ProjectBean implements Serializable {
     }
 
     public boolean removeKeyword(Long projectId, String keyword) {
-        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
             logger.error("Project does not exist: " + projectId);
             return false;
@@ -289,6 +322,11 @@ public class ProjectBean implements Serializable {
 
         if (!projectEntity.keywordExists(keyword)) {
             logger.error("Keyword does not exist in project: " + keyword);
+            return false;
+        }
+
+        if (projectEntity.isKeywordOnly(keyword)) {
+            logger.error("Cannot remove the only keyword from project: " + keyword);
             return false;
         }
 
@@ -300,6 +338,66 @@ public class ProjectBean implements Serializable {
     }
 
     /**
+     * Finds a ProjectEntity by its id.
+     *
+     * This method uses the ProjectDao to find a ProjectEntity in the database with the given id.
+     * If the ProjectEntity does not exist, it logs an error and returns null.
+     *
+     * @param projectId The id of the ProjectEntity to find.
+     * @return The found ProjectEntity, or null if it does not exist.
+     */
+    public ProjectEntity findProject(Long projectId) {
+        ProjectEntity projectEntity = projectDao.findProjectById(projectId);
+        if (projectEntity == null) {
+            logger.error("Project does not exist: " + projectId);
+        }
+        return projectEntity;
+    }
+
+    /**
+     * Finds a SkillEntity by its id.
+     *
+     * This method uses the SkillDao to find a SkillEntity in the database with the given id.
+     * If the SkillEntity does not exist, it logs an error and returns null.
+     *
+     * @param skillId The id of the SkillEntity to find.
+     * @return The found SkillEntity, or null if it does not exist.
+     */
+    private SkillEntity findSkill(Long skillId) {
+        SkillEntity skillEntity = skillDao.findSkillById(skillId);
+        if (skillEntity == null) {
+            logger.error("Skill does not exist: " + skillId);
+        }
+        return skillEntity;
+    }
+
+    /**
+     * Finds a ResourceEntity by its id.
+     *
+     * This method uses the ResourceDao to find a ResourceEntity in the database with the given id.
+     * If the ResourceEntity does not exist, it logs an error and returns null.
+     *
+     * @param resourceId The id of the ResourceEntity to find.
+     * @return The found ResourceEntity, or null if it does not exist.
+     */
+    private ResourceEntity findResource(Long resourceId) {
+        ResourceEntity resourceEntity = resourceDao.findResourceById(resourceId);
+        if (resourceEntity == null) {
+            logger.error("Resource does not exist: " + resourceId);
+        }
+        return resourceEntity;
+    }
+
+    private UserEntity findUser(Long userId) {
+        UserEntity userEntity = userDao.findUserById(userId);
+        if (userEntity == null) {
+            logger.error("User does not exist: " + userId);
+        }
+        return userEntity;
+    }
+
+
+    /**
      * Checks if a state id is valid.
      * @param stateId The state id to be checked.
      * @return true if the state id is valid, false otherwise.
@@ -308,14 +406,6 @@ public class ProjectBean implements Serializable {
         return stateId == 100 || stateId == 200 || stateId == 300 || stateId == 400 || stateId == 500 || stateId == 600;
     }
 
-    /**
-     * Finds a project by its id.
-     * @param id The id of the project to be found.
-     * @return The found project entity, or null if no project with the given id exists.
-     */
-    public ProjectEntity findProjectById(long id) {
-        return projectDao.findProjectById(id);
-    }
 
     /**
      * Gets all projects ordered from latest to oldest.
@@ -338,7 +428,6 @@ public class ProjectBean implements Serializable {
         projectEntity.setDescription(project.getDescription());
         projectEntity.setStateId(project.getStateId());
         projectEntity.setKeywords(project.getKeywords());
-        projectEntity.setMaxMembers(project.getMaxMembers());
         projectEntity.setLab(labBean.convertToEntity(project.getLab()));
         projectEntity.setNeeds(project.getNeeds());
 
@@ -357,13 +446,13 @@ public class ProjectBean implements Serializable {
         project.setDescription(projectEntity.getDescription());
         project.setStateId(projectEntity.getStateId());
         project.setKeywords(projectEntity.getKeywords());
-        project.setMaxMembers(projectEntity.getMaxMembers());
         project.setLab(labBean.convertToDTO(projectEntity.getLab()));
         project.setNeeds(projectEntity.getNeeds());
         project.setCreatedAt(projectEntity.getCreatedAt());
         project.setUpdatedAt(projectEntity.getUpdatedAt());
         project.setConclusionDate(projectEntity.getConclusionDate());
         project.setInitialDate(projectEntity.getInitialDate());
+        project.setSkills(projectSkillBean.getSkillsOfProject(projectEntity.getId()));
 
         return project;
     }

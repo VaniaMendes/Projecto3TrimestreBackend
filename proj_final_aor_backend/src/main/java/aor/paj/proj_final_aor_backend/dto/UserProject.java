@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -13,7 +14,7 @@ public class UserProject {
     private Long userId;
 
     @XmlElement
-    private String userType;
+    private UserTypeInProject userType;
 
     @XmlElement
     private boolean approved;
@@ -40,11 +41,11 @@ public class UserProject {
         this.userId = userId;
     }
 
-    public String getUserType() {
+    public UserTypeInProject getUserType() {
         return userType;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(UserTypeInProject userType) {
         this.userType = userType;
     }
 
