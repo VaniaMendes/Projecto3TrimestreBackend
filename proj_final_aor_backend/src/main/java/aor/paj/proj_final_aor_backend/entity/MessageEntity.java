@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Table(name="messages")
 
 //Querys for the MessageEntity class
-@NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user1 AND m.receiver.id = :user2)")
+@NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
 @NamedQuery(name= "Message.findMessagesGroupedBySender", query = "SELECT m FROM MessageEntity m WHERE m.receiver.id = :receiver ORDER BY m.sendTimestamp DESC")
 public class MessageEntity implements Serializable {
 
@@ -21,6 +21,7 @@ public class MessageEntity implements Serializable {
      * Unique identifier for message
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
@@ -28,25 +29,25 @@ public class MessageEntity implements Serializable {
     /**
      * Read status of the message
      */
-    @Column(name = "readStatus", nullable = false, unique = false, updatable = true)
+    @Column(name = "readStatus", nullable = false)
     private boolean readStatus;
 
     /**
      * Send timestamp of the message
      */
-    @Column(name = "sendTimestamp", nullable = false, unique = false, updatable = true)
+    @Column(name = "sendTimestamp", nullable = false)
     private LocalDateTime sendTimestamp;
 
     /**
      * Read timestamp of the message
      */
-    @Column(name = "readTimestamp", nullable = false, unique = false, updatable = true)
+    @Column(name = "readTimestamp")
     private LocalDateTime readTimestamp;
 
     /**
      * Content of the message
      */
-    @Column(name = "content", nullable = false, unique = false, updatable = true)
+    @Column(name = "content", nullable = false)
     private String content;
 
     /**
@@ -60,7 +61,7 @@ public class MessageEntity implements Serializable {
      * Single User Receiver of the message
      */
     @ManyToOne
-    @JoinColumn(name="receiver_id", nullable = true)
+    @JoinColumn(name="receiver_id", nullable = false)
     private UserEntity receiver;
 
     /**
@@ -68,11 +69,9 @@ public class MessageEntity implements Serializable {
      */
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name="receiver_user_id", referencedColumnName="user_id", nullable = true),
             @JoinColumn(name="receiver_project_id", referencedColumnName="project_id", nullable = true)
     })
     private UserProjectEntity receiverGroup;
-
 
 
     /**
@@ -195,4 +194,6 @@ public class MessageEntity implements Serializable {
     public void setReceiverGroup(UserProjectEntity receiverGroup) {
         this.receiverGroup = receiverGroup;
     }
+
+
 }

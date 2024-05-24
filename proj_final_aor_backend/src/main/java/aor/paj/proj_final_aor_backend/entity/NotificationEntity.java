@@ -53,7 +53,7 @@ public class NotificationEntity implements Serializable {
     /**
      * Read timestamp of the notification
      */
-    @Column(name = "readTimestamp", nullable = false, unique = false, updatable = true)
+    @Column(name = "readTimestamp")
     private LocalDateTime readTimestamp;
 
     /**

@@ -28,11 +28,11 @@ public class  TextEvent {
 
 
     @XmlElement
-    private long sender_id;
+    private User sender;
 
 
     @XmlElement
-    private long receiver_id;
+    private User receiver;
 
 
     /**
@@ -115,31 +115,19 @@ public class  TextEvent {
      * @return the ID of the sender of the text event.
      */
 
-    public long getSender_id() {
-        return sender_id;
+    public User getSender() {
+        return sender;
     }
 
-    /**
-     * Sets the ID of the sender of the text event.
-     * @param sender_id the ID of the sender of the text event.
-     */
-    public void setSender_id(long sender_id) {
-        this.sender_id = sender_id;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
-    /**
-     * Gets the ID of the receiver of the text event.
-     * @return the ID of the receiver of the text event.
-     */
-    public long getReceiver_id() {
-        return receiver_id;
+    public User getReceiver() {
+        return receiver;
     }
 
-    /**
-     * Sets the ID of the receiver of the text event.
-     * @param receiver_id the ID of the receiver of the text event.
-     */
-    public void setReceiver_id(long receiver_id) {
-        this.receiver_id = receiver_id;
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 }

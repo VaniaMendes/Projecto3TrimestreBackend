@@ -67,6 +67,21 @@ public class UserBean implements Serializable {
     }
 
     /**
+     * This method is responsible by find one user by id.
+     * @param id the id of the user.
+     * @return the user.
+     */
+    public User getUserById(long id){
+        //Retrieve the user from the database
+        UserEntity userEntity = userDao.findUserById(id);
+        if(userEntity != null){
+            //Convert the user entity to a user dto
+            return convertUserEntityToDto(userEntity);
+        }
+        return null;
+    }
+
+    /**
      * This method is responsible by find one user by email
      * @param email the email of the user
      * @return the user
@@ -542,10 +557,19 @@ public class UserBean implements Serializable {
         User user = new User();
         user.setId(userEntity.getId());
         user.setEmail(userEntity.getEmail());
-        user.setPassword(userEntity.getPassword());
         user.setActiveState(userEntity.isActiveState());
         user.setUserType(userEntity.getUserType());
         user.setBiography(userEntity.getBiography());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setNickname(userEntity.getNickname());
+        return user;
+    }
+
+    public User convertUserToDTOForMessage(UserEntity userEntity) {
+        User user = new User();
+        user.setId(userEntity.getId());
+        user.setNickname(userEntity.getFirstName());
         user.setFirstName(userEntity.getFirstName());
         return user;
     }
