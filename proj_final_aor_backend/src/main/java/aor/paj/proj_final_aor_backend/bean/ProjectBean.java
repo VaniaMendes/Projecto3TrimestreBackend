@@ -111,9 +111,7 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
-    private boolean addCreatorToProject(ProjectEntity projectEntity, UserEntity userEntity) {
-        return userProjectBean.addUserToProject(userEntity, projectEntity, UserTypeInProject.CREATOR);
-    }
+
 
     /**
      * This method validates a Project.
@@ -207,7 +205,45 @@ public class ProjectBean implements Serializable {
             return false;
         }
 
+        if (userProjectBean.userProjectExists(userId, projectId) || userType == UserTypeInProject.EXITED || userType == UserTypeInProject.CREATOR) {
+            return false;
+        }
+
         userProjectBean.addUserToProject(userEntity, projectEntity, userType);
+
+        if (userType != UserTypeInProject.CANDIDATE) {
+            projectEntity.setUpdatedAt(LocalDateTime.now());
+            projectDao.merge(projectEntity);
+        }
+
+        return true;
+    }
+
+    /**
+     * Approves a user in a project.
+     *
+     * This method first retrieves the ProjectEntity from the database using the provided project ID.
+     * If the ProjectEntity does not exist, it returns false.
+     * If the ProjectEntity exists, it attempts to approve the user in the project using the UserProjectBean.
+     * If the user approval is unsuccessful, it returns false.
+     * If the user approval is successful, it updates the project's update timestamp and merges the updated project entity back into the database.
+     *
+     * @param userId The ID of the user to be approved.
+     * @param projectId The ID of the project in which the user is to be approved.
+     * @return true if the user was successfully approved in the project, false otherwise.
+     */
+    public boolean approveUser(Long userId, Long projectId, UserTypeInProject userType) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return false;
+        }
+
+        if (!userProjectBean.approveUserInProject(userId, projectId, userType)){
+            return false;
+        }
+        projectEntity.setUpdatedAt(LocalDateTime.now());
+
+        projectDao.merge(projectEntity);
 
         return true;
     }
@@ -453,6 +489,7 @@ public class ProjectBean implements Serializable {
         project.setConclusionDate(projectEntity.getConclusionDate());
         project.setInitialDate(projectEntity.getInitialDate());
         project.setSkills(projectSkillBean.getSkillsOfProject(projectEntity.getId()));
+        project.setUsersInfo(userProjectBean.getUsersInAProject(projectEntity.getId()));
 
         return project;
     }

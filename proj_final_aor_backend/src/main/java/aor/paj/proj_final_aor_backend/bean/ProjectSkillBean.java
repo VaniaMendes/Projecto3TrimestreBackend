@@ -68,7 +68,7 @@ public class ProjectSkillBean implements Serializable {
         return true;
     }
 
-    public ArrayList<Skill> getSkillsOfProject(Long projectId) {
+    public List<Skill> getSkillsOfProject(Long projectId) {
         List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllSkillsFromProject(projectId);
         ArrayList<Skill> skills = new ArrayList<>();
         for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
