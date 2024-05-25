@@ -22,6 +22,7 @@ public class NotificationEntity implements Serializable {
      * Unique identifier for notification
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
 
@@ -35,8 +36,14 @@ public class NotificationEntity implements Serializable {
     /**
      * Receiver of the notification
      */
-    @ManyToMany(mappedBy = "notifications")
+    @ManyToMany
+    @JoinTable(
+            name = "user_notifications",
+            joinColumns = @JoinColumn(name = "notification_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     private Set<UserEntity> receivers = new HashSet<>();
+
 
     /**
      * Read status of the notification

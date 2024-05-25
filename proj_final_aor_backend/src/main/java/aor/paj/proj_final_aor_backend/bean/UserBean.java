@@ -22,6 +22,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -526,6 +527,10 @@ public class UserBean implements Serializable {
             logger.error("Failed to update user: " + user.getId(), e);
             return false;
         }
+    }
+
+    public List<UserEntity> getAllUsers(){
+        return userDao.findAllAtiveUsers();
     }
 
     public UserEntity findUserById(long id) {
