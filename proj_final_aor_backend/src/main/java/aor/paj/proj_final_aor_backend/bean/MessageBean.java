@@ -1,11 +1,12 @@
 package aor.paj.proj_final_aor_backend.bean;
 
-import aor.paj.proj_final_aor_backend.dao.MessageDao;
-import aor.paj.proj_final_aor_backend.dao.SessionDao;
-import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Message;
 import aor.paj.proj_final_aor_backend.entity.MessageEntity;
+import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
+import com.mysql.cj.Messages;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+
 
 /**
  * This class represents a MessageBean in the system.
@@ -47,6 +50,10 @@ public class MessageBean implements Serializable {
 
     @EJB
     UserBean userBean;
+    @EJB
+    ProjectDao projectDao;
+    @EJB
+    UserProjectDao userProjectDao;
 
 
     /**
@@ -62,13 +69,13 @@ public class MessageBean implements Serializable {
      * @param token   The token of the user who is sending the message. This is used to authenticate the user.
      * @param content The content of the message that is to be sent.
      * @param id      The id of the user who will receive the message.
-     * @return        Returns true if the message was successfully sent, false otherwise.
+     * @return Returns true if the message was successfully sent, false otherwise.
      */
-    public boolean sendMessage(String token, String content, long id){
+    public boolean sendMessage(String token, String content, long id) {
         // Find the user by token
         UserEntity user = sessionDao.findUserByToken(token);
         // Check if the user exists
-        if(user == null){
+        if (user == null) {
             logger.error("User not found");
             return false;
         }
@@ -76,7 +83,7 @@ public class MessageBean implements Serializable {
         // Find the receiver by id
         UserEntity receiver = userDao.findUserById(id);
         // Check if the receiver exists
-        if(receiver == null){
+        if (receiver == null) {
             logger.error("Receiver not found");
             return false;
         }
@@ -95,43 +102,124 @@ public class MessageBean implements Serializable {
     }
 
 
-    public List<Message> getMessagesBetweenTwoUsers(String token, long id){
+    public List<Message> getMessagesBetweenTwoUsers(String token, long id) {
 
         UserEntity user1 = sessionDao.findUserByToken(token);
         UserEntity user2 = userDao.findUserById(id);
-        if(user1 == null || user2 == null){
+        if (user1 == null || user2 == null) {
             logger.error("User not found");
             return null;
         }
 
-        List<MessageEntity> messageEntities = messageDao.findMessagesBetweenUsers(user1,user2);
+        List<MessageEntity> messageEntities = messageDao.findMessagesBetweenUsers(user1, user2);
 
 
-   List<Message> messages = new ArrayList<>();
-   if(messageEntities != null && !messageEntities.isEmpty()){
-       for(MessageEntity messageEntity : messageEntities){
-           Message message = convertMessageToDto(messageEntity);
-           messages.add(message);
-       }
-   }
+        List<Message> messages = new ArrayList<>();
+        if (messageEntities != null && !messageEntities.isEmpty()) {
+            for (MessageEntity messageEntity : messageEntities) {
+                Message message = convertMessageToDto(messageEntity);
+                messages.add(message);
+            }
+        }
 
         return messages;
 
     }
 
 
+    public boolean sendMessageToChatGroup(String token, long project_id, String content) {
+
+        //Check if the user exists
+        UserEntity sender = sessionDao.findUserByToken(token);
+        System.out.println(sender.getEmail());
+        if (sender == null) {
+            logger.debug("User not found");
+            return false;
+        }
+
+        //Check if the project exists
+        ProjectEntity project = projectDao.findProjectById(project_id);
+        System.out.println(project_id);
+        if (project == null) {
+            logger.debug("Project not found");
+            return false;
+        }
+
+        //Check if the user is in the project
+        UserProjectEntity userProject = userProjectDao.findUserInProject(project_id, sender.getId());
+        if (userProject == null) {
+            logger.debug("User not in project");
+            return false;
+        }
+
+        // Create the message
+        MessageEntity message = new MessageEntity();
+        message.setContent(content);
+        message.setSender(sender);
+        message.setReceiverGroup(userProject);
+        message.setSendTimestamp(LocalDateTime.now());
+        message.setReadStatus(false);
+        message.setReadTimestamp(null);
+        // Save the message in the database
+        messageDao.createMessage(message);
+        return true;
+
+    }
 
 
-public Message convertMessageToDto (MessageEntity messageEntity){
-    Message messageDto = new Message();
-    messageDto.setId(messageEntity.getId());
-    messageDto.setContent(messageEntity.getContent());
-    messageDto.setSender(userBean.convertUserToDTOForMessage(messageEntity.getSender()));
-    messageDto.setReceiver(userBean.convertUserToDTOForMessage(messageEntity.getReceiver()));
-    messageDto.setSendTimestamp(messageEntity.getSendTimestamp());
-    messageDto.setReadStatus(messageEntity.isReadStatus());
-    messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
-    return messageDto;
-}
+    public List<Message> getMessagesChatPtoject(String token, long project_id) {
+        UserEntity user = sessionDao.findUserByToken(token);
+        if (user == null) {
+            logger.error("User not found");
+            return null;
+        }
+        ProjectEntity project = projectDao.findProjectById(project_id);
+        if (project == null) {
+            logger.error("Project not found");
+            return null;
+        }
 
+        //Check if the user is in the project
+        UserProjectEntity userProject = userProjectDao.findUserInProject(project_id, user.getId());
+        if (userProject == null) {
+            logger.debug("User not in project");
+            return null;
+        }
+
+        List<MessageEntity> messageEntities = messageDao.findMessagesByProject(project_id);
+        List<Message> messages = new ArrayList<>();
+        if (messageEntities != null && !messageEntities.isEmpty()) {
+            for (MessageEntity messageEntity : messageEntities) {
+                Message message = convertMessageChatGroupToDTO(messageEntity);
+                messages.add(message);
+            }
+        }
+        return messages;
+
+    }
+
+
+    public Message convertMessageToDto(MessageEntity messageEntity) {
+        Message messageDto = new Message();
+        messageDto.setId(messageEntity.getId());
+        messageDto.setContent(messageEntity.getContent());
+        messageDto.setSender(userBean.convertUserToDTOForMessage(messageEntity.getSender()));
+        messageDto.setReceiver(userBean.convertUserToDTOForMessage(messageEntity.getReceiver()));
+        messageDto.setSendTimestamp(messageEntity.getSendTimestamp());
+        messageDto.setReadStatus(messageEntity.isReadStatus());
+        messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
+        return messageDto;
+    }
+
+    public Message convertMessageChatGroupToDTO(MessageEntity messageEntity) {
+        Message messageDto = new Message();
+        messageDto.setId(messageEntity.getId());
+        messageDto.setContent(messageEntity.getContent());
+        messageDto.setSender(userBean.convertUserToDTOForMessage(messageEntity.getSender()));
+        messageDto.setSendTimestamp(messageEntity.getSendTimestamp());
+        messageDto.setReadStatus(messageEntity.isReadStatus());
+        messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
+        return messageDto;
+
+    }
 }

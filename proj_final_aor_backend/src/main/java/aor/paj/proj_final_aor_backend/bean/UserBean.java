@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
@@ -566,11 +567,11 @@ public class UserBean implements Serializable {
         return user;
     }
 
-    public User convertUserToDTOForMessage(UserEntity userEntity) {
-        User user = new User();
+    public MessageInfoUser convertUserToDTOForMessage(UserEntity userEntity) {
+        MessageInfoUser user = new MessageInfoUser();
         user.setId(userEntity.getId());
-        user.setNickname(userEntity.getFirstName());
         user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
         return user;
     }
 

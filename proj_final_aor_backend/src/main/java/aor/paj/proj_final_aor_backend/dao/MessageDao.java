@@ -50,6 +50,15 @@ public class MessageDao extends AbstractDao<MessageEntity>{
         }
     }
 
+    public List<MessageEntity> findMessagesByProject(long projectId) {
+        try {
+            List<MessageEntity> messageEntities = em.createNamedQuery("Message.findMessagesByProject").setParameter("projectId", projectId).getResultList();
+            return messageEntities;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * Method to create a new message.
      * It uses the entity manager to persist the message in the database.

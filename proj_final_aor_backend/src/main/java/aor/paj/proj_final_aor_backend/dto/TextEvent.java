@@ -28,11 +28,11 @@ public class  TextEvent {
 
 
     @XmlElement
-    private User sender;
+    private MessageInfoUser sender;
 
 
     @XmlElement
-    private User receiver;
+    private MessageInfoUser receiver;
 
 
     /**
@@ -115,19 +115,19 @@ public class  TextEvent {
      * @return the ID of the sender of the text event.
      */
 
-    public User getSender() {
+    public MessageInfoUser getSender() {
         return sender;
     }
 
-    public void setSender(User sender) {
+    public void setSender(MessageInfoUser sender) {
         this.sender = sender;
     }
 
-    public User getReceiver() {
+    public MessageInfoUser getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User receiver) {
+    public void setReceiver(MessageInfoUser receiver) {
         this.receiver = receiver;
     }
 }

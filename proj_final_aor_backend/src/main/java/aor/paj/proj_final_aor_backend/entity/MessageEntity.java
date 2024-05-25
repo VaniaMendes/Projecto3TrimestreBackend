@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 //Querys for the MessageEntity class
 @NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
 @NamedQuery(name= "Message.findMessagesGroupedBySender", query = "SELECT m FROM MessageEntity m WHERE m.receiver.id = :receiver ORDER BY m.sendTimestamp DESC")
+@NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp DESC")
 public class MessageEntity implements Serializable {
 
     /**
@@ -61,7 +62,7 @@ public class MessageEntity implements Serializable {
      * Single User Receiver of the message
      */
     @ManyToOne
-    @JoinColumn(name="receiver_id", nullable = false)
+    @JoinColumn(name="receiver_id")
     private UserEntity receiver;
 
     /**
@@ -69,7 +70,7 @@ public class MessageEntity implements Serializable {
      */
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name="receiver_project_id", referencedColumnName="project_id", nullable = true)
+            @JoinColumn(name="receiver_project_id", referencedColumnName="project_id")
     })
     private UserProjectEntity receiverGroup;
 
