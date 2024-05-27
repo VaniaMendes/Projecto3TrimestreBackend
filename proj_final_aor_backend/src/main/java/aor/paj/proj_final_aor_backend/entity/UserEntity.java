@@ -148,12 +148,14 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "lab_id", referencedColumnName = "id")
     private LabEntity lab;
 
-
     @OneToMany(mappedBy = "user")
     private Set<UserProjectEntity> projects;
 
     @OneToOne(mappedBy = "user")
     private AuthenticationEntity authentication;
+
+    @OneToMany(mappedBy = "author")
+    private Set<ActivityEntity> activities;
 
 
     /**
@@ -417,5 +419,13 @@ public class UserEntity implements Serializable {
 
     public void setInterests(Set<UserInterestEntity> interests) {
         this.interests = interests;
+    }
+
+    public Set<ActivityEntity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(Set<ActivityEntity> activities) {
+        this.activities = activities;
     }
 }
