@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.service;
 
+import aor.paj.proj_final_aor_backend.bean.ActivityBean;
 import aor.paj.proj_final_aor_backend.bean.ProjectBean;
 import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Project;
@@ -24,6 +25,9 @@ public class ProjectService {
 
     @EJB
     private UserProjectBean userProjectBean;
+
+    @EJB
+    private ActivityBean activityBean;
 
     @Context
     private HttpServletRequest request;
@@ -61,11 +65,11 @@ public class ProjectService {
     @Path("/{id}/state")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateState(@PathParam("id") long projectId, @HeaderParam("stateId") int stateId) {
+    public Response updateState(@PathParam("id") long projectId, @HeaderParam("stateId") int stateId, @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to update project from IP: " + ip);
 
-        if (projectBean.updateState(projectId, stateId)){
+        if (projectBean.updateState(projectId, stateId, token)){
             logger.info("Project updated successfully");
             return Response.status(Response.Status.OK).entity("Project updated successfully").build();
         } else {
@@ -80,11 +84,12 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateDescription(@PathParam("id") long projectId,
-                                      @HeaderParam("description") String description) {
+                                      @HeaderParam("description") String description,
+                                      @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
         logger.info("Received request to update project description from IP: " + ip);
 
-        if (projectBean.updateDescription(projectId, description)){
+        if (projectBean.updateDescription(projectId, description, token)){
             logger.info("Project description updated successfully");
             return Response.status(Response.Status.OK).entity("Project description updated successfully").build();
         } else {
@@ -196,11 +201,12 @@ public class ProjectService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addUserToProject(@PathParam("id") long projectId,
                                      @PathParam("userId") long userId,
-                                     @PathParam("userType") String userType){
+                                     @PathParam("userType") String userType,
+                                     @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
         logger.info("Received request to add user to project from IP: " + ip);
 
-        if (projectBean.addUser(projectId, userId, UserTypeInProject.valueOf(userType))){
+        if (projectBean.addUser(projectId, userId, UserTypeInProject.valueOf(userType), token)){
             logger.info("User added to Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("User added successfully").build();
         } else {
@@ -214,11 +220,12 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeUserFromProject(@PathParam("id") long projectId,
-                                          @PathParam("userId") long userId) {
+                                          @PathParam("userId") long userId,
+                                          @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
         logger.info("Received request to remove user from project from IP: " + ip);
 
-        if (userProjectBean.removeUserFromProject(userId, projectId)){
+        if (userProjectBean.removeUserFromProject(userId, projectId, token)){
             logger.info("User removed from Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("User removed successfully").build();
         } else {
@@ -234,11 +241,12 @@ public class ProjectService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response approveUserInProject(@PathParam("id") long projectId,
                                          @PathParam("userId") long userId,
-                                         @PathParam("userType") String userType){
+                                         @PathParam("userType") String userType,
+                                         @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
         logger.info("Received request to approve user in project from IP: " + ip);
 
-        if (projectBean.approveUser(userId, projectId, UserTypeInProject.valueOf(userType))){
+        if (projectBean.approveUser(userId, projectId, UserTypeInProject.valueOf(userType), token)){
             logger.info("User approved in Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("User approved successfully").build();
         } else {
@@ -266,6 +274,21 @@ public class ProjectService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update user type in project").build();
         }
 
+    }
+
+    @GET
+    @Path("/{id}/activity/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getActivitiesFromProject(@PathParam("id") long projectId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get activities from project from IP: " + ip);
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }else {
+            logger.info("Activities from Project with id '" + projectId + "' retrieved successfully");
+            return Response.status(Response.Status.OK).entity(activityBean.getActivitiesFromProject(projectId)).build();
+        }
     }
 
 
