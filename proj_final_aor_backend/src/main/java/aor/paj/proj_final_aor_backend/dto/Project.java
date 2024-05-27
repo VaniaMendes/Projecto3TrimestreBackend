@@ -4,7 +4,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a Project in the system.
@@ -58,10 +58,10 @@ public class Project {
     private Integer vacancyNumber;
 
     @XmlElement
-    private ArrayList<User> users;
+    private List<UserInfoInProject> usersInfo;
 
     @XmlElement
-    private ArrayList<Skill> skills;
+    private List<Skill> skills;
 
     // Current state of the project
     @XmlElement
@@ -285,34 +285,36 @@ public class Project {
     }
 
     /**
-     * Getter for the list of users associated with the project.
-     * @return An ArrayList of User objects associated with the project.
+     * Gets the list of users associated with the project.
+     *
+     * @return A list of UserInfoInProject objects representing the users associated with the project.
      */
-    public ArrayList<User> getUsers() {
-        return users;
+    public List<UserInfoInProject> getUsersInfo() {
+        return usersInfo;
     }
 
     /**
-     * Setter for the list of users associated with the project.
-     * @param users An ArrayList of User objects to be associated with the project.
+     * Sets the list of users associated with the project.
+     *
+     * @param usersInfo A list of UserInfoInProject objects to be associated with the project.
      */
-    public void setUsers(ArrayList<User> users) {
-        this.users = users;
+    public void setUsersInfo(List<UserInfoInProject> usersInfo) {
+        this.usersInfo = usersInfo;
     }
 
     /**
      * Getter for the list of skills required for the project.
-     * @return An ArrayList of Skill objects required for the project.
+     * @return A List of Skill objects required for the project.
      */
-    public ArrayList<Skill> getSkills() {
+    public List<Skill> getSkills() {
         return skills;
     }
 
     /**
      * Setter for the list of skills required for the project.
-     * @param skills An ArrayList of Skill objects to be set as required for the project.
+     * @param skills A List of Skill objects to be set as required for the project.
      */
-    public void setSkills(ArrayList<Skill> skills) {
+    public void setSkills(List<Skill> skills) {
         this.skills = skills;
     }
 }

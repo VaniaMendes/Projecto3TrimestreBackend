@@ -6,12 +6,11 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.entity.AuthenticationEntity;
-import aor.paj.proj_final_aor_backend.entity.LabEntity;
-import aor.paj.proj_final_aor_backend.entity.SessionEntity;
-import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
+import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
+import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -578,6 +577,16 @@ public class UserBean implements Serializable {
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());
         return user;
+    }
+
+    public UserInfoInProject convertToDTO(UserEntity userEntity, UserTypeInProject userTypeInProject) {
+        UserInfoInProject userInfoInProject = new UserInfoInProject();
+        userInfoInProject.setUserId(userEntity.getId());
+        userInfoInProject.setFirstName(userEntity.getFirstName());
+        userInfoInProject.setLastName(userEntity.getLastName());
+        userInfoInProject.setPhoto(userEntity.getPhoto());
+        userInfoInProject.setUserType(userTypeInProject);
+        return userInfoInProject;
     }
 
 
