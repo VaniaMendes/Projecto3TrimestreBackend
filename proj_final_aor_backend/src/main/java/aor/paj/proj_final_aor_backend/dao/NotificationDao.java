@@ -34,7 +34,7 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
      *
      * @param notification The NotificationEntity object to be saved.
      */
-    public void createNotification(NotificationEntity notification) {
+    public void create(NotificationEntity notification) {
         em.persist(notification);
     }
 }

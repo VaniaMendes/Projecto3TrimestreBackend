@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
 import aor.paj.proj_final_aor_backend.entity.*;
@@ -20,6 +21,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -63,6 +65,21 @@ public class UserBean implements Serializable {
             }
     }
         return u;
+    }
+
+    /**
+     * This method is responsible by find one user by id.
+     * @param id the id of the user.
+     * @return the user.
+     */
+    public User getUserById(long id){
+        //Retrieve the user from the database
+        UserEntity userEntity = userDao.findUserById(id);
+        if(userEntity != null){
+            //Convert the user entity to a user dto
+            return convertUserEntityToDto(userEntity);
+        }
+        return null;
     }
 
     /**
@@ -511,6 +528,10 @@ public class UserBean implements Serializable {
         }
     }
 
+    public List<UserEntity> getAllUsers(){
+        return userDao.findAllAtiveUsers();
+    }
+
     public UserEntity findUserById(long id) {
         return userDao.findUserById(id);
     }
@@ -541,11 +562,20 @@ public class UserBean implements Serializable {
         User user = new User();
         user.setId(userEntity.getId());
         user.setEmail(userEntity.getEmail());
-        user.setPassword(userEntity.getPassword());
         user.setActiveState(userEntity.isActiveState());
         user.setUserType(userEntity.getUserType());
         user.setBiography(userEntity.getBiography());
         user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setNickname(userEntity.getNickname());
+        return user;
+    }
+
+    public MessageInfoUser convertUserToDTOForMessage(UserEntity userEntity) {
+        MessageInfoUser user = new MessageInfoUser();
+        user.setId(userEntity.getId());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
         return user;
     }
 
