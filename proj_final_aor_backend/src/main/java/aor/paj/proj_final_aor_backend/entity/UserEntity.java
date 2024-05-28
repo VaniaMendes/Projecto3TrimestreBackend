@@ -118,7 +118,7 @@ public class UserEntity implements Serializable {
             name = "user_notification",
             joinColumns = @JoinColumn(name = "receiver_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id"))
-    private Set<NotificationEntity> notifications;
+    private Set<NotificationEntity> notifications = new HashSet<>();
 
     /**
      * Messages sent by the user.
