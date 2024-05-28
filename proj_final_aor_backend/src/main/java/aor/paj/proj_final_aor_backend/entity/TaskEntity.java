@@ -284,7 +284,7 @@ public class TaskEntity implements Serializable {
      * Returns the erased status of the task.
      * @return erased status of the task
      */
-    public Boolean getErased() {
+    public Boolean isErased() {
         return erased;
     }
 

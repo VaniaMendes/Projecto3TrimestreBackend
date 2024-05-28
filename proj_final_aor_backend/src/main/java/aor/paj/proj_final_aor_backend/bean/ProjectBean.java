@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
+import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
@@ -317,10 +318,10 @@ public class ProjectBean implements Serializable {
 
         if (projectResourceBean.exists(projectEntity, resourceEntity)) {
             projectResourceBean.mergeProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource already exists in project.");
+            logger.info("Resource already exists in project, added more: " + quantity + " units");
         }else{
             projectResourceBean.persistProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource does not exist in project.");
+            logger.info("New resource added to the project with id: " + projectId);
         }
 
         projectEntity.setUpdatedAt(LocalDateTime.now());
@@ -570,4 +571,5 @@ public class ProjectBean implements Serializable {
 
         return project;
     }
+
 }

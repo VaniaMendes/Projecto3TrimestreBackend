@@ -46,7 +46,7 @@ public class Task {
 
     // Current state of the task
     @XmlElement
-    private Integer state;
+    private Integer stateId;
 
     // Constants representing different states of the task
     @XmlElement
@@ -58,7 +58,7 @@ public class Task {
 
     // Priority of the task
     @XmlElement
-    private Integer priority;
+    private Integer priorityId;
 
     // Constants representing different priorities of the task
     @XmlElement
@@ -224,32 +224,32 @@ public class Task {
      * Getter for the current state of the task.
      * @return current state of the task.
      */
-    public Integer getState() {
-        return state;
+    public Integer getStateId() {
+        return stateId;
     }
 
     /**
      * Setter for the current state of the task.
-     * @param state the new current state of the task.
+     * @param stateId the new current state of the task.
      */
-    public void setState(Integer state) {
-        this.state = state;
+    public void setStateId(Integer stateId) {
+        this.stateId = stateId;
     }
 
     /**
      * Getter for the priority of the task.
      * @return priority of the task.
      */
-    public Integer getPriority() {
-        return priority;
+    public Integer getPriorityId() {
+        return priorityId;
     }
 
     /**
      * Setter for the priority of the task.
-     * @param priority the new priority of the task.
+     * @param priorityId the new priority of the task.
      */
-    public void setPriority(Integer priority) {
-        this.priority = priority;
+    public void setPriorityId(Integer priorityId) {
+        this.priorityId = priorityId;
     }
 
     /**
