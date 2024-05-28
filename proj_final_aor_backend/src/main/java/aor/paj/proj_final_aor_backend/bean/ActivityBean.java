@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ActivityDao;
 import aor.paj.proj_final_aor_backend.dto.Activity;
+import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.entity.ActivityEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
@@ -22,6 +23,12 @@ public class ActivityBean implements Serializable {
 
     @EJB
     private ActivityDao activityDao;
+
+    @EJB
+    private UserBean userBean;
+
+    @EJB
+    private ProjectBean projectBean;
 
     public ActivityBean() {
     }
@@ -62,6 +69,24 @@ public class ActivityBean implements Serializable {
         activity.setId(activityEntity.getId());
         activity.setCreatedAt(activityEntity.getCreatedAt());
         activity.setType(activityEntity.getType());
+        activity.setAuthor(convertToDTOAuthorInfo(userBean.findUserById(activityEntity.getAuthor().getId())));
+        activity.setProject(convertToDTOProjectInfo(activityEntity.getProject()));
         return activity;
     }
+
+    private IdAndNameDTO convertToDTOProjectInfo(ProjectEntity projectEntity) {
+        IdAndNameDTO project = new IdAndNameDTO();
+        project.setId(projectEntity.getId());
+        project.setName(projectEntity.getName());
+        return project;
+    }
+
+    private IdAndNameDTO convertToDTOAuthorInfo(UserEntity userEntity) {
+        IdAndNameDTO user = new IdAndNameDTO();
+        user.setId(userEntity.getId());
+        String fullName = userEntity.getFirstName() + " " + userEntity.getLastName();
+        user.setName(fullName);
+        return user;
+    }
+
 }

@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
+import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
@@ -570,4 +571,5 @@ public class ProjectBean implements Serializable {
 
         return project;
     }
+
 }
