@@ -317,10 +317,10 @@ public class ProjectBean implements Serializable {
 
         if (projectResourceBean.exists(projectEntity, resourceEntity)) {
             projectResourceBean.mergeProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource already exists in project.");
+            logger.info("Resource already exists in project, added more: " + quantity + " units");
         }else{
             projectResourceBean.persistProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource does not exist in project.");
+            logger.info("New resource added to the project with id: " + projectId);
         }
 
         projectEntity.setUpdatedAt(LocalDateTime.now());

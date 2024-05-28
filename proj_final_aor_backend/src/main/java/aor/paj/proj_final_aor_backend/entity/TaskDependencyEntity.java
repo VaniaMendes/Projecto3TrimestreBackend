@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "task_dependency")
-public class TaskDependency implements Serializable {
+public class TaskDependencyEntity implements Serializable {
 
     // Unique identifier for serialization
     private static final long serialVersionUID = 1L;
@@ -34,7 +34,7 @@ public class TaskDependency implements Serializable {
     /**
      * Default constructor for the TaskDependency class.
      */
-    public TaskDependency() {
+    public TaskDependencyEntity() {
     }
 
     /**
