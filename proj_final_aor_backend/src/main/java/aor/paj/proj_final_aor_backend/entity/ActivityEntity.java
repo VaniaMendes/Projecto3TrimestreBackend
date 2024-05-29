@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "activity")
+@NamedQuery(name = "ActivityEntity.findAllFromProject", query = "SELECT a FROM ActivityEntity a WHERE a.project.id = :projectId ORDER BY a.createdAt DESC")
 public class ActivityEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -25,6 +27,7 @@ public class ActivityEntity implements Serializable {
     private Long id;
 
     // Date and time when the activity was created
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, unique = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -32,6 +35,11 @@ public class ActivityEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, unique = false, updatable = false)
     private ProjectActivityType type;
+
+    // Author of the activity
+    @ManyToOne
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
+    private UserEntity author;
 
     // Project associated with the activity
     @ManyToOne
@@ -90,5 +98,41 @@ public class ActivityEntity implements Serializable {
      */
     public void setType(ProjectActivityType type) {
         this.type = type;
+    }
+
+    /**
+     * Returns the author of this activity.
+     *
+     * @return the author of this activity as a UserEntity
+     */
+    public UserEntity getAuthor() {
+        return author;
+    }
+
+    /**
+     * Sets the author of this activity.
+     *
+     * @param author the UserEntity to set as the author of this activity
+     */
+    public void setAuthor(UserEntity author) {
+        this.author = author;
+    }
+
+    /**
+     * Returns the project associated with this activity.
+     *
+     * @return the project associated with this activity as a ProjectEntity
+     */
+    public ProjectEntity getProject() {
+        return project;
+    }
+
+    /**
+     * Sets the project associated with this activity.
+     *
+     * @param project the ProjectEntity to associate with this activity
+     */
+    public void setProject(ProjectEntity project) {
+        this.project = project;
     }
 }

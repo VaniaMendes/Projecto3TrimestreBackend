@@ -1,8 +1,10 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
+import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
+import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -54,6 +56,9 @@ public class ProjectBean implements Serializable {
     @EJB
     private LabBean labBean;
 
+    @EJB
+    private ActivityBean activityBean;
+
     // EJB reference for ProjectResourceBean to perform operations related to ProjectResource entities.
     @EJB
     private ProjectResourceBean projectResourceBean;
@@ -75,6 +80,7 @@ public class ProjectBean implements Serializable {
      * It first validates the project, then sets its stateId, converts it to an entity,
      * fetches the associated LabEntity, sets it to the ProjectEntity and finally persists it.
      * @param project The Project DTO to be converted to an entity and persisted.
+     * @param token The token of the user creating the project.
      * @return The persisted ProjectEntity, or null if the project is invalid or the associated Lab does not exist.
      */
     public boolean createProject(Project project, String token) {
@@ -152,16 +158,28 @@ public class ProjectBean implements Serializable {
      * Updates the state of a project.
      * @param id The id of the project to be updated.
      * @param stateId The new state id to be set.
+     * @param token The token of the user updating the project.
      * @return true if the update was successful, false otherwise.
      */
-    public boolean updateState(long id, int stateId) {
+    public boolean updateState(long id, int stateId, String token) {
         ProjectEntity projectEntity = findProject(id);
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
         projectEntity.setStateId(stateId);
         projectEntity.setUpdatedAt(LocalDateTime.now());
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author);
+
         projectDao.merge(projectEntity);
+
+        logger.info("Project state updated to: " + stateId + " for project: " + projectEntity.getName() + " by user with id: " + author.getId());
         return true;
     }
 
@@ -169,16 +187,28 @@ public class ProjectBean implements Serializable {
      * Updates the description of a project.
      * @param id The id of the project to be updated.
      * @param description The new description to be set.
+     * @param token The token of the user updating the project.
      * @return true if the update was successful, false otherwise.
      */
-    public boolean updateDescription(long id, String description) {
+    public boolean updateDescription(long id, String description, String token) {
         ProjectEntity projectEntity = findProject(id);
         if (projectEntity == null || description == null || description.isEmpty()) {
             return false;
         }
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author);
+
         projectDao.merge(projectEntity);
+
+        logger.info("Project description updated for project: " + projectEntity.getName() + " by user with id: " + author.getId());
         return true;
     }
 
@@ -192,9 +222,10 @@ public class ProjectBean implements Serializable {
      * @param projectId The ID of the project to which the user will be added.
      * @param userId The ID of the user to be added to the project.
      * @param userType The role of the user in the project.
+     * @param token The token of the user adding the user to the project.
      * @return true if the user was successfully added to the project, false otherwise.
      */
-    public boolean addUser(Long projectId, Long userId, UserTypeInProject userType) {
+    public boolean addUser(Long projectId, Long userId, UserTypeInProject userType, String token) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
             return false;
@@ -202,6 +233,11 @@ public class ProjectBean implements Serializable {
 
         UserEntity userEntity = findUser(userId);
         if (userEntity == null) {
+            return false;
+        }
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
             return false;
         }
 
@@ -215,6 +251,10 @@ public class ProjectBean implements Serializable {
             projectEntity.setUpdatedAt(LocalDateTime.now());
             projectDao.merge(projectEntity);
         }
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+
+        logger.info("User with id: " + userEntity.getId() + " added to project: " + projectEntity.getName() + " by user with id: " + author.getId());
 
         return true;
     }
@@ -230,11 +270,17 @@ public class ProjectBean implements Serializable {
      *
      * @param userId The ID of the user to be approved.
      * @param projectId The ID of the project in which the user is to be approved.
+     * @param token The token of the user approving the user in the project.
      * @return true if the user was successfully approved in the project, false otherwise.
      */
-    public boolean approveUser(Long userId, Long projectId, UserTypeInProject userType) {
+    public boolean approveUser(Long userId, Long projectId, UserTypeInProject userType, String token) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
+            return false;
+        }
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
             return false;
         }
 
@@ -244,6 +290,10 @@ public class ProjectBean implements Serializable {
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
         projectDao.merge(projectEntity);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+
+        logger.info("User with id: " + userId + " approved in project: " + projectEntity.getName() + " by user with id: " + author.getId());
 
         return true;
     }
@@ -268,10 +318,10 @@ public class ProjectBean implements Serializable {
 
         if (projectResourceBean.exists(projectEntity, resourceEntity)) {
             projectResourceBean.mergeProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource already exists in project.");
+            logger.info("Resource already exists in project, added more: " + quantity + " units");
         }else{
             projectResourceBean.persistProjectResourceConnection(projectEntity, resourceEntity, quantity);
-            logger.info("Resource does not exist in project.");
+            logger.info("New resource added to the project with id: " + projectId);
         }
 
         projectEntity.setUpdatedAt(LocalDateTime.now());
@@ -331,6 +381,19 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
+    /**
+     * Adds a keyword to a project.
+     *
+     * This method first retrieves the ProjectEntity from the database using the provided project ID.
+     * If the ProjectEntity does not exist, it returns false.
+     * If the ProjectEntity exists, it checks if the keyword already exists in the project.
+     * If the keyword already exists in the project, it logs an error and returns false.
+     * If the keyword does not exist in the project, it adds the keyword to the project, updates the project's update timestamp and merges the updated project entity back into the database.
+     *
+     * @param projectId The ID of the project to which the keyword will be added.
+     * @param keyword The keyword to be added to the project.
+     * @return true if the keyword was successfully added to the project, false otherwise.
+     */
     public boolean addKeyword(Long projectId, String keyword) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
@@ -349,6 +412,21 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
+    /**
+     * Removes a keyword from a project.
+     *
+     * This method first retrieves the ProjectEntity from the database using the provided project ID.
+     * If the ProjectEntity does not exist, it logs an error and returns false.
+     * If the ProjectEntity exists, it checks if the keyword exists in the project.
+     * If the keyword does not exist in the project, it logs an error and returns false.
+     * If the keyword exists in the project, it checks if the keyword is the only one in the project.
+     * If the keyword is the only one in the project, it logs an error and returns false.
+     * If the keyword is not the only one in the project, it removes the keyword from the project, updates the project's update timestamp and merges the updated project entity back into the database.
+     *
+     * @param projectId The ID of the project from which the keyword will be removed.
+     * @param keyword The keyword to be removed from the project.
+     * @return true if the keyword was successfully removed from the project, false otherwise.
+     */
     public boolean removeKeyword(Long projectId, String keyword) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
@@ -493,4 +571,5 @@ public class ProjectBean implements Serializable {
 
         return project;
     }
+
 }

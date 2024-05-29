@@ -71,6 +71,8 @@ public class ProjectEntity implements Serializable {
     @Column(name = "keywords", nullable = false)
     private String keywords;
 
+    @Column(name = "max_members", nullable = false)
+    private int maxMembers;
 
     // Needs of the project
     @Column(name = "needs")
@@ -236,93 +238,138 @@ public class ProjectEntity implements Serializable {
 
     /**
      * Sets the keywords for the project.
-     * The input string is split into individual words, and each word is transformed such that
-     * it begins with an uppercase letter and the rest of the letters are in lowercase.
-     * The transformed words are then joined back into a single string with spaces in between,
-     * and this string is set as the project's keywords.
+     * The input is a string of keywords separated by commas.
+     * Each keyword is transformed so that it begins with an uppercase letter and the rest of the letters are in lowercase.
+     * The transformed keywords are then joined back into a single string with commas and spaces in between.
      *
-     * @param keywords A string of keywords for the project. The keywords should be separated by spaces.
+     * @param keywords A string of keywords separated by commas.
      */
     public void setKeywords(String keywords) {
-        // Split the input string into individual words
-        String[] words = keywords.split(" ");
+        // Split the input string into individual keywords based on comma
+        String[] keywordArray = keywords.split(",");
+
+        for (int i = 0; i < keywordArray.length; i++) {
+            // Split the keyword into individual words
+            String[] words = keywordArray[i].trim().split(" ");
+
+            // Loop through each word
+            for (int j = 0; j < words.length; j++) {
+                // Capitalize the first letter and make the rest of the letters lowercase
+                words[j] = words[j].substring(0, 1).toUpperCase() + words[j].substring(1).toLowerCase();
+            }
+
+            // Join the words back into a single keyword and store it back in the array
+            keywordArray[i] = String.join(" ", words);
+        }
+
+        // Join the transformed keywords back into a single string with comma and space in between
+        this.keywords = String.join(",", keywordArray);
+    }
+
+    /**
+     * Adds a keyword to the project's keywords.
+     * The input keyword can be one or more words long.
+     * Each word in the keyword is transformed so that it begins with an uppercase letter and the rest of the letters are in lowercase.
+     * The transformed keyword is then added to the project's keywords if it doesn't already exist.
+     *
+     * @param keyword A string representing the keyword to be added.
+     */
+    public void addKeyword(String keyword) {
+        // Split the keyword into individual words
+        String[] words = keyword.split(" ");
 
         // Loop through each word
         for (int i = 0; i < words.length; i++) {
-            // Transform the word so that it begins with an uppercase letter and the rest of the letters are in lowercase
+            // Capitalize the first letter and make the rest of the letters lowercase
             words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
         }
 
-        // Join the transformed words back into a single string with spaces in between
-        this.keywords = String.join(" ", words);
-    }
+        // Join the words back into a single keyword
+        keyword = String.join(" ", words);
 
-    /**
-     * This method is used to add a new keyword to the project's keywords.
-     * It first splits the existing keywords string into a list, checks if the new keyword already exists in the list,
-     * and if it doesn't, adds the new keyword to the list. The list is then joined back into a string and set as the project's keywords.
-     *
-     * @param keyword The new keyword to be added to the project's keywords.
-     */
-    public void addKeyword(String keyword) {
-        // Ensure the first letter is uppercase and the rest are lowercase
-        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+        // Split the keywords string into individual keywords based on comma
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(",")));
 
-        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        // Add the keyword to the list if it doesn't already exist
         if (!keywordsList.contains(keyword)) {
             keywordsList.add(keyword);
-            this.keywords = String.join(" ", keywordsList);
+            this.keywords = String.join(",", keywordsList);
         }
     }
 
     /**
-     * This method is used to remove a keyword from the project's keywords.
-     * It first splits the existing keywords string into a list, removes the specified keyword from the list,
-     * and then joins the list back into a string and sets it as the project's keywords.
+     * Removes a keyword from the project's keywords.
+     * The input keyword can be one or more words long.
+     * Each word in the keyword is transformed so that it begins with an uppercase letter and the rest of the letters are in lowercase.
+     * The transformed keyword is then removed from the project's keywords if it exists and there's more than one keyword.
      *
-     * @param keyword The keyword to be removed from the project's keywords.
+     * @param keyword A string representing the keyword to be removed.
      */
     public void removeKeyword(String keyword) {
-        // Ensure the first letter is uppercase and the rest are lowercase
-        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+        // Split the keyword into individual words
+        String[] words = keyword.split(" ");
 
-        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        // Loop through each word
+        for (int i = 0; i < words.length; i++) {
+            // Capitalize the first letter and make the rest of the letters lowercase
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+
+        // Join the words back into a single keyword
+        keyword = String.join(" ", words);
+
+        // Split the keywords string into individual keywords based on comma
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(",")));
 
         // Only remove the keyword if there's more than one keyword
-        if (keywordsList.size() > 1) {
+        if (keywordsList.size() > 1 && keywordsList.contains(keyword)) {
             keywordsList.remove(keyword);
-            this.keywords = String.join(" ", keywordsList);
+            this.keywords = String.join(",", keywordsList);
         }
     }
 
     /**
-     * This method is used to check if a keyword already exists in the project's keywords.
-     * It first splits the existing keywords string into a list, then checks if the specified keyword is in the list.
+     * Checks if a keyword exists in the project's keywords.
+     * The input keyword can be one or more words long.
+     * Each word in the keyword is transformed so that it begins with an uppercase letter and the rest of the letters are in lowercase.
+     * The transformed keyword is then checked against the project's keywords.
      *
-     * @param keyword The keyword to be checked.
-     * @return true if the keyword exists, false otherwise.
+     * @param keyword A string representing the keyword to be checked.
+     * @return true if the keyword exists in the project's keywords, false otherwise.
      */
     public boolean keywordExists(String keyword) {
-        // Ensure the first letter is uppercase and the rest are lowercase
-        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+        // Split the keyword into individual words
+        String[] words = keyword.split(" ");
 
-        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
+        // Loop through each word
+        for (int i = 0; i < words.length; i++) {
+            // Capitalize the first letter and make the rest of the letters lowercase
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+
+        // Join the words back into a single keyword
+        keyword = String.join(" ", words);
+
+        // Split the keywords string into individual keywords based on comma
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(",")));
+
+        // Check if the keyword exists in the list
         return keywordsList.contains(keyword);
     }
 
+
     /**
      * This method checks if the provided keyword is the only keyword associated with the project.
-     * It first splits the existing keywords string into a list, then checks if the list contains only the specified keyword.
      *
-     * @param keyword The keyword to be checked.
-     * @return true if the keyword is the only one, false otherwise.
+     * @param keyword A string representing the keyword to be checked.
+     * @return true if the provided keyword is the only keyword associated with the project, false otherwise.
      */
     public boolean isKeywordOnly(String keyword) {
-        // Ensure the first letter is uppercase and the rest are lowercase
-        keyword = keyword.substring(0, 1).toUpperCase() + keyword.substring(1).toLowerCase();
+        // Split the keywords string into individual keywords based on comma
+        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(",")));
 
-        List<String> keywordsList = new ArrayList<>(Arrays.asList(this.keywords.split(" ")));
-        return keywordsList.size() == 1 && keywordsList.contains(keyword);
+        // Check if the keyword is the only one in the list and if it matches the provided keyword
+        return keywordsList.size() == 1 && keywordsList.get(0).equals(keyword);
     }
 
     /**
@@ -460,6 +507,26 @@ public class ProjectEntity implements Serializable {
      */
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    /**
+     * This method is a getter for the maxMembers property of the ProjectEntity class.
+     * The maxMembers property represents the maximum number of members that a project can have.
+     *
+     * @return the maximum number of members that the project can have.
+     */
+    public int getMaxMembers() {
+        return maxMembers;
+    }
+
+    /**
+     * This method is a setter for the maxMembers property of the ProjectEntity class.
+     * It updates the maximum number of members that a project can have.
+     *
+     * @param maxMembers the new maximum number of members that the project can have.
+     */
+    public void setMaxMembers(int maxMembers) {
+        this.maxMembers = maxMembers;
     }
 
     /**

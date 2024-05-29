@@ -27,11 +27,11 @@ public class Activity {
 
     // The author of the activity
     @XmlElement
-    private User author;
+    private IdAndNameDTO author;
 
     // The project associated with the activity
     @XmlElement
-    private Project project;
+    private IdAndNameDTO project;
 
     // Default constructor
     public Activity() {
@@ -85,11 +85,12 @@ public class Activity {
         this.type = type;
     }
 
+
     /**
      * Returns the author of the activity.
      * @return the author of the activity
      */
-    public User getAuthor() {
+    public IdAndNameDTO getAuthor() {
         return author;
     }
 
@@ -97,7 +98,7 @@ public class Activity {
      * Sets the author of the activity.
      * @param author the new author of the activity
      */
-    public void setAuthor(User author) {
+    public void setAuthor(IdAndNameDTO author) {
         this.author = author;
     }
 
@@ -105,7 +106,7 @@ public class Activity {
      * Returns the project associated with the activity.
      * @return the project associated with the activity
      */
-    public Project getProject() {
+    public IdAndNameDTO getProject() {
         return project;
     }
 
@@ -113,7 +114,7 @@ public class Activity {
      * Sets the project associated with the activity.
      * @param project the new project associated with the activity
      */
-    public void setProject(Project project) {
+    public void setProject(IdAndNameDTO project) {
         this.project = project;
     }
 }

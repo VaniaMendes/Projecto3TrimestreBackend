@@ -1,11 +1,13 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserProjectDao;
-import aor.paj.proj_final_aor_backend.dto.Skill;
-import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
 import aor.paj.proj_final_aor_backend.dto.UserProject;
-import aor.paj.proj_final_aor_backend.entity.*;
+import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
+import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -30,9 +32,15 @@ public class UserProjectBean implements Serializable {
     @EJB
     private UserProjectDao userProjectDao;
 
+    @EJB
+    private SessionDao sessionDao;
+
     // EJB injection for UserBean
     @EJB
     private UserBean userBean;
+
+    @EJB
+    private ActivityBean activityBean;
 
     // EJB injection for ProjectBean
     @EJB
@@ -96,9 +104,10 @@ public class UserProjectBean implements Serializable {
      * Method to remove a user from a project.
      * @param userId The ID of the user to be removed.
      * @param projectId The ID of the project from which the user is to be removed.
+     * @param token The token of the user who is removing the user from the project.
      * @return boolean value indicating whether the user was successfully removed from the project.
      */
-    public boolean removeUserFromProject(Long userId, Long projectId) {
+    public boolean removeUserFromProject(Long userId, Long projectId, String token) {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
         // If the user does not exist in the project or is the creator of the project, return false
@@ -106,12 +115,21 @@ public class UserProjectBean implements Serializable {
             return false;
         }
 
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
         // Set the user's status to exited and update the time they left the project
         userProjectEntity.setExited(true);
         userProjectEntity.setUserType(UserTypeInProject.EXITED);
         userProjectEntity.setLeftAt(LocalDateTime.now());
+
+        activityBean.registerActivity(projectBean.findProject(projectId), ProjectActivityType.REMOVED_MEMBER, author);
+
         userProjectDao.merge(userProjectEntity);
-        logger.info("User removed from Project");
+
+        logger.info("User with ID '" + userId + "' removed from Project with ID '" + projectId + "' by User with ID '" + author.getId() + "'");
         return true;
     }
 
