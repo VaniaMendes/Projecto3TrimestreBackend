@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -72,7 +74,7 @@ public class UserProjectEntity implements Serializable {
 
     // Represents the messages received by the user in the project
     @OneToMany(mappedBy = "receiverGroup")
-    private Set<MessageEntity> messagesReceived;
+    private Set<MessageEntity> messagesReceived = new HashSet<>();
 
     // Default constructor
     public UserProjectEntity() {

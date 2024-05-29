@@ -299,6 +299,20 @@ public class UserProjectBean implements Serializable {
     }
 
     /**
+     * Method to get a list of active users in a specific project.
+     * @param projectId The ID of the project.
+     * @return List of UserEntity objects representing the active users in the project.
+     */
+    public List<UserEntity> getActiveUsersInProject(Long projectId) {
+        List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveUsersByProjectId(projectId);
+        List<UserEntity> users = new ArrayList<>();
+        for (UserProjectEntity userProjectEntity : userProjectEntities) {
+            users.add(userProjectEntity.getUser());
+        }
+        return users;
+    }
+
+    /**
      * Method to convert a UserProjectEntity object to a UserProject object.
      * @param userProjectEntity The UserProjectEntity object to be converted.
      * @return The converted UserProject object.

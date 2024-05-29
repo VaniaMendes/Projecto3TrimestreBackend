@@ -33,16 +33,6 @@ public class NotificationEntity implements Serializable {
     @Column(name = "sender_id", nullable = false, unique = false, updatable = false)
     private long sender_id;
 
-    /**
-     * Receiver of the notification
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "user_notifications",
-            joinColumns = @JoinColumn(name = "notification_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<UserEntity> receivers = new HashSet<>();
 
 
     /**
@@ -69,6 +59,13 @@ public class NotificationEntity implements Serializable {
 
     @Column(name = "type", nullable = false, unique = false, updatable = true)
     private String type;
+
+    /**
+     * Many to many relationship with the UserEntity class
+     */
+    @ManyToMany(mappedBy = "notifications")
+    private Set<UserEntity> users = new HashSet<>();
+
 
 
     /**
@@ -174,19 +171,12 @@ public class NotificationEntity implements Serializable {
         this.sender_id = sender_id;
     }
 
-    /**
-     * Getter for the receiver of the notification.
-     * @return receiver of the notification.
-     */
-    public Set<UserEntity> getReceivers() {
-        return receivers;
+
+    public Set<UserEntity> getUsers() {
+        return users;
     }
 
-    /**
-     * Setter for the receiver of the notification.
-     * @param receivers the new receiver of the notification.
-     */
-    public void setReceivers(Set<UserEntity> receivers) {
-        this.receivers = receivers;
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
     }
 }
