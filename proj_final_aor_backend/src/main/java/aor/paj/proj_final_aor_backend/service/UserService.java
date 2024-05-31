@@ -55,7 +55,7 @@ public class UserService {
     @Path("/confirm")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response confirmUser(@QueryParam("tokenConfirmation") String tokenConfirmation, User user, @Context HttpServletRequest request) {
+    public Response confirmUser(@HeaderParam("tokenConfirmation") String tokenConfirmation, User user, @Context HttpServletRequest request) {
 
         try {
             boolean isConfirmed = userBean.confirmUser(user, tokenConfirmation);
@@ -217,6 +217,5 @@ public class UserService {
         }
 
     }
-
 
 }
