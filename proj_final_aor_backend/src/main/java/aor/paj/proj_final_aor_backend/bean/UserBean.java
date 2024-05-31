@@ -325,7 +325,7 @@ public class UserBean implements Serializable {
         body.append("<h1>Welcome to Innovation Lab Management!</h1>");
         body.append("<p>Dear User,</p>");
         body.append("<p>You requested to recover your password. Please click the link below to recover your password:</p>");
-        body.append("<p><a href=\"http://localhost:3000/recoverypassword?token=" + resetPassToken + "\">Recover Password</a></p>");
+        body.append("<p><a href=\"http://localhost:3000/change-password?token=" + resetPassToken + "\">Recover Password</a></p>");
         body.append("<p>If you did not request to recover your password, please ignore this email.</p>");
         body.append("<p>Best regards,<br>Critical Software</p>");
         body.append("</body>");

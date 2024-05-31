@@ -164,6 +164,9 @@ public class UserService {
     @Transactional
     public Response changePassword(@HeaderParam("resetPassToken") String resetPassToken, @QueryParam("password") String password, @QueryParam("confirmPassword") String confirmPassword, @Context HttpServletRequest request) {
 
+        if(resetPassToken == null || password == null || confirmPassword == null){
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+        }
         try {
             boolean isChanged = userBean.changePassword(resetPassToken, password, confirmPassword);
             System.out.println(isChanged);
