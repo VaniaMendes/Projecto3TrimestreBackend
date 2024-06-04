@@ -187,30 +187,32 @@ public class UserBean implements Serializable {
         return null;
     }
 
+
     /**
      * This method is responsible for confirming a user´s account.
      * @param user The user to be confirmed. It should have the first name, last name, lab, and visibility state fields filled.
      * @param token The confirmation token of the user. It should be a valid token.
      * @return A boolean value indicating whether the confirmation was successful. Returns false if the required fields are not present, the nickname already exists, the lab is not valid, or the token is not valid. Returns true if the user was successfully confirmed.
      */
-    public boolean confirmUser(User user, String token) {
+    public boolean confirmUser(User user, String token, String lab) {
 
         // Check if the required fields are present
         if(user.getFirstName() == null || user.getLastName() == null ){
             return false;
         }
         //Check if the nickname already exists
-        if(nicknameExists(user.getNickname())){
-            return false;
+        if(user.getNickname() != null && !user.getNickname().isEmpty()){
+            if(nicknameExists(user.getNickname())){
+                return false;
+            }
         }
+
+        LabEntity labEntity = labDao.findLabByName(lab);
 
         //Check if the lab is valid
-        if(user.getLab() == null){
+        if(labEntity == null){
             return false;
         }
-        LabEntity labEntity = labDao.findLabById(user.getLab().getId());
-        System.out.println(labEntity.getName());
-
         //Check if the token is valid
         UserEntity userConfirm = authenticationDao.findUserByAuthenticationToken(token);
 
@@ -230,11 +232,12 @@ public class UserBean implements Serializable {
         if(user.getBiography() != null){
             userConfirm.setBiography(user.getBiography());
         }
-        if(user.getPhoto() != null){
-            userConfirm.setPhoto(user.getPhoto());
-        }
+
         if(user.getNickname() != null){
             userConfirm.setNickname(user.getNickname());
+        }
+        if(user.getPhoto() != null){
+            userConfirm.setPhoto(user.getPhoto());
         }
 
         //Update the user in the database
@@ -388,7 +391,7 @@ public class UserBean implements Serializable {
         body.append("<p>Dear User,</p>");
         body.append("<p>Thank you for registering with us. We're excited to have you on board.</p>");
         body.append("<p>To complete your registration, please click the link below to confirm your account:</p>");
-        body.append("<p><a href=\"http://localhost:3000/confirm?token=" + token + "\">Confirm Account</a></p>");
+        body.append("<p><a href=\"http://localhost:3000/confirm-account?token=" + token + "\">Confirm Account</a></p>");
         body.append("<p>If you did not register for our service, please ignore this email.</p>");
         body.append("<p>Best regards,<br>Critical Software</p>");
         body.append("</body>");
