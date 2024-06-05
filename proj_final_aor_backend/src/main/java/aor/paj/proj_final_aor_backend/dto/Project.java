@@ -55,6 +55,9 @@ public class Project {
     private String needs;
 
     @XmlElement
+    private Integer maxMembers;
+
+    @XmlElement
     private Integer vacancyNumber;
 
     @XmlElement
@@ -282,6 +285,22 @@ public class Project {
      */
     public void setVacancyNumber(Integer vacancyNumber) {
         this.vacancyNumber = vacancyNumber;
+    }
+
+    /**
+     * This method is used to get the maximum number of members that can be part of the project.
+     * @return An Integer representing the maximum number of members that can be part of the project.
+     */
+    public Integer getMaxMembers() {
+        return maxMembers;
+    }
+
+    /**
+     * This method is used to set the maximum number of members that can be part of the project.
+     * @param maxMembers An Integer representing the maximum number of members that can be part of the project.
+     */
+    public void setMaxMembers(Integer maxMembers) {
+        this.maxMembers = maxMembers;
     }
 
     /**
