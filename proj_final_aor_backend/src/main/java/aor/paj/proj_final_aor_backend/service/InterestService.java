@@ -114,14 +114,14 @@ public class InterestService {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response getAllInterests(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+    public Response getAllInterests(@Context HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        User user = userBean.getUSerByToken(token);
+        /*User user = userBean.getUSerByToken(token);
         if(user== null){
             logger.error("User not found");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
-        logger.info("Received request to retrieve all interests from IP: " + ip);
+        logger.info("Received request to retrieve all interests from IP: " + ip);*/
 
         // Retrieve all interests
         return Response.status(Response.Status.OK).entity(interestBean.getAllInterests()).build();
