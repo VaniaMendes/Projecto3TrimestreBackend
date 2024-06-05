@@ -69,7 +69,15 @@ public class InterestBean {
 
        // Create the interest
         InterestEntity interestEntity = new InterestEntity();
-        interestEntity.setName(interest.getName());
+
+        String name = interest.getName();
+        String[] words = name.split(" ");
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+        String formattedName = String.join(" ", words);
+        interestEntity.setName(formattedName);
+
         // Persist the interest in the database
         interestDao.createInterest(interestEntity);
         return true;

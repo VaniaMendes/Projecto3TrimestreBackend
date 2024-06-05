@@ -97,7 +97,7 @@ public class ProjectBean implements Serializable {
             return false;
         }
 
-        project.setStateId(100);
+        project.setStateId(getStateNameFromId(Project.PLANNING));
 
         ProjectEntity projectEntity = convertToEntity(project);
 
@@ -549,6 +549,14 @@ public class ProjectBean implements Serializable {
         return projectsDTO;
     }
 
+    /**
+     * This method is used to count the number of vacancies in a project.
+     * It first finds the project by its ID, then calculates the number of vacancies by subtracting the number of active users from the maximum number of members.
+     * If the number of vacancies is less than 0, it returns 0.
+     *
+     * @param projectId The ID of the project for which to count the vacancies.
+     * @return The number of vacancies in the project, or null if the project does not exist.
+     */
     private Integer countVacancies(Long projectId) {
         ProjectEntity p = findProject(projectId);
         if (p == null) {
@@ -564,6 +572,62 @@ public class ProjectBean implements Serializable {
         return vacancies;
     }
 
+    public Integer countAllProjects() {
+        return projectDao.countAllProjects();
+    }
+
+    /**
+     * This method is used to get the name of a project state from its ID.
+     * It uses a switch statement to map the state ID to its corresponding name.
+     *
+     * @param stateId The ID of the state for which to get the name.
+     * @return The name of the state, or "UNKNOWN_STATE" if the state ID does not match any known state.
+     */
+    private String getStateNameFromId(int stateId) {
+        switch (stateId) {
+            case Project.PLANNING:
+                return "PLANNING";
+            case Project.READY:
+                return "READY";
+            case Project.APPROVED:
+                return "APPROVED";
+            case Project.IN_PROGRESS:
+                return "IN_PROGRESS";
+            case Project.FINISHED:
+                return "FINISHED";
+            case Project.CANCELLED:
+                return "CANCELLED";
+            default:
+                return "UNKNOWN_STATE";
+        }
+    }
+
+    /**
+     * This method is used to get the ID of a project state from its name.
+     * It uses a switch statement to map the state name to its corresponding ID.
+     *
+     * @param stateName The name of the state for which to get the ID.
+     * @return The ID of the state, or -1 if the state name does not match any known state.
+     */
+    private int getStateNumberFromName(String stateName) {
+        switch (stateName) {
+            case "PLANNING":
+                return Project.PLANNING;
+            case "READY":
+                return Project.READY;
+            case "APPROVED":
+                return Project.APPROVED;
+            case "IN_PROGRESS":
+                return Project.IN_PROGRESS;
+            case "FINISHED":
+                return Project.FINISHED;
+            case "CANCELLED":
+                return Project.CANCELLED;
+            default:
+                return -1;
+        }
+    }
+
 
     /**
      * Converts a project DTO to a project entity.
@@ -574,7 +638,7 @@ public class ProjectBean implements Serializable {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());
-        projectEntity.setStateId(project.getStateId());
+        projectEntity.setStateId(getStateNumberFromName(project.getStateId()));
         projectEntity.setKeywords(project.getKeywords());
         projectEntity.setLab(labBean.convertToEntity(project.getLab()));
         projectEntity.setNeeds(project.getNeeds());
@@ -593,7 +657,7 @@ public class ProjectBean implements Serializable {
         project.setId(projectEntity.getId());
         project.setName(projectEntity.getName());
         project.setDescription(projectEntity.getDescription());
-        project.setStateId(projectEntity.getStateId());
+        project.setStateId(getStateNameFromId(projectEntity.getStateId()));
         project.setKeywords(projectEntity.getKeywords());
         project.setLab(labBean.convertToDTO(projectEntity.getLab()));
         project.setNeeds(projectEntity.getNeeds());
