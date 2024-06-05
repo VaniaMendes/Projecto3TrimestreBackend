@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.LabDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
@@ -571,6 +572,13 @@ public class UserBean implements Serializable {
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());
         user.setNickname(userEntity.getNickname());
+        user.setPhoto(userEntity.getPhoto());
+
+        Lab lab = new Lab();
+        lab.setId(userEntity.getLab().getId());
+        lab.setName(userEntity.getLab().getName());
+        user.setLab(lab);
+
         return user;
     }
 

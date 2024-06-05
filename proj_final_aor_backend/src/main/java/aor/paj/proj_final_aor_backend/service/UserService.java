@@ -220,4 +220,28 @@ public class UserService {
 
     }
 
+    @GET
+    @Path("/profile")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response getUser(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+
+        try {
+                   User userlogged = userBean.getUSerByToken(token);
+            if(userlogged == null){
+                logger.warn("IP Adress " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+
+            }
+
+            logger.info("IP Address: " + request.getRemoteAddr() + " - User retrieved with successfully: " + userlogged.getEmail() + " at " + LocalDateTime.now());
+            return Response.status(Response.Status.OK).entity(userlogged).build();
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to retrieve user at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve user").build();
+        }
+
+    }
+
 }
+
