@@ -32,7 +32,8 @@ public class ProjectBean implements Serializable {
     // EJB reference for ProjectDao to perform operations related to Project entities.
     @EJB
     private ProjectDao projectDao;
-
+    @EJB
+    private UserProjectDao userProjectDao;
     @EJB
     private SessionDao sessionDao;
 
@@ -548,6 +549,21 @@ public class ProjectBean implements Serializable {
         return projectsDTO;
     }
 
+    private Integer countVacancies(Long projectId) {
+        ProjectEntity p = findProject(projectId);
+        if (p == null) {
+            return null;
+        }
+
+        int vacancies = p.getMaxMembers() - userProjectDao.countActiveUsersByProjectId(projectId);
+
+        if (vacancies < 0) {
+            return 0;
+        }
+
+        return vacancies;
+    }
+
 
     /**
      * Converts a project DTO to a project entity.
@@ -562,6 +578,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setKeywords(project.getKeywords());
         projectEntity.setLab(labBean.convertToEntity(project.getLab()));
         projectEntity.setNeeds(project.getNeeds());
+        projectEntity.setMaxMembers(project.getMaxMembers());
 
         return projectEntity;
     }
@@ -586,6 +603,7 @@ public class ProjectBean implements Serializable {
         project.setInitialDate(projectEntity.getInitialDate());
         project.setSkills(projectSkillBean.getSkillsOfProject(projectEntity.getId()));
         project.setUsersInfo(userProjectBean.getUsersInAProject(projectEntity.getId()));
+        project.setVacancyNumber(countVacancies(projectEntity.getId()));
 
         return project;
     }
