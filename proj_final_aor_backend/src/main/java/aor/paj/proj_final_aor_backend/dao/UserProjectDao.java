@@ -62,4 +62,12 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
+    public Integer countActiveUsersByProjectId(Long id) {
+        try {
+            return em.createNamedQuery("UserProject.countActiveUsersByProjectId", Long.class).setParameter("id", id).getSingleResult().intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
