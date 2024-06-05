@@ -111,13 +111,9 @@ public class SkillService {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllSkills(@HeaderParam("token") String token, @Context HttpServletRequest request) {
-        User user = userBean.getUSerByToken(token);
-        if(user == null) {
-            logger.error("IP Adress " + request.getRemoteAddr() +  "User not found");
-            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
-        }
-        logger.info("IP Adress: " + request.getRemoteAddr() + "Skills retrieved successfully by user "  + user.getId());
+    public Response getAllSkills(@Context HttpServletRequest request) {
+
+        logger.info("IP Adress: " + request.getRemoteAddr() + "Skills retrieved successfully");
         return Response.status(Response.Status.OK).entity(skillBean.getSkills()).build();
     }
 

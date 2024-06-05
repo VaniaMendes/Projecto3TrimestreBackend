@@ -76,7 +76,15 @@ public class SkillBean implements Serializable {
         }
         // Create the skill
         SkillEntity skillEntity = new SkillEntity();
-        skillEntity.setName(skill.getName());
+
+        String name = skill.getName();
+        String[] words = name.split(" ");
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1).toLowerCase();
+        }
+        String formattedName = String.join(" ", words);
+        skillEntity.setName(formattedName);
+
         skillEntity.setType(skill.getType());
         // Persist the skill in the database
         skillDao.createSkill(skillEntity);

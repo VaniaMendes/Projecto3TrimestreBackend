@@ -68,7 +68,7 @@ public class Project {
 
     // Current state of the project
     @XmlElement
-    private int stateId;
+    private String stateId;
 
     // Constants representing different states of the project
     @XmlElement
@@ -236,18 +236,22 @@ public class Project {
     }
 
     /**
-     * Getter for the current state of the project.
-     * @return current state of the project.
+     * This method is used to get the current state of the project.
+     * The state is represented as a String, which corresponds to the name of the state.
+     *
+     * @return A String representing the current state of the project.
      */
-    public Integer getStateId() {
+    public String getStateId() {
         return stateId;
     }
 
     /**
-     * Setter for the current state of the project.
-     * @param stateId the new current state of the project.
+     * This method is used to set the current state of the project.
+     * The state should be represented as a String, which corresponds to the name of the state.
+     *
+     * @param stateId A String representing the new state to be set for the project.
      */
-    public void setStateId(int stateId) {
+    public void setStateId(String stateId) {
         this.stateId = stateId;
     }
 

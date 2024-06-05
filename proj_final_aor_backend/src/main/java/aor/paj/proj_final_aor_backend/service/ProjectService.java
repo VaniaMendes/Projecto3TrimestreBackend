@@ -291,5 +291,15 @@ public class ProjectService {
         }
     }
 
+    @GET
+    @Path("/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countProjects() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to count projects from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(projectBean.countAllProjects()).build();
+    }
+
 
 }

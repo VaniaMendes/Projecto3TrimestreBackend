@@ -43,7 +43,7 @@ public class ProjectEntity implements Serializable {
     private String name;
 
     // Description of the project
-    @Column(name = "description")
+    @Column(name = "description", length = 500)
     private String description;
 
     // Date and time when the project was created
