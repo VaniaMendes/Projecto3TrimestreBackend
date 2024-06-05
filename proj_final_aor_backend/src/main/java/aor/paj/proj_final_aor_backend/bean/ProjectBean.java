@@ -13,7 +13,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -527,9 +529,24 @@ public class ProjectBean implements Serializable {
      * @return A list of all projects ordered from latest to oldest.
      */
     public List<Project> getAllProjectsLatestToOldest() {
-        return projectDao.findAllProjectsOrderedDESC().stream()
+
+        // Retrieve all projects from the database in descending order
+        List<ProjectEntity> projects = projectDao.findAllProjectsOrderedDESC();
+
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
+
+        List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+
+        return projectsDTO;
     }
 
     private Integer countVacancies(Long projectId) {
