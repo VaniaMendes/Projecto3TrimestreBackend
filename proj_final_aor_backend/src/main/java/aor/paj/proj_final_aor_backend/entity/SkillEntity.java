@@ -19,6 +19,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NamedQuery(name = "Skill.findSkillById", query = "SELECT s FROM SkillEntity s WHERE s.id = :id")
 @NamedQuery(name = "Skill.findAllSkills", query = "SELECT s FROM SkillEntity s")
 @NamedQuery(name = "Skill.findSkillByName", query = "SELECT s FROM SkillEntity s WHERE s.name = :name")
+@NamedQuery(name = "Skill.findSkillsByUserId", query = "SELECT s From SkillEntity s JOIN s.usersSkills us WHERE us.user.id = :userId")
 @JsonIgnoreProperties({"projectSkill", "usersSkills"})
 public class SkillEntity implements Serializable {
 
