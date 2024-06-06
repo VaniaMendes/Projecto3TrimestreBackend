@@ -47,6 +47,16 @@ public class SkillDao extends AbstractDao<SkillEntity>{
     }
 
 
+    public List<SkillEntity>findSkillsByUserId(long userId){
+        try {
+            return em.createNamedQuery("Skill.findSkillsByUserId", SkillEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
 

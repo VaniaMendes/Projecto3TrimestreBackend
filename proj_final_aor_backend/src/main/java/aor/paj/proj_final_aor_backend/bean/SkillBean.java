@@ -58,6 +58,10 @@ public class SkillBean implements Serializable {
         return skillDao.findAllSkills();
     }
 
+    public List<SkillEntity>getSkillsByUserId(long userId){
+        return skillDao.findSkillsByUserId(userId);
+    }
+
     /**
      * This method creates a new skill in the database.
      * @param skill Skill object to be created.
@@ -102,13 +106,15 @@ public class SkillBean implements Serializable {
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         SkillEntity skill = skillDao.find(skillId);
+        System.out.println(user.getId());
+        System.out.println(skill.getId());
 
         // Check if the user or the skill does not exist
         if (user == null || skill == null) {
             return false;
         }
         // Check if the user already has the skill associated
-        if(verifySkillExists(skillId)){
+        if(verifySkillExists(userId, skillId)){
             return false;
         }
 
@@ -156,6 +162,8 @@ public class SkillBean implements Serializable {
         return true;
     }
 
+
+
     public Skill convertToDTO(SkillEntity skillEntity) {
         Skill skill = new Skill();
         skill.setId(skillEntity.getId());
@@ -169,9 +177,9 @@ public class SkillBean implements Serializable {
      * @param skillId The id of the skill to verify.
      * @return True if the skill exists, false otherwise.
      */
-    public boolean verifySkillExists(Long skillId){
+    public boolean verifySkillExists(Long userId, Long skillId){
         // Fetch the skill from the database
-        SkillEntity skill = skillDao.find(skillId);
+        UserSkillEntity skill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
         return skill != null;
     }
 }
