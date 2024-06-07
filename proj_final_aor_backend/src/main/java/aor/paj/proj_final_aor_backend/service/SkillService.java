@@ -117,4 +117,25 @@ public class SkillService {
         return Response.status(Response.Status.OK).entity(skillBean.getSkills()).build();
     }
 
+
+    @GET
+    @Path("/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSkillsByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get skills by user id from IP: " + ip);
+
+        // Authentication and authorization
+        User user = userBean.getUSerByToken(token);
+        if (user == null || user.getId() != userId) {
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Get the skills by user id
+        logger.info("IP Adress: " + ip + "Skills retrieved successfully for user with id: " + userId);
+        return Response.status(Response.Status.OK).entity(skillBean.getSkillsByUserId(userId)).build();
+    }
+
+
 }

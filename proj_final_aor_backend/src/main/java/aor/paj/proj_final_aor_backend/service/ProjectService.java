@@ -2,8 +2,10 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.ActivityBean;
 import aor.paj.proj_final_aor_backend.bean.ProjectBean;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
@@ -28,6 +30,8 @@ public class ProjectService {
 
     @EJB
     private ActivityBean activityBean;
+    @EJB
+    private UserBean userBean;
 
     @Context
     private HttpServletRequest request;
@@ -302,4 +306,20 @@ public class ProjectService {
     }
 
 
+    @GET
+    @Path("/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectsByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUSerByToken(token);
+        if(user == null || user.getId() != userId){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        logger.info("Received request to get projects by user id from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(userProjectBean.getActiveProjectsOfAUser(userId)).build();
+    }
 }

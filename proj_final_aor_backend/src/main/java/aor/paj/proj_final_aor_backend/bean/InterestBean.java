@@ -181,4 +181,8 @@ public class InterestBean {
 
 
 
+    public List<InterestEntity> getAllInterestsByUser(long userId){
+        return userInterestDao.getAllInterestsByUserId(userId);
+    }
+
 }
