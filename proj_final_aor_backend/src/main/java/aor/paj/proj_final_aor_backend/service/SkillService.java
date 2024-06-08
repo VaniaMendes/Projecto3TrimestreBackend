@@ -65,6 +65,11 @@ public class SkillService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }
 
+        if(userId == null || skillId == null) {
+            logger.error("User or skill not found");
+            return Response.status(Response.Status.BAD_REQUEST).entity("User or skill not found").build();
+        }
+
         // Associate the skill to the user
         boolean isAssociated = skillBean.associateSkillToUser(userId, skillId);
 

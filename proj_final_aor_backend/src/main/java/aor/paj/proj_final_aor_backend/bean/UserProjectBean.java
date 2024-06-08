@@ -2,8 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserProjectDao;
-import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
-import aor.paj.proj_final_aor_backend.dto.UserProject;
+import aor.paj.proj_final_aor_backend.dto.*;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
@@ -274,13 +273,27 @@ public class UserProjectBean implements Serializable {
      * @param userId The ID of the user.
      * @return List of active UserProject objects associated with the user.
      */
-    public List<UserProject> getActiveProjectsOfAUser(Long userId){
+    public List<ProjectInfoUser> getActiveProjectsOfAUser(Long userId){
         List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveProjectsFromAUserByUserId(userId);
-        List<UserProject> userProjects = new ArrayList<>();
+        List<ProjectInfoUser> userProjects = new ArrayList<>();
         for (UserProjectEntity userProjectEntity : userProjectEntities) {
-            userProjects.add(convertToDTO(userProjectEntity));
+            userProjects.add(convertUserProjecttoProjectDTO(userProjectEntity));
         }
         return userProjects;
+    }
+
+    public ProjectInfoUser convertUserProjecttoProjectDTO(UserProjectEntity userProjectEntity){
+        ProjectInfoUser project = new ProjectInfoUser();
+        project.setId(userProjectEntity.getProject().getId());
+        project.setName(userProjectEntity.getProject().getName());
+        project.setJoinedAt(userProjectEntity.getJoinedAt());
+        project.setLeftAt(userProjectEntity.getLeftAt());
+        Lab lab = new Lab();
+        lab.setId(userProjectEntity.getProject().getLab().getId());
+        lab.setName(userProjectEntity.getProject().getLab().getName());
+
+        project.setLab(lab);
+        return project;
     }
 
     /**
