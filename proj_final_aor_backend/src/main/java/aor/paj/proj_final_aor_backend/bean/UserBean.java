@@ -485,34 +485,34 @@ public class UserBean implements Serializable {
         }
 
         //Check if the first name is not null
-        if(user.getFirstName() != null){
+        if(user.getFirstName()!=null && !user.getFirstName().isEmpty()){
             logger.info("Updating first name to: " + user.getFirstName());
             userEntity.setFirstName(user.getFirstName());
         }
-        //Check if the biography is not null
-        if(user.getBiography() != null){
-            userEntity.setBiography(user.getBiography());
-        }
+
         //Check if the last name is not null
-        if (user.getLastName() != null){
+        if (user.getLastName()!= null && !user.getLastName().isEmpty()){
             logger.info("Updating last name to: " + user.getLastName());
             userEntity.setLastName(user.getLastName());
         }
-        //Check if the lab is valid
-        if(user.getLab() != null && user.getLab().getId() != 0){
-            LabEntity labEntity = labDao.findLabById(user.getLab().getId());
+        // Check if the lab name is not null
+        if (user.getLab() != null && user.getLab().getName() != null) {
+            // Find the lab entity by name
+            LabEntity labEntity = labDao.findLabByName(String.valueOf(user.getLab().getName()));
+            if (labEntity == null) {
+                logger.warn("Lab not found with name: " + user.getLab().getName());
+                return false;
+            }
+            // Assign the lab entity to the user
             userEntity.setLab(labEntity);
         }
-        //Check if the biography field is not null
-        if(user.getBiography() != null){
-            userEntity.setBiography(user.getBiography());
-        }
+
         //Check if the photo field is not null
         if(user.getPhoto() != null){
             userEntity.setPhoto(user.getPhoto());
         }
         //Check if the nickname is not null and if is a valid nickname
-        if(user.getNickname() != null){
+        if(user.getNickname() != null && !user.getNickname().isEmpty()){
             if(nicknameExists(user.getNickname())){
                 logger.warn("Nickname already exists: " + user.getNickname());
                 return false;
@@ -528,6 +528,32 @@ public class UserBean implements Serializable {
             return true;
         } catch (Exception e) {
             logger.error("Failed to update user: " + user.getId(), e);
+            return false;
+        }
+    }
+
+    public boolean updateBiography (String biography, long userId){
+        UserEntity userEntity = userDao.findUserById(userId);
+
+
+        //Check if the user exists
+        if(userEntity == null){
+            logger.warn("User not found with ID: " + userEntity.getId());
+            return false;
+        }
+        //Check if the biography is not null
+        if(!biography.isEmpty()){
+            logger.info("Updating biography to: " + userEntity.getBiography());
+
+            userEntity.setBiography(biography);
+        }
+        try {
+            //Update the user in the database
+            userDao.updateUser(userEntity);
+            logger.info("User updated successfully: " + userEntity.getId());
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to update user: " + userEntity.getId(), e);
             return false;
         }
     }
