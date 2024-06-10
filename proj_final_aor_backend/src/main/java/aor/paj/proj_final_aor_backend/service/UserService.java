@@ -187,7 +187,7 @@ public class UserService {
 
     }
 
-    @PATCH
+    @PUT
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -219,6 +219,36 @@ public class UserService {
         }
 
     }
+    @PUT
+    @Path("/{userId}/biography")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response updateBiography(@HeaderParam("token") String token, @PathParam("userId") int userId, String biography, @Context HttpServletRequest request) {
+
+        try {
+            // Authentication and authorization
+            User userLogged = userBean.getUSerByToken(token);
+            if (userLogged == null || userLogged.getId() != userId) {
+                logger.warn("IP Address " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+
+            // Update biography
+            boolean isUpdated = userBean.updateBiography(biography, userId);
+            if (isUpdated) {
+                logger.info("IP Address: " + request.getRemoteAddr() + " - Biography updated successfully for user: " + userId + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.OK).entity("Biography updated").build();
+            } else {
+                logger.warn("IP Address " + request.getRemoteAddr() + " - Failed to update biography for user: " + userId + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update biography").build();
+            }
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to update biography for user: " + userId + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to update biography").build();
+        }
+    }
+
 
     @GET
     @Path("/profile")
