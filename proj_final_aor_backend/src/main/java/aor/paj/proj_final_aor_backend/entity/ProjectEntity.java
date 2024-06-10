@@ -16,16 +16,42 @@ import java.util.*;
 @NamedQuery(name = "Project.findAllProjects", query = "SELECT p FROM ProjectEntity p")
 @NamedQuery(name = "Project.findAllProjectsOrderedDESC", query = "SELECT p FROM ProjectEntity p ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectById", query = "SELECT p FROM ProjectEntity p WHERE p.id = :id")
+@NamedQuery(name = "Project.findActiveProjectsByUserId", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByLab", query = "SELECT p FROM ProjectEntity p WHERE p.lab = :lab")
 @NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
 @NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
+
+@NamedQuery(name = "Project.orderByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
+                "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+                "GROUP BY p.id " +
+                "ORDER BY (p.maxMembers - COUNT(up)) ASC"
+)
+@NamedQuery(name = "Project.orderByVacanciesDESC",
+        query = "SELECT p FROM ProjectEntity p " +
+                "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+                "GROUP BY p.id " +
+                "ORDER BY (p.maxMembers - COUNT(up)) DESC"
+)
+@NamedQuery(name = "Project.orderByVacanciesAndStateASC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE p.stateId = :stateId " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) ASC"
+)
+@NamedQuery(name = "Project.orderByVacanciesAndStateDESC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE p.stateId = :stateId " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) DESC"
+)
+
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
-
-//Queries para saber vagas
-
+@NamedQuery(name = "Project.countProjectsByState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.stateId = :stateId")
+@NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
+@NamedQuery(name = "Project.countProjectsBySkill", query = "SELECT COUNT(p) FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
 
 public class ProjectEntity implements Serializable {
 
