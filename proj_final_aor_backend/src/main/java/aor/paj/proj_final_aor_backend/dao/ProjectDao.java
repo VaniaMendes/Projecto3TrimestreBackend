@@ -85,6 +85,15 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    public List<ProjectEntity> findActiveProjectsByUserIdAndState(Long id, int state) {
+        try {
+            return em.createNamedQuery("Project.findActiveProjectsByUserIdAndState", ProjectEntity.class).setParameter("id", id).setParameter("stateId", state).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
     /**
      * Retrieves all projects associated with a given lab.
      * @param lab the lab to retrieve projects for.

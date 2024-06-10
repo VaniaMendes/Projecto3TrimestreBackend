@@ -312,7 +312,12 @@ public class ProjectService {
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+    public Response getProjectsByUserId(@HeaderParam("token") String token,
+                                        @PathParam("userId") Long userId,
+                                        @QueryParam("order") String order,
+                                        @QueryParam("vacancies") Boolean vacancies,
+                                        @QueryParam("state") Integer state) {
+
         String ip = request.getRemoteAddr();
 
         User user = userBean.getUSerByToken(token);
