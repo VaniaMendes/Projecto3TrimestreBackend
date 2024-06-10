@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.UserBean;
+import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.Login;
 import aor.paj.proj_final_aor_backend.dto.User;
@@ -25,6 +26,12 @@ public class UserService {
 
     @EJB
     UserBean userBean;
+
+    @EJB
+    UserProjectBean userProjectBean;
+
+    @Context
+    private HttpServletRequest request;
 
 
     @POST
@@ -271,6 +278,16 @@ public class UserService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve user").build();
         }
 
+    }
+
+    @GET
+    @Path("/{id}/projects/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response countProjectsByUserId(@PathParam("id") long userId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to count projects by user id from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(userProjectBean.countProjectsByUserId(userId)).build();
     }
 
 }

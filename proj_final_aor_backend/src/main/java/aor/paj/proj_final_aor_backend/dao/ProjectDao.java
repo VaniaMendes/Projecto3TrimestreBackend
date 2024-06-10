@@ -77,6 +77,14 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    public List<ProjectEntity> findActiveProjectsByUserId(Long id) {
+        try {
+            return em.createNamedQuery("Project.findActiveProjectsByUserId", ProjectEntity.class).setParameter("id", id).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     /**
      * Retrieves all projects associated with a given lab.
      * @param lab the lab to retrieve projects for.
@@ -158,9 +166,65 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    public List<ProjectEntity> findProjectsByVacanciesOrderedASC() {
+        try {
+            return em.createNamedQuery("Project.orderByVacanciesASC", ProjectEntity.class).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ProjectEntity> findProjectsByVacanciesOrderedDESC() {
+        try {
+            return em.createNamedQuery("Project.orderByVacanciesDESC", ProjectEntity.class).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ProjectEntity> findProjectsByVacanciesAndStateOrderedASC(int state) {
+        try {
+            return em.createNamedQuery("Project.orderByVacanciesAndStateASC", ProjectEntity.class).setParameter("stateId", state).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ProjectEntity> findProjectsByVacanciesAndStateOrderedDESC(int state) {
+        try {
+            return em.createNamedQuery("Project.orderByVacanciesAndStateDESC", ProjectEntity.class).setParameter("stateId", state).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
     public Integer countAllProjects() {
         try {
             return ((Number) em.createNamedQuery("Project.countAllProjects").getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Integer countProjectsByState(int state) {
+        try {
+            return ((Number) em.createNamedQuery("Project.countProjectsByState").setParameter("stateId", state).getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Integer countProjectsBySkill(String skill) {
+        try {
+            return ((Number) em.createNamedQuery("Project.countProjectsBySkill").setParameter("skillName", skill).getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Integer countProjectsByKeyword(String keyword) {
+        try {
+            return ((Number) em.createNamedQuery("Project.countProjectsByKeyword").setParameter("keyword", "%" + keyword + "%").getSingleResult()).intValue();
         } catch (Exception e) {
             return null;
         }

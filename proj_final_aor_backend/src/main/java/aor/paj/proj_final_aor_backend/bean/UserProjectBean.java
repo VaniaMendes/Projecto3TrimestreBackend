@@ -282,6 +282,10 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
+    public Integer countProjectsByUserId(Long userId) {
+        return userProjectDao.countProjectsByUserId(userId);
+    }
+
     public ProjectInfoUser convertUserProjecttoProjectDTO(UserProjectEntity userProjectEntity){
         ProjectInfoUser project = new ProjectInfoUser();
         project.setId(userProjectEntity.getProject().getId());
