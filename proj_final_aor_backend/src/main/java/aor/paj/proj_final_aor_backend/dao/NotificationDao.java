@@ -3,6 +3,7 @@ package aor.paj.proj_final_aor_backend.dao;
 import aor.paj.proj_final_aor_backend.entity.NotificationEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
+import jakarta.persistence.NamedQuery;
 
 import java.util.List;
 
@@ -36,5 +37,13 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
      */
     public void create(NotificationEntity notification) {
         em.persist(notification);
+    }
+
+    public List<NotificationEntity> findNotificationsByUserID(long userId) {
+        try {
+            return em.createNamedQuery("Notification.findNotificationsByUserID").setParameter("userId", userId).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

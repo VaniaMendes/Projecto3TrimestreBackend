@@ -69,7 +69,7 @@ public class NotificationService {
         }
         logger.info("IP Adress: " + ip + "Received request to send a new notification to project " + projectId);
         try {
-            boolean sent = notificationBean.sendNotificationToProjectUsers(token, projectId, notification.getType());
+            boolean sent = notificationBean.sendNotificationToProjectUsers(token, projectId, notification.getType().toString());
 
             if(sent) {
                 logger.info("IP Adress: "+ ip + "Notification sent successfully" + " to members of project with id " + projectId +
@@ -81,6 +81,28 @@ public class NotificationService {
             }
         } catch (Exception e) {
             logger.error("Error sending notification: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId){
+        logger.info("Received request to get notifications for user with id: " + userId);
+        try {
+            List<Notification> notifications = notificationBean.getNotificationsByUserId(token, userId);
+
+            if(notifications != null) {
+                logger.info("Notifications retrieved successfully");
+                return Response.status(Response.Status.OK).entity(notifications).build();
+            } else {
+                logger.error("Error retrieving notifications");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving notifications").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving notifications: " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

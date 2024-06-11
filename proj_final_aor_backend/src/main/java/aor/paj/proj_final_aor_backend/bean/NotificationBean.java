@@ -3,11 +3,13 @@ package aor.paj.proj_final_aor_backend.bean;
 import aor.paj.proj_final_aor_backend.dao.NotificationDao;
 import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.Notification;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
 import aor.paj.proj_final_aor_backend.entity.NotificationEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +54,7 @@ public class NotificationBean implements Serializable {
      * @throws Exception If no user is found with the given token, if there are no users to send the notification to, or if no type is specified for the notification.
      */
 
-    public boolean sendNotificationToAllUsers(String token, String type) {
+    public boolean sendNotificationToAllUsers(String token, NotificationType type) {
 
         UserEntity sender = sessionDao.findUserByToken(token);
 
@@ -67,7 +69,7 @@ public class NotificationBean implements Serializable {
 
             return false;
         }
-        if(type == null || type.isEmpty()) {
+        if(type == null || type.toString().isEmpty()) {
             logger.error("No type specified for notification");
             return false;
         }
@@ -132,7 +134,7 @@ public class NotificationBean implements Serializable {
                 notification.setReadStatus(false);
                 notification.setSendTimestamp(LocalDateTime.now());
                 notification.setSender(userBean.convertUserToDTOForMessage(sender));
-                notification.setType(type);
+                notification.setType(NotificationType.valueOf(type));
 
                 NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
                 notificationDao.create(notificationEntity);
@@ -153,11 +155,46 @@ public class NotificationBean implements Serializable {
         return true;
     }
 
+    public List<Notification> getNotificationsByUserId(String token, long userId) {
+        UserEntity user = sessionDao.findUserByToken(token);
+
+        if(user == null) {
+            logger.error("No user found with token: " + token);
+            return null;
+        }
+
+        List<NotificationEntity> notifications = notificationDao.findNotificationsByUserID(userId);
+
+        if(notifications == null || notifications.isEmpty()) {
+            logger.error("No notifications found for user with id: " + userId);
+            return null;
+        }
+
+        List<Notification> notificationList = new ArrayList<>();
+        for (NotificationEntity notificationEntity : notifications) {
+            Notification notification = new Notification();
+            notification.setId(notificationEntity.getId());
+            notification.setReadStatus(notificationEntity.isReadStatus());
+            notification.setSendTimestamp(notificationEntity.getSendTimestamp());
+            notification.setType(NotificationType.valueOf(notificationEntity.getType().toString()));
+            UserEntity senderEntity = new UserEntity();
+            senderEntity.setId(notificationEntity.getSender_id());
+
+
+            MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
+
+            notification.setSender(senderDto);
+            notificationList.add(notification);
+        }
+
+        return notificationList;
+    }
+
     public NotificationEntity convertDtoTOEntity(Notification notification, UserEntity sender) {
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.setReadStatus(notification.isReadStatus());
         notificationEntity.setSendTimestamp(notification.getSendTimestamp());
-        notificationEntity.setType(notification.getType());
+        notificationEntity.setType(notification.getType().toString());
         notificationEntity.setSender_id(userBean.convertUserToDTOForMessage(sender).getId());
         return notificationEntity;
     }

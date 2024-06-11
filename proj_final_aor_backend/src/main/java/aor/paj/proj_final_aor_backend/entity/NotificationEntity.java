@@ -13,6 +13,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name="notifications")
+@NamedQuery(name = "Notification.findNotificationsByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId")
 
 //Querys for the NotificationEntity class
 

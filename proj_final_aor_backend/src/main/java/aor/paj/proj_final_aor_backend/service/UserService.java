@@ -48,11 +48,10 @@ public class UserService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to register user").build();
         }
 
-
     }
 
     @PUT
-    @Path("/confirm")
+    @Path("/confirm-account")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response confirmUser(@HeaderParam("tokenConfirmation") String tokenConfirmation, @QueryParam("lab") String lab, User user, @Context HttpServletRequest request) {

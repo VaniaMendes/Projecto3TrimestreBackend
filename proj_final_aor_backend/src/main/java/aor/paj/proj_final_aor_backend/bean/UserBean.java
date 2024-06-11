@@ -212,6 +212,7 @@ public class UserBean implements Serializable {
 
         //Check if the lab is valid
         if(labEntity == null){
+            System.out.println(labEntity.getName());
             return false;
         }
         //Check if the token is valid
