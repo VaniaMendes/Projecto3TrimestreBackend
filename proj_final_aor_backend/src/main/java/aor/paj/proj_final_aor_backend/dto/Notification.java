@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -13,7 +14,7 @@ public class Notification extends TextEvent{
      * The type of the notification.
      */
     @XmlElement
-    private String type;
+    private NotificationType type;
 
 
     /**
@@ -26,7 +27,7 @@ public class Notification extends TextEvent{
      * Returns the type of the notification.
      * @return the type of the notification.
      */
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 
@@ -34,7 +35,7 @@ public class Notification extends TextEvent{
      * Sets the type of the notification.
      * @param type the type of the notification.
      */
-    public void setType(String type) {
+    public void setType(NotificationType type) {
         this.type = type;
     }
 }
