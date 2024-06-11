@@ -77,17 +77,33 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
-    public List<ProjectEntity> findActiveProjectsByUserId(Long id) {
+    public List<ProjectEntity> findActiveProjectsByUserIdOrderedASC(Long id) {
         try {
-            return em.createNamedQuery("Project.findActiveProjectsByUserId", ProjectEntity.class).setParameter("id", id).getResultList();
+            return em.createNamedQuery("Project.findActiveProjectsByUserIdOrderedASC", ProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public List<ProjectEntity> findActiveProjectsByUserIdAndState(Long id, int state) {
+    public List<ProjectEntity> findActiveProjectsByUserIdOrderedDESC(Long id) {
         try {
-            return em.createNamedQuery("Project.findActiveProjectsByUserIdAndState", ProjectEntity.class).setParameter("id", id).setParameter("stateId", state).getResultList();
+            return em.createNamedQuery("Project.findActiveProjectsByUserIdOrderedDESC", ProjectEntity.class).setParameter("id", id).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<ProjectEntity> findActiveProjectsByUserIdAndStateOrderedASC(Long id, int state) {
+        try {
+            return em.createNamedQuery("Project.findActiveProjectsByUserIdAndStateOrderedASC", ProjectEntity.class).setParameter("id", id).setParameter("stateId", state).getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<ProjectEntity> findActiveProjectsByUserIdAndStateOrderedDESC(Long id, int state) {
+        try {
+            return em.createNamedQuery("Project.findActiveProjectsByUserIdAndStateOrderedDESC", ProjectEntity.class).setParameter("id", id).setParameter("stateId", state).getResultList();
         } catch (Exception e) {
             return null;
         }
@@ -175,6 +191,12 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Retrieves all projects from the database ordered by vacancies in ascending order.
+     * This method uses a named query "Project.orderByVacanciesASC" to retrieve the projects.
+     *
+     * @return A list of ProjectEntity instances ordered by vacancies in ascending order. Returns an empty list if no projects are found.
+     */
     public List<ProjectEntity> findProjectsByVacanciesOrderedASC() {
         try {
             return em.createNamedQuery("Project.orderByVacanciesASC", ProjectEntity.class).getResultList();
@@ -183,6 +205,12 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Retrieves all projects from the database ordered by vacancies in descending order.
+     * This method uses a named query "Project.orderByVacanciesDESC" to retrieve the projects.
+     *
+     * @return A list of ProjectEntity instances ordered by vacancies in descending order. Returns an empty list if no projects are found.
+     */
     public List<ProjectEntity> findProjectsByVacanciesOrderedDESC() {
         try {
             return em.createNamedQuery("Project.orderByVacanciesDESC", ProjectEntity.class).getResultList();
@@ -191,6 +219,43 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Retrieves all projects associated with a specific user ordered by vacancies in ascending order.
+     * This method uses a named query "Project.orderByUserByVacanciesASC" to retrieve the projects.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of ProjectEntity instances associated with the specified user and ordered by vacancies in ascending order. Returns an empty list if no projects are found.
+     */
+    public List<ProjectEntity> findProjectsByUserByVacanciesASC(Long userId) {
+        try {
+            return em.createNamedQuery("Project.orderByUserByVacanciesASC", ProjectEntity.class).setParameter("userId", userId).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all projects associated with a specific user ordered by vacancies in descending order.
+     * This method uses a named query "Project.orderByUserByVacanciesDESC" to retrieve the projects.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of ProjectEntity instances associated with the specified user and ordered by vacancies in descending order. Returns an empty list if no projects are found.
+     */
+    public List<ProjectEntity> findProjectsByUserByVacanciesDESC(Long userId) {
+        try {
+            return em.createNamedQuery("Project.orderByUserByVacanciesDESC", ProjectEntity.class).setParameter("userId", userId).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all projects in a specific state ordered by vacancies in ascending order.
+     * This method uses a named query "Project.orderByVacanciesAndStateASC" to retrieve the projects.
+     *
+     * @param state The state of the projects to be retrieved.
+     * @return A list of ProjectEntity instances in the specified state and ordered by vacancies in ascending order. Returns an empty list if no projects are found.
+     */
     public List<ProjectEntity> findProjectsByVacanciesAndStateOrderedASC(int state) {
         try {
             return em.createNamedQuery("Project.orderByVacanciesAndStateASC", ProjectEntity.class).setParameter("stateId", state).getResultList();
@@ -199,6 +264,13 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Retrieves all projects in a specific state ordered by vacancies in descending order.
+     * This method uses a named query "Project.orderByVacanciesAndStateDESC" to retrieve the projects.
+     *
+     * @param state The state of the projects to be retrieved.
+     * @return A list of ProjectEntity instances in the specified state and ordered by vacancies in descending order. Returns an empty list if no projects are found.
+     */
     public List<ProjectEntity> findProjectsByVacanciesAndStateOrderedDESC(int state) {
         try {
             return em.createNamedQuery("Project.orderByVacanciesAndStateDESC", ProjectEntity.class).setParameter("stateId", state).getResultList();
@@ -207,6 +279,12 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Counts the total number of projects in the database.
+     * This method uses a named query "Project.countAllProjects" to count the projects.
+     *
+     * @return The total number of projects in the database. Returns null if an exception occurs.
+     */
     public Integer countAllProjects() {
         try {
             return ((Number) em.createNamedQuery("Project.countAllProjects").getSingleResult()).intValue();
@@ -215,6 +293,13 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Counts the number of projects in the database that are in a specific state.
+     * This method uses a named query "Project.countProjectsByState" to count the projects.
+     *
+     * @param state The state of the projects to be counted.
+     * @return The number of projects in the specified state. Returns null if an exception occurs.
+     */
     public Integer countProjectsByState(int state) {
         try {
             return ((Number) em.createNamedQuery("Project.countProjectsByState").setParameter("stateId", state).getSingleResult()).intValue();
@@ -223,6 +308,13 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Counts the number of projects in the database that require a specific skill.
+     * This method uses a named query "Project.countProjectsBySkill" to count the projects.
+     *
+     * @param skill The skill required by the projects to be counted.
+     * @return The number of projects that require the specified skill. Returns null if an exception occurs.
+     */
     public Integer countProjectsBySkill(String skill) {
         try {
             return ((Number) em.createNamedQuery("Project.countProjectsBySkill").setParameter("skillName", skill).getSingleResult()).intValue();
@@ -231,6 +323,13 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
+    /**
+     * Counts the number of projects in the database that contain a specific keyword in their name.
+     * This method uses a named query "Project.countProjectsByKeyword" to count the projects.
+     *
+     * @param keyword The keyword to be found in the names of the projects to be counted.
+     * @return The number of projects that contain the specified keyword in their name. Returns null if an exception occurs.
+     */
     public Integer countProjectsByKeyword(String keyword) {
         try {
             return ((Number) em.createNamedQuery("Project.countProjectsByKeyword").setParameter("keyword", "%" + keyword + "%").getSingleResult()).intValue();

@@ -16,8 +16,10 @@ import java.util.*;
 @NamedQuery(name = "Project.findAllProjects", query = "SELECT p FROM ProjectEntity p")
 @NamedQuery(name = "Project.findAllProjectsOrderedDESC", query = "SELECT p FROM ProjectEntity p ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectById", query = "SELECT p FROM ProjectEntity p WHERE p.id = :id")
-@NamedQuery(name = "Project.findActiveProjectsByUserId", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
-@NamedQuery(name = "Project.findActiveProjectsByUserIdAndState", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
+@NamedQuery(name = "Project.findActiveProjectsByUserIdOrderedASC", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
+@NamedQuery(name = "Project.findActiveProjectsByUserIdOrderedDESC", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false ORDER BY up.project.createdAt DESC")
+@NamedQuery(name = "Project.findActiveProjectsByUserIdAndStateOrderedASC", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
+@NamedQuery(name = "Project.findActiveProjectsByUserIdAndStateOrderedDESC", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId ORDER BY up.project.createdAt DESC")
 @NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByLab", query = "SELECT p FROM ProjectEntity p WHERE p.lab = :lab")
 @NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
@@ -41,6 +43,18 @@ import java.util.*;
         "WHERE p.stateId = :stateId " +
         "GROUP BY p.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) ASC"
+)
+@NamedQuery(name = "Project.orderByUserByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE up.user.id = :userId " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) ASC"
+)
+@NamedQuery(name = "Project.orderByUserByVacanciesDESC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE up.user.id = :userId " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
 @NamedQuery(name = "Project.orderByVacanciesAndStateDESC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
