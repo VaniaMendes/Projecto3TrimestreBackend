@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static aor.paj.proj_final_aor_backend.util.enums.NotificationType.MESSAGE_RECEIVED;
 
 
 /**
@@ -54,6 +55,8 @@ public class MessageBean implements Serializable {
     ProjectDao projectDao;
     @EJB
     UserProjectDao userProjectDao;
+    @EJB
+    NotificationBean notificationBean;
 
 
     /**
@@ -97,6 +100,9 @@ public class MessageBean implements Serializable {
         message.setReadTimestamp(null);
         // Save the message in the database
         messageDao.createMessage(message);
+
+
+        notificationBean.sendNotificationToOneUser(token, id, MESSAGE_RECEIVED);
 
         return true;
     }
