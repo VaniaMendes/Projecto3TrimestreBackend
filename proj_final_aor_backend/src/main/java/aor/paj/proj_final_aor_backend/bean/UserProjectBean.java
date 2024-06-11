@@ -232,7 +232,6 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
-
     /**
      * Retrieves a list of active users in a specific project.
      *
@@ -252,7 +251,6 @@ public class UserProjectBean implements Serializable {
         }
         return users;
     }
-
 
     /**
      * Method to get a list of UserProject objects associated with a specific user.
@@ -282,10 +280,39 @@ public class UserProjectBean implements Serializable {
         return userProjects;
     }
 
-    public Integer countProjectsByUserId(Long userId) {
-        return userProjectDao.countProjectsByUserId(userId);
+    /**
+     * Counts the number of projects associated with a specific user.
+     * If the state parameter is 1, it counts all projects associated with the user.
+     * Otherwise, it counts only the projects that are in the specified state.
+     *
+     * @param userId The ID of the user for whom to count the projects.
+     * @param state The state of the projects to be counted. If state is 1, all projects are counted.
+     * @return The number of projects associated with the specified user that are in the specified state.
+     */
+    public Integer countProjectsByUserId(Long userId, Integer state) {
+        int count = 0;
+
+        if (state == 1) {
+            // Count all projects
+            count = userProjectDao.countProjectsByUserId(userId);
+        } else {
+            // Count projects with the specified state
+            count = userProjectDao.countProjectsByUserIdAndState(userId, state);
+        }
+
+        return count;
     }
 
+    /**
+     * Converts a UserProjectEntity object to a ProjectInfoUser DTO object.
+     * The conversion involves setting the ID, name, joinedAt, and leftAt properties of the ProjectInfoUser object
+     * from the corresponding properties of the UserProjectEntity object.
+     * It also involves creating a new Lab object, setting its ID and name from the Lab object associated with the ProjectEntity object
+     * in the UserProjectEntity object, and setting the Lab object as the lab of the ProjectInfoUser object.
+     *
+     * @param userProjectEntity The UserProjectEntity object to be converted.
+     * @return The converted ProjectInfoUser DTO object.
+     */
     public ProjectInfoUser convertUserProjecttoProjectDTO(UserProjectEntity userProjectEntity){
         ProjectInfoUser project = new ProjectInfoUser();
         project.setId(userProjectEntity.getProject().getId());
