@@ -312,7 +312,12 @@ public class ProjectService {
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+    public Response getProjectsByUserId(@HeaderParam("token") String token,
+                                        @PathParam("userId") Long userId,
+                                        @QueryParam("order") String order,
+                                        @QueryParam("vacancies") Boolean vacancies,
+                                        @QueryParam("state") Integer state) {
+
         String ip = request.getRemoteAddr();
 
         User user = userBean.getUSerByToken(token);
@@ -329,7 +334,12 @@ public class ProjectService {
     @GET
     @Path("/{userId}/info/full")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsInfoByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+    public Response getProjectsInfoByUserId(@HeaderParam("token") String token,
+                                            @PathParam("userId") Long userId,
+                                            @QueryParam("order") String order,
+                                            @QueryParam("vacancies") Boolean vacancies,
+                                            @QueryParam("state") Integer state) {
+
         String ip = request.getRemoteAddr();
 
         User user = userBean.getUSerByToken(token);
@@ -340,6 +350,6 @@ public class ProjectService {
 
         logger.info("Received request to get projects by user id from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(projectBean.getProjectsWithUser(userId)).build();
+        return Response.status(Response.Status.OK).entity(projectBean.getAllProjectsWithUser(userId, order, vacancies, state)).build();
     }
 }

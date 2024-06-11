@@ -576,14 +576,7 @@ public class ProjectBean implements Serializable {
         // Retrieve all projects from the database in descending order
         List<ProjectEntity> projects = projectDao.findAllProjectsOrderedDESC();
 
-        for (ProjectEntity project : projects) {
-            Set<UserProjectEntity> userProjects = project.getUserProjects();
-            for (UserProjectEntity userProject : userProjects) {
-                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
-                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
-                userProject.setMessagesReceived(clonedMessages);
-            }
-        }
+        cloneMessageEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -600,14 +593,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getAllProjectsOldestToLatest() {
         List<ProjectEntity> projects = projectDao.findAllProjects();
 
-        for (ProjectEntity project : projects) {
-            Set<UserProjectEntity> userProjects = project.getUserProjects();
-            for (UserProjectEntity userProject : userProjects) {
-                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
-                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
-                userProject.setMessagesReceived(clonedMessages);
-            }
-        }
+        cloneMessageEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -625,14 +611,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getProjectsByStateDESC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedDESC(state);
 
-        for (ProjectEntity project : projects) {
-            Set<UserProjectEntity> userProjects = project.getUserProjects();
-            for (UserProjectEntity userProject : userProjects) {
-                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
-                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
-                userProject.setMessagesReceived(clonedMessages);
-            }
-        }
+        cloneMessageEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -650,14 +629,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getProjectsByStateASC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedASC(state);
 
-        for (ProjectEntity project : projects) {
-            Set<UserProjectEntity> userProjects = project.getUserProjects();
-            for (UserProjectEntity userProject : userProjects) {
-                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
-                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
-                userProject.setMessagesReceived(clonedMessages);
-            }
-        }
+        cloneMessageEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -708,17 +680,131 @@ public class ProjectBean implements Serializable {
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    public List<Project> getAllProjectsWithUser(Long userId, String order, Boolean vacancies, Integer state) {
+        List<Project> projectsDTO = new ArrayList<>();
+
+        if (order.equals("desc")) {
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByUserByVacanciesDESC(userId);
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsWithUserLatestToOldest(userId);
+            } else if (state != null) {
+                projectsDTO = getProjectsWithUserByStateDESC(userId, state);
+            }
+        } else if (order.equals("asc")) {
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByUserByVacanciesASC(userId);
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsWithUserOldestToLatest(userId);
+            } else if (state != null) {
+                projectsDTO = getProjectsWithUserByStateASC(userId, state);
+            }
+        }
+
+        return projectsDTO;
+    }
+
     /**
-     * Retrieves all projects from the database with a specific state that have vacancies, in the order specified by the parameter.
+     * Retrieves all active projects associated with a specific user, ordered from latest to oldest.
      * For each project, it clones the messages received by each user project and sets them back to the user project.
      * Converts each ProjectEntity to a Project DTO and collects them into a list.
      *
-     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
-     * @param state The state of the projects to be retrieved.
-     * @return A list of Project DTOs with the specified state that have vacancies, ordered according to the specified order.
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of Project DTOs associated with the specified user, ordered from newest to oldest.
      */
-    private List<Project> getProjectsByVacanciesAndState(String order, int state){
-        List<ProjectEntity> projects = "DESC".equals(order) ? projectDao.findProjectsByVacanciesAndStateOrderedDESC(state) : projectDao.findProjectsByVacanciesAndStateOrderedASC(state);
+    public List<Project> getProjectsWithUserLatestToOldest(Long userId) {
+        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdOrderedDESC(userId);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user, ordered from oldest to latest.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of Project DTOs associated with the specified user, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsWithUserOldestToLatest(Long userId) {
+        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdOrderedASC(userId);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user and a specific state, ordered from newest to oldest.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs associated with the specified user and state, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsWithUserByStateDESC(Long userId, int state) {
+        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdAndStateOrderedDESC(userId, state);
+        cloneMessageEntities(projects);
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user and a specific state, ordered from oldest to newest.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs associated with the specified user and state, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsWithUserByStateASC(Long userId, int state) {
+        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdAndStateOrderedASC(userId, state);
+        cloneMessageEntities(projects);
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user that have vacancies, in descending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of Project DTOs associated with the specified user that have vacancies, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByUserByVacanciesDESC(Long userId) {
+        return getProjectsByUserByVacancies(userId, "DESC");
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user that have vacancies, in ascending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @return A list of Project DTOs associated with the specified user that have vacancies, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByUserByVacanciesASC(Long userId) {
+        return getProjectsByUserByVacancies(userId, "ASC");
+    }
+
+    /**
+     * Retrieves all active projects associated with a specific user that have vacancies, in the order specified by the parameter.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param userId The ID of the user for whom to retrieve the projects.
+     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
+     * @return A list of Project DTOs associated with the specified user that have vacancies, ordered according to the specified order.
+     */
+    private List<Project> getProjectsByUserByVacancies(Long userId, String order) {
+        List<ProjectEntity> projects = "DESC".equals(order) ? projectDao.findProjectsByUserByVacanciesDESC(userId) : projectDao.findProjectsByUserByVacanciesASC(userId);
 
         for (ProjectEntity project : projects) {
             for (UserProjectEntity userProject : project.getUserProjects()) {
@@ -728,34 +814,6 @@ public class ProjectBean implements Serializable {
 
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
-
-    /**
-     * Retrieves all active projects from the database associated with a specific user.
-     * For each project, it clones the messages received by each user project and sets them back to the user project.
-     * Converts each ProjectEntity to a Project DTO and collects them into a list.
-     * @param userId The ID of the user whose projects are to be retrieved.
-     * @return A list of Project DTOs associated with the specified user.
-     */
-    public List<Project> getProjectsWithUser (Long userId) {
-        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserId(userId);
-
-        for (ProjectEntity project : projects) {
-            Set<UserProjectEntity> userProjects = project.getUserProjects();
-            for (UserProjectEntity userProject : userProjects) {
-                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
-                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
-                userProject.setMessagesReceived(clonedMessages);
-            }
-        }
-
-        List<Project> projectsDTO = projects.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-
-        return projectsDTO;
-    }
-
-
 
 
     /**
@@ -896,6 +954,27 @@ public class ProjectBean implements Serializable {
         project.setVacancyNumber(countVacancies(projectEntity.getId()));
 
         return project;
+    }
+
+    /**
+     * This method is used to clone the MessageEntity set for each UserProjectEntity in each ProjectEntity.
+     * The method takes a list of ProjectEntity objects as input.
+     * For each ProjectEntity in the list, it retrieves the set of UserProjectEntity objects.
+     * For each UserProjectEntity, it retrieves the set of MessageEntity objects received by the user.
+     * It then creates a new HashSet of MessageEntity objects, which is a clone of the original set.
+     * Finally, it sets the cloned set of MessageEntity objects as the messages received by the UserProjectEntity.
+     *
+     * @param projects A list of ProjectEntity objects for which to clone the MessageEntity set.
+     */
+    private void cloneMessageEntities(List<ProjectEntity> projects) {
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
     }
 
 }

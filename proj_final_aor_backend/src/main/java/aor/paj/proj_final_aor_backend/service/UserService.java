@@ -282,11 +282,11 @@ public class UserService {
     @GET
     @Path("/{id}/projects/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countProjectsByUserId(@PathParam("id") long userId) {
+    public Response countProjectsByUserId(@PathParam("id") long userId, @QueryParam("state") Integer state) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to count projects by user id from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(userProjectBean.countProjectsByUserId(userId)).build();
+        return Response.status(Response.Status.OK).entity(userProjectBean.countProjectsByUserId(userId, state)).build();
     }
 
 }
