@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
+import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
@@ -70,6 +71,9 @@ public class ProjectBean implements Serializable {
     @EJB
     private UserProjectBean userProjectBean;
 
+    @EJB
+    private NotificationBean notificationBean;
+
     // Default constructor
     public ProjectBean() {
     }
@@ -115,6 +119,9 @@ public class ProjectBean implements Serializable {
         projectEntity.setLab(labEntity);
 
         userProjectBean.addUserToProject(creator, projectEntity, UserTypeInProject.CREATOR);
+        String message = projectEntity.getName();
+        System.out.println("Message: " + message);
+        notificationBean.sendNotificationToAllUsers(token, NotificationType.NEW_PROJECT, message);
 
         projectDao.persist(projectEntity);
 

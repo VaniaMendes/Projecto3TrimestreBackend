@@ -13,7 +13,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name="notifications")
-@NamedQuery(name = "Notification.findNotificationsByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId")
+@NamedQuery(name = "Notification.findMessageReceivedByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = 'MESSAGE_RECEIVED' ORDER BY n.sendTimestamp DESC")
+@NamedQuery(name = "Notification.findNewProjectByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = 'NEW_PROJECT'")
+@NamedQuery(name = "Notification.findProjectStatusByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = 'PROJECT_STATUS'")
 
 //Querys for the NotificationEntity class
 
@@ -35,7 +37,6 @@ public class NotificationEntity implements Serializable {
     private long sender_id;
 
 
-
     /**
      * Read status of the notification
      */
@@ -53,6 +54,12 @@ public class NotificationEntity implements Serializable {
      */
     @Column(name = "readTimestamp")
     private LocalDateTime readTimestamp;
+
+    /**
+     * Related entity id
+     */
+    @Column(name = "relatedEntityName")
+    private String relatedEntityName;
 
     /**
      * Type of the notification
@@ -179,5 +186,13 @@ public class NotificationEntity implements Serializable {
 
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
+    }
+
+    public String getRelatedEntityName() {
+        return relatedEntityName;
+    }
+
+    public void setRelatedEntityName(String relatedEntityName) {
+        this.relatedEntityName = relatedEntityName;
     }
 }

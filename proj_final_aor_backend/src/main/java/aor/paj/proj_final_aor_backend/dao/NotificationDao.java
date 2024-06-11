@@ -5,6 +5,7 @@ import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NamedQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,11 +40,46 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
         em.persist(notification);
     }
 
-    public List<NotificationEntity> findNotificationsByUserID(long userId) {
-        try {
-            return em.createNamedQuery("Notification.findNotificationsByUserID").setParameter("userId", userId).getResultList();
-        } catch (Exception e) {
-            return null;
-        }
+    public NotificationEntity findNotificationById(long id) {
+        return em.find(NotificationEntity.class, id);
     }
+
+    public List<NotificationEntity> findNotificationsByUserID(long userId) {
+        List<NotificationEntity> notifications = new ArrayList<>();
+
+        try {
+            NotificationEntity latestMessageReceived = em.createNamedQuery("Notification.findMessageReceivedByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .setMaxResults(1)
+                    .getSingleResult();
+            if (latestMessageReceived != null) {
+                notifications.add(latestMessageReceived);
+            }
+        } catch (Exception e) {
+            // handle exception
+        }
+
+        try {
+            List<NotificationEntity> newProjectNotifications = em.createNamedQuery("Notification.findNewProjectByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+            notifications.addAll(newProjectNotifications);
+        } catch (Exception e) {
+            // handle exception
+        }
+
+        try {
+            List<NotificationEntity> projectStatusNotifications = em.createNamedQuery("Notification.findProjectStatusByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+            notifications.addAll(projectStatusNotifications);
+        } catch (Exception e) {
+
+        }
+
+        notifications.sort((n1, n2) -> n2.getSendTimestamp().compareTo(n1.getSendTimestamp()));
+        return notifications;
+    }
+
+
 }
