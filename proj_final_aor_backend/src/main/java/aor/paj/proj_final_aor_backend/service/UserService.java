@@ -61,7 +61,7 @@ public class UserService {
     @PUT
     @Path("/confirm")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Transactional
+    @Produces(MediaType.APPLICATION_JSON)
     public Response confirmUser(@HeaderParam("tokenConfirmation") String tokenConfirmation, @QueryParam("lab") String lab, User user, @Context HttpServletRequest request) {
 
         try {
