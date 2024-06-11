@@ -17,6 +17,8 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 @Path("/projects")
 public class ProjectService {
 
@@ -57,12 +59,13 @@ public class ProjectService {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllProjects() {
+    public Response getAllProjects(@QueryParam("order") String order, @QueryParam("vacancies") Boolean vacancies, @QueryParam("state") Integer state) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get all projects from IP: " + ip);
 
         // Get all projects
-        return Response.status(Response.Status.OK).entity(projectBean.getAllProjectsLatestToOldest()).build();
+        List<Project> projects = projectBean.getAllProjects(order, vacancies, state);
+        return Response.status(Response.Status.OK).entity(projects).build();
     }
 
     @PUT
@@ -298,11 +301,11 @@ public class ProjectService {
     @GET
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countProjects() {
+    public Response countProjects(@QueryParam("state") Integer state) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to count projects from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(projectBean.countAllProjects()).build();
+        return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
     }
 
 
@@ -321,5 +324,22 @@ public class ProjectService {
         logger.info("Received request to get projects by user id from IP: " + ip);
 
         return Response.status(Response.Status.OK).entity(userProjectBean.getActiveProjectsOfAUser(userId)).build();
+    }
+
+    @GET
+    @Path("/{userId}/info/full")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectsInfoByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUSerByToken(token);
+        if(user == null || user.getId() != userId){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        logger.info("Received request to get projects by user id from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(projectBean.getProjectsWithUser(userId)).build();
     }
 }

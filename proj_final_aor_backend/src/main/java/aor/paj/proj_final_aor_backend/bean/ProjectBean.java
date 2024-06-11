@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -523,12 +524,47 @@ public class ProjectBean implements Serializable {
         return stateId == 100 || stateId == 200 || stateId == 300 || stateId == 400 || stateId == 500 || stateId == 600;
     }
 
+    /**
+     * Retrieves all projects from the database based on the specified order, vacancies, and state.
+     * If the order is "desc", it retrieves projects in descending order. If the order is "asc", it retrieves projects in ascending order.
+     * If vacancies is true, it retrieves projects that have vacancies. If vacancies is false, it retrieves all projects.
+     * If state is 1 or null, it retrieves all projects. Otherwise, it retrieves projects with the specified state.
+     *
+     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
+     * @param vacancies Whether to retrieve only projects that have vacancies.
+     * @param state The state of the projects to be retrieved. If state is 1 or null, all projects are retrieved.
+     * @return A list of Project DTOs that match the specified order, vacancies, and state.
+     */
+    public List<Project> getAllProjects(String order, Boolean vacancies, Integer state) {
+        List<Project> projectsDTO = new ArrayList<>();
+
+        if (order.equals("desc")) {
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByVacanciesDESC();
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getAllProjectsLatestToOldest();
+            } else if (state != null) {
+                projectsDTO = getProjectsByStateDESC(state);
+            }
+        } else if (order.equals("asc")) {
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByVacanciesASC();
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getAllProjectsOldestToLatest();
+            } else if (state != null) {
+                projectsDTO = getProjectsByStateASC(state);
+            }
+        }
+
+        return projectsDTO;
+    }
+
 
     /**
      * Gets all projects ordered from latest to oldest.
      * @return A list of all projects ordered from latest to oldest.
      */
-    public List<Project> getAllProjectsLatestToOldest() {
+    private List<Project> getAllProjectsLatestToOldest() {
 
         // Retrieve all projects from the database in descending order
         List<ProjectEntity> projects = projectDao.findAllProjectsOrderedDESC();
@@ -548,6 +584,172 @@ public class ProjectBean implements Serializable {
 
         return projectsDTO;
     }
+
+    /**
+     * Retrieves all projects from the database in ascending order of their creation time.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     * @return A list of Project DTOs, ordered from oldest to newest.
+     */
+    private List<Project> getAllProjectsOldestToLatest() {
+        List<ProjectEntity> projects = projectDao.findAllProjects();
+
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
+
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+    /**
+     * Retrieves all projects from the database with a specific state in descending order of their creation time.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs with the specified state, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByStateDESC(int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedDESC(state);
+
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
+
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+    /**
+     * Retrieves all projects from the database with a specific state in ascending order of their creation time.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs with the specified state, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByStateASC(int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedASC(state);
+
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
+
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+    /**
+     * Retrieves all projects from the database that have vacancies, in descending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @return A list of Project DTOs that have vacancies, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByVacanciesDESC() {
+        return getProjectsByVacancies("DESC");
+    }
+
+    /**
+     * Retrieves all projects from the database that have vacancies, in ascending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @return A list of Project DTOs that have vacancies, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByVacanciesASC() {
+        return getProjectsByVacancies("ASC");
+    }
+
+    /**
+     * Retrieves all projects from the database that have vacancies, in the order specified by the parameter.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
+     * @return A list of Project DTOs that have vacancies, ordered according to the specified order.
+     */
+    private List<Project> getProjectsByVacancies(String order) {
+        List<ProjectEntity> projects = "DESC".equals(order) ? projectDao.findProjectsByVacanciesOrderedDESC() : projectDao.findProjectsByVacanciesOrderedASC();
+
+        for (ProjectEntity project : projects) {
+            for (UserProjectEntity userProject : project.getUserProjects()) {
+                userProject.setMessagesReceived(new HashSet<>(userProject.getMessagesReceived()));
+            }
+        }
+
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database with a specific state that have vacancies, in the order specified by the parameter.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs with the specified state that have vacancies, ordered according to the specified order.
+     */
+    private List<Project> getProjectsByVacanciesAndState(String order, int state){
+        List<ProjectEntity> projects = "DESC".equals(order) ? projectDao.findProjectsByVacanciesAndStateOrderedDESC(state) : projectDao.findProjectsByVacanciesAndStateOrderedASC(state);
+
+        for (ProjectEntity project : projects) {
+            for (UserProjectEntity userProject : project.getUserProjects()) {
+                userProject.setMessagesReceived(new HashSet<>(userProject.getMessagesReceived()));
+            }
+        }
+
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all active projects from the database associated with a specific user.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     * @param userId The ID of the user whose projects are to be retrieved.
+     * @return A list of Project DTOs associated with the specified user.
+     */
+    public List<Project> getProjectsWithUser (Long userId) {
+        List<ProjectEntity> projects = projectDao.findActiveProjectsByUserId(userId);
+
+        for (ProjectEntity project : projects) {
+            Set<UserProjectEntity> userProjects = project.getUserProjects();
+            for (UserProjectEntity userProject : userProjects) {
+                Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+                Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+                userProject.setMessagesReceived(clonedMessages);
+            }
+        }
+
+        List<Project> projectsDTO = projects.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return projectsDTO;
+    }
+
+
+
 
     /**
      * This method is used to count the number of vacancies in a project.
@@ -572,8 +774,25 @@ public class ProjectBean implements Serializable {
         return vacancies;
     }
 
-    public Integer countAllProjects() {
-        return projectDao.countAllProjects();
+    /**
+     * This method is used to count the number of projects based on their state.
+     * If the state is 1, it counts all projects. Otherwise, it counts projects with the specified state.
+     *
+     * @param state The state of the projects to be counted. If state is 1, all projects are counted.
+     * @return The number of projects with the specified state, or the total number of projects if state is 1.
+     */
+    public Integer countProjects(Integer state) {
+        int count = 0;
+
+        if (state == 1) {
+            // Count all projects
+            count = projectDao.countAllProjects();
+        } else {
+            // Count projects with the specified state
+            count = projectDao.countProjectsByState(state);
+        }
+
+        return count;
     }
 
     /**
