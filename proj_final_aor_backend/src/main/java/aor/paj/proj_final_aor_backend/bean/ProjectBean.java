@@ -815,6 +815,47 @@ public class ProjectBean implements Serializable {
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all projects from the database that contain a specific keyword, in ascending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @return A list of Project DTOs that contain the specified keyword, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByKeywordASC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrderedASC(keyword);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that contain a specific keyword, in descending order of their creation time.
+     * For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @return A list of Project DTOs that contain the specified keyword, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByKeywordDESC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrderedDESC(keyword);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public List<Project> getProjectsByKeyword(String keyword, String order) {
+        if (order.equals("desc")) {
+            return getProjectsByKeywordDESC(keyword);
+        } else if (order.equals("asc")) {
+            return getProjectsByKeywordASC(keyword);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<String> getAllKeywords() {
+        return projectDao.findAllUniqueKeywords();
+    }
+
 
     /**
      * This method is used to count the number of vacancies in a project.
