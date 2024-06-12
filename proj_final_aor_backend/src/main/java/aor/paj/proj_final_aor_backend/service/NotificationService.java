@@ -29,28 +29,6 @@ public class NotificationService {
     @EJB
     UserBean userBean;
 
-    @POST
-    @Path("/send")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response sendNotification(@HeaderParam("token") String token, Notification notification, @Context HttpServletRequest request){
-        logger.info("Received request to send a new notification");
-        try {
-            boolean sent = notificationBean.sendNotificationToAllUsers(token, notification.getType());
-
-       if(sent) {
-                logger.info("Notification sent successfully");
-                return Response.status(Response.Status.OK).entity("Notification sent successfully").build();
-            } else {
-                logger.error("Error sending notification");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Error sending notification").build();
-            }
-        } catch (Exception e) {
-            logger.error("Error sending notification: " + e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        }
-    }
 
     @POST
     @Path("/project/{projectId}")
@@ -88,7 +66,7 @@ public class NotificationService {
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId){
         logger.info("Received request to get notifications for user with id: " + userId);
         try {
@@ -103,6 +81,28 @@ public class NotificationService {
             }
         } catch (Exception e) {
             logger.error("Error retrieving notifications: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    @PUT
+    @Path("/{notificationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response markNotificationAsRead(@HeaderParam("token") String token, @PathParam("notificationId") long notificationId){
+        logger.info("Received request to mark notification with id: " + notificationId + " as read");
+        try {
+            boolean updated = notificationBean.markNotificationAsRead(token, notificationId);
+
+            if(updated) {
+                logger.info("Notification marked as read successfully");
+                return Response.status(Response.Status.OK).entity("Notification marked as read successfully").build();
+            } else {
+                logger.error("Error marking notification as read");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error marking notification as read").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error marking notification as read: " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

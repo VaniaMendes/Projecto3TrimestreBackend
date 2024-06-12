@@ -18,6 +18,13 @@ public class Notification extends TextEvent{
 
 
     /**
+     * The name of the related entity.
+     */
+    @XmlElement
+    private String relatedEntityName;
+
+
+    /**
      * Default constructor.
      */
     public Notification() {
@@ -37,5 +44,21 @@ public class Notification extends TextEvent{
      */
     public void setType(NotificationType type) {
         this.type = type;
+    }
+
+    /**
+     * Returns the name of the related entity.
+     * @return the name of the related entity.
+     */
+    public String getRelatedEntityName() {
+        return relatedEntityName;
+    }
+
+    /**
+     * Sets the name of the related entity.
+     * @param relatedEntityName the name of the related entity.
+     */
+    public void setRelatedEntityName(String relatedEntityName) {
+        this.relatedEntityName = relatedEntityName;
     }
 }
