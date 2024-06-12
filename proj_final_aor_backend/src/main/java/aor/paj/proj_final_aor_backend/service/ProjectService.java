@@ -68,6 +68,28 @@ public class ProjectService {
         return Response.status(Response.Status.OK).entity(projects).build();
     }
 
+    @GET
+    @Path("/keyword/{keyword}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectsByKeyword(@PathParam("keyword") String keyword, @QueryParam("order") String order) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get projects by keyword from IP: " + ip);
+
+        List<Project> projects = projectBean.getProjectsByKeyword(keyword, order);
+        return Response.status(Response.Status.OK).entity(projects).build();
+    }
+
+    @GET
+    @Path("/keywords")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllKeywords() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get all keywords from IP: " + ip);
+
+        List<String> keywords = projectBean.getAllKeywords();
+        return Response.status(Response.Status.OK).entity(keywords).build();
+    }
+
     @PUT
     @Path("/{id}/state")
     @Consumes(MediaType.APPLICATION_JSON)
