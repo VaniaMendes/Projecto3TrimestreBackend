@@ -479,6 +479,15 @@ public class ProjectBean implements Serializable {
         return projectEntity;
     }
 
+    public Project getProjectById(Long projectId) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return null;
+        }
+        cloneMessageEntities(projectEntity);
+        return convertToDTO(projectEntity);
+    }
+
     /**
      * Finds a SkillEntity by its id.
      *
@@ -1019,6 +1028,15 @@ public class ProjectBean implements Serializable {
                 Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
                 userProject.setMessagesReceived(clonedMessages);
             }
+        }
+    }
+
+    private void cloneMessageEntities(ProjectEntity project) {
+        Set<UserProjectEntity> userProjects = project.getUserProjects();
+        for (UserProjectEntity userProject : userProjects) {
+            Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+            Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+            userProject.setMessagesReceived(clonedMessages);
         }
     }
 
