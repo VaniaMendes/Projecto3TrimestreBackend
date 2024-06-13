@@ -69,6 +69,23 @@ public class ProjectService {
     }
 
     @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectById(@PathParam("id") long projectId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get project by id from IP: " + ip);
+
+        Project project = projectBean.getProjectById(projectId);
+        if (project == null) {
+            logger.error("Project not found");
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        } else {
+            logger.info("Project with id '" + projectId + "' retrieved successfully");
+            return Response.status(Response.Status.OK).entity(project).build();
+        }
+    }
+
+    @GET
     @Path("/keyword/{keyword}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsByKeyword(@PathParam("keyword") String keyword, @QueryParam("order") String order) {
