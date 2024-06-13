@@ -323,11 +323,16 @@ public class ProjectService {
     @GET
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countProjects(@QueryParam("state") Integer state) {
+    public Response countProjects(@QueryParam("state") Integer state, @QueryParam("keyword") String keyword) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to count projects from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
+        if (keyword != null) {
+            logger.info("Projects counted by keyword " + keyword + " successfully");
+            return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeyword(keyword)).build();
+        }else {
+            return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
+        }
     }
 
 
