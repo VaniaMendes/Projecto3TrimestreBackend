@@ -67,7 +67,7 @@ import java.util.*;
 
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
 @NamedQuery(name = "Project.countProjectsByState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.stateId = :stateId")
-@NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
+@NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
 @NamedQuery(name = "Project.countProjectsBySkill", query = "SELECT COUNT(p) FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
 
 public class ProjectEntity implements Serializable {

@@ -901,6 +901,10 @@ public class ProjectBean implements Serializable {
         return count;
     }
 
+    public Integer countProjectsByKeyword(String keyword) {
+        return projectDao.countProjectsByKeyword(keyword);
+    }
+
     /**
      * This method is used to get the name of a project state from its ID.
      * It uses a switch statement to map the state ID to its corresponding name.
