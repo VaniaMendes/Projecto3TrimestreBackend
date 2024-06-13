@@ -44,6 +44,12 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
         return em.find(NotificationEntity.class, id);
     }
 
+
+    public List<NotificationEntity> findUnreadNotificationsByUserID(long id) {
+        return em.createNamedQuery("Notification.findUnreadNotificationsByUserID", NotificationEntity.class)
+                .setParameter("id", id)
+                .getResultList();
+    }
     public List<NotificationEntity> findNotificationsByUserID(long userId) {
         List<NotificationEntity> notifications = new ArrayList<>();
 

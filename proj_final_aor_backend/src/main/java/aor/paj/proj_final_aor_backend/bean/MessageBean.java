@@ -6,6 +6,7 @@ import aor.paj.proj_final_aor_backend.entity.MessageEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
+import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import com.mysql.cj.Messages;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -187,6 +188,9 @@ public class MessageBean implements Serializable {
         message.setReadTimestamp(null);
         // Save the message in the database
         messageDao.createMessage(message);
+        String nameOfProject = project.getName();
+        String type = String.valueOf(NotificationType.MESSAGE_PROJECT);
+        notificationBean.sendNotificationToProjectUsers(token, project_id, type, nameOfProject );
         return true;
 
     }
