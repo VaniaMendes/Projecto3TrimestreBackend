@@ -279,6 +279,35 @@ public class UserService {
 
     }
 
+
+    @GET
+    @Path("/profile/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserInfoByTokenAndUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
+        String ip = request.getRemoteAddr();
+
+        // Check if the token is valid
+        User user = userBean.getUSerByToken(token);
+        if(user == null ){
+            logger.warn("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Check if the user profile is visible
+        User userProfile = userBean.getUserById(userId);
+
+        if(userProfile.isVisibilityState()) {
+            logger.info("Received request to get user info by user id from IP: " + ip);
+        }else{
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Return the user profile
+        return Response.status(Response.Status.OK).entity(userProfile).build();
+    }
+
+
+
     @GET
     @Path("/{id}/projects/count")
     @Produces(MediaType.APPLICATION_JSON)
