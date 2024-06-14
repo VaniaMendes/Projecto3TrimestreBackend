@@ -3,6 +3,7 @@ package aor.paj.proj_final_aor_backend.bean;
 import aor.paj.proj_final_aor_backend.dao.ResourceDao;
 import aor.paj.proj_final_aor_backend.dao.ResourceSupplierDao;
 import aor.paj.proj_final_aor_backend.dto.Resource;
+import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
 import aor.paj.proj_final_aor_backend.entity.ResourceSupplierEntity;
@@ -256,6 +257,15 @@ public class ResourceBean implements Serializable {
         return resourceDao.findResourceByName(name) != null;
     }
 
+    public ResourceSmallInfo findResourceById(Long id, int quantity) {
+        ResourceEntity resourceEntity = resourceDao.findResourceById(id);
+        if (resourceEntity == null) {
+            logger.error("Resource with id '" + id + "' does not exist");
+            return null;
+        }
+        return convertToDTO(resourceEntity, quantity);
+    }
+
 
     /**
      * Updates the properties of a resource in the database.
@@ -397,6 +407,15 @@ public class ResourceBean implements Serializable {
                     .collect(Collectors.toList()));
         }
         return resource;
+    }
+
+    private ResourceSmallInfo convertToDTO(ResourceEntity resourceEntity, int quantity) {
+        ResourceSmallInfo r = new ResourceSmallInfo();
+        r.setId(resourceEntity.getId());
+        r.setName(resourceEntity.getName());
+        r.setBrand(resourceEntity.getBrand());
+        r.setQuantity(quantity);
+        return r;
     }
 
 }

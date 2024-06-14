@@ -998,6 +998,7 @@ public class ProjectBean implements Serializable {
         project.setStateId(getStateNameFromId(projectEntity.getStateId()));
         project.setKeywords(projectEntity.getKeywords());
         project.setLab(labBean.convertToDTO(projectEntity.getLab()));
+        project.setMaxMembers(projectEntity.getMaxMembers());
         project.setNeeds(projectEntity.getNeeds());
         project.setCreatedAt(projectEntity.getCreatedAt());
         project.setUpdatedAt(projectEntity.getUpdatedAt());
