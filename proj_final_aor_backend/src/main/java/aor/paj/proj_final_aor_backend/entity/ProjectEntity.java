@@ -22,11 +22,13 @@ import java.util.*;
 @NamedQuery(name = "Project.findActiveProjectsByUserIdAndStateOrderedDESC", query = "SELECT up.project FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId ORDER BY up.project.createdAt DESC")
 @NamedQuery(name = "Project.findProjectByName", query = "SELECT p FROM ProjectEntity p WHERE p.name = :name ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByLab", query = "SELECT p FROM ProjectEntity p WHERE p.lab = :lab")
+@NamedQuery(name = "Project.findProjectsByKeywordOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
+@NamedQuery(name = "Project.findProjectsByKeywordOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%') ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Project.findProjectsByStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId")
 @NamedQuery(name = "Project.findProjectsByStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.stateId = :stateId ORDER BY p.createdAt DESC")
-@NamedQuery(name = "Project.findProjectsByKeyword", query = "SELECT p FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
+@NamedQuery(name = "Project.findProjectsBySkillOrderedASC", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
 @NamedQuery(name = "Project.findProjectsBySkill", query = "SELECT p FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
-
+@NamedQuery(name = "Project.findAllKeywords", query = "SELECT p.keywords FROM ProjectEntity p")
 @NamedQuery(name = "Project.orderByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
                 "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
                 "GROUP BY p.id " +
@@ -65,7 +67,7 @@ import java.util.*;
 
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
 @NamedQuery(name = "Project.countProjectsByState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.stateId = :stateId")
-@NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.keywords LIKE :keyword")
+@NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
 @NamedQuery(name = "Project.countProjectsBySkill", query = "SELECT COUNT(p) FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
 
 public class ProjectEntity implements Serializable {

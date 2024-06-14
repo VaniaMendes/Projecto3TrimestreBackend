@@ -6,7 +6,10 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Stateless session bean that provides CRUD operations for ProjectEntity.
@@ -152,20 +155,6 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
-    /**
-     * Retrieves all projects that contain a given keyword.
-     * @param keyword the keyword to search for in project names.
-     * @return a list of projects that contain the given keyword, or an empty list if no such projects are found.
-     */
-    public List<ProjectEntity> findProjectsByKeyword(String keyword) {
-        try {
-            return em.createNamedQuery("Project.findProjectsByKeyword", ProjectEntity.class)
-                    .setParameter("keyword", "%" + keyword + "%")
-                    .getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
 
     /**
      * Retrieves all projects associated with a given skill.
@@ -277,6 +266,79 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         } catch (NoResultException e) {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Retrieves all projects that contain a given keyword in ascending order.
+     * This method uses a named query "Project.findProjectsByKeywordOrderedASC" defined in the ProjectEntity class.
+     * The query is expected to select projects from the database where the keyword matches the provided parameter.
+     * The keyword is set as a parameter in the query using the setParameter method.
+     * The '%' wildcard character is used to ensure that the keyword can be found anywhere within the project's keywords.
+     *
+     * If the query returns results, a list of ProjectEntity objects is returned.
+     * If the query does not return any results (i.e., there are no projects containing the given keyword),
+     * a NoResultException is caught and an empty list is returned.
+     *
+     * @param keyword the keyword to search for in project keywords.
+     * @return a list of projects that contain the given keyword in ascending order, or an empty list if no such projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrderedASC(String keyword) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrderedASC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all projects that contain a given keyword in descending order.
+     * This method uses a named query "Project.findProjectsByKeywordOrderedDESC" defined in the ProjectEntity class.
+     * The query is expected to select projects from the database where the keyword matches the provided parameter.
+     * The keyword is set as a parameter in the query using the setParameter method.
+     * The '%' wildcard character is used to ensure that the keyword can be found anywhere within the project's keywords.
+     *
+     * If the query returns results, a list of ProjectEntity objects is returned.
+     * If the query does not return any results (i.e., there are no projects containing the given keyword),
+     * a NoResultException is caught and an empty list is returned.
+     *
+     * @param keyword the keyword to search for in project keywords.
+     * @return a list of projects that contain the given keyword in descending order, or an empty list if no such projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrderedDESC(String keyword) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrderedDESC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves all unique keywords from the projects in the database.
+     *
+     * This method executes a named query to get a list of keyword strings from the database,
+     * then uses Java 8's Stream API to split each string into individual keywords, trim any whitespace,
+     * and collect the keywords into a set, which automatically removes duplicates.
+     *
+     * @return a set of all unique keywords from the projects in the database.
+     */
+    public List<String> findAllUniqueKeywords() {
+        // Execute the named query to get the list of keyword strings
+        List<String> keywordStrings = em.createNamedQuery("Project.findAllKeywords", String.class).getResultList();
+
+        Set<String> uniqueKeywords = keywordStrings.stream()
+                // Split each keyword string into individual keywords
+                .flatMap(keywords -> Arrays.stream(keywords.split(",")))
+                // Trim whitespace from each keyword
+                .map(String::trim)
+                // Collect the keywords into a set, automatically removing duplicates
+                .collect(Collectors.toSet());
+
+        // Convert the set to a list
+        return new ArrayList<>(uniqueKeywords);
     }
 
     /**

@@ -68,6 +68,45 @@ public class ProjectService {
         return Response.status(Response.Status.OK).entity(projects).build();
     }
 
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectById(@PathParam("id") long projectId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get project by id from IP: " + ip);
+
+        Project project = projectBean.getProjectById(projectId);
+        if (project == null) {
+            logger.error("Project not found");
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        } else {
+            logger.info("Project with id '" + projectId + "' retrieved successfully");
+            return Response.status(Response.Status.OK).entity(project).build();
+        }
+    }
+
+    @GET
+    @Path("/keyword/{keyword}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProjectsByKeyword(@PathParam("keyword") String keyword, @QueryParam("order") String order) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get projects by keyword from IP: " + ip);
+
+        List<Project> projects = projectBean.getProjectsByKeyword(keyword, order);
+        return Response.status(Response.Status.OK).entity(projects).build();
+    }
+
+    @GET
+    @Path("/keywords")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllKeywords() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get all keywords from IP: " + ip);
+
+        List<String> keywords = projectBean.getAllKeywords();
+        return Response.status(Response.Status.OK).entity(keywords).build();
+    }
+
     @PUT
     @Path("/{id}/state")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -301,11 +340,16 @@ public class ProjectService {
     @GET
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countProjects(@QueryParam("state") Integer state) {
+    public Response countProjects(@QueryParam("state") Integer state, @QueryParam("keyword") String keyword) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to count projects from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
+        if (keyword != null) {
+            logger.info("Projects counted by keyword " + keyword + " successfully");
+            return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeyword(keyword)).build();
+        }else {
+            return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
+        }
     }
 
 
