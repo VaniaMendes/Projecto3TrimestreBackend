@@ -1,6 +1,8 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectResourceDao;
+import aor.paj.proj_final_aor_backend.dto.Resource;
+import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectResourceEntity;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
@@ -10,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stateless session bean for managing project resources.
@@ -27,6 +31,9 @@ public class ProjectResourceBean implements Serializable {
      */
     @EJB
     private ProjectResourceDao projectResourceDao;
+
+    @EJB
+    private ResourceBean resourceBean;
 
     /**
      * Default constructor.
@@ -46,7 +53,7 @@ public class ProjectResourceBean implements Serializable {
     /**
      * Checks if a resource exists in a project.
      *
-     * @param projectEntity the project entity
+     * @param projectEntity  the project entity
      * @param resourceEntity the resource entity
      * @return true if the resource exists in the project, false otherwise
      */
@@ -57,9 +64,9 @@ public class ProjectResourceBean implements Serializable {
     /**
      * Merges a project resource connection.
      *
-     * @param projectEntity the project entity
+     * @param projectEntity  the project entity
      * @param resourceEntity the resource entity
-     * @param quantity the quantity of the resource
+     * @param quantity       the quantity of the resource
      */
     public void mergeProjectResourceConnection(ProjectEntity projectEntity, ResourceEntity resourceEntity, int quantity) {
         ProjectResourceEntity projectResourceEntity = projectResourceDao.findResourceFromProject(projectEntity.getId(), resourceEntity.getId());
@@ -77,9 +84,9 @@ public class ProjectResourceBean implements Serializable {
     /**
      * Persists a project resource connection.
      *
-     * @param projectEntity the project entity
+     * @param projectEntity  the project entity
      * @param resourceEntity the resource entity
-     * @param quantity the quantity of the resource
+     * @param quantity       the quantity of the resource
      */
     public void persistProjectResourceConnection(ProjectEntity projectEntity, ResourceEntity resourceEntity, int quantity) {
 
@@ -95,4 +102,16 @@ public class ProjectResourceBean implements Serializable {
 
         projectResourceDao.persist(projectResourceEntity);
     }
+
+    public List<ResourceSmallInfo> findAllResourcesFromProject(ProjectEntity projectEntity) {
+        return projectResourceDao.findAllResourcesFromProject(projectEntity.getId())
+                .stream()
+                .map(projectResourceEntity -> {
+                    ResourceEntity resourceEntity = projectResourceEntity.getResource();
+                    int quantity = projectResourceEntity.getQuantity();
+                    return resourceBean.findResourceById(resourceEntity.getId(), quantity);
+                })
+                .collect(Collectors.toList());
+    }
+
 }
