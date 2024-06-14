@@ -10,6 +10,7 @@ import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
 import aor.paj.proj_final_aor_backend.entity.NotificationEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
+import aor.paj.proj_final_aor_backend.websocket.Notifier;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,8 @@ public class NotificationBean implements Serializable {
     UserProjectBean userProjectBean;
     @EJB
     UserDao userDao;
+    @EJB
+    Notifier notifier;
 
 
     /**
@@ -82,6 +85,7 @@ public class NotificationBean implements Serializable {
 
         userDao.updateUser(user);
 
+
         return true;
     }
 
@@ -116,27 +120,29 @@ public class NotificationBean implements Serializable {
         List<Notification> sentNotifications = new ArrayList<>();
         for (UserEntity user : users) {
             try {
-                logger.debug("Sending notification to user with id: " + user.getId());
-                Notification notification = new Notification();
-                notification.setReadStatus(false);
-                notification.setSendTimestamp(LocalDateTime.now());
-                notification.setSender(userBean.convertUserToDTOForMessage(sender));
-                notification.setType(type);
-                notification.setReceiver(userBean.convertUserToDTOForMessage(user));
-                notificationDao.create(convertDtoTOEntity(notification, sender));
-                notification.setRelatedEntityName(message);
-                System.out.println(notification.getRelatedEntityName());
 
+                if(user.getId() != sender.getId() ){
+                    logger.debug("Sending notification to user with id: " + user.getId());
+                    Notification notification = new Notification();
+                    notification.setReadStatus(false);
+                    notification.setSendTimestamp(LocalDateTime.now());
+                    notification.setSender(userBean.convertUserToDTOForMessage(sender));
+                    notification.setType(type);
+                    notification.setReceiver(userBean.convertUserToDTOForMessage(user));
 
-                NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
-                notificationDao.create(notificationEntity);
+                    notification.setRelatedEntityName(message);
 
-                user.getNotifications().add(notificationEntity);
-                notificationEntity.getUsers().add(user);
+                    NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
+                    notificationDao.create(notificationEntity);
 
-                userDao.updateUser(user);
+                    user.getNotifications().add(notificationEntity);
+                    notificationEntity.getUsers().add(user);
 
-                sentNotifications.add(notification);
+                    userDao.updateUser(user);
+
+                    sentNotifications.add(notification);
+
+                }
             } catch (Exception e) {
                 logger.error("Error sending notification to user with id: " + user.getId(), e);
             }

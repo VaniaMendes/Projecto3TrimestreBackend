@@ -30,25 +30,25 @@ public class NotificationService {
     UserBean userBean;
 
 
-
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId){
-        logger.info("Received request to get notifications for user with id: " + userId);
+    public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId, @Context HttpServletRequest request){
+        String ip = request.getRemoteAddr();
+        logger.debug("Received request to get notifications for user with id: " + userId);
         try {
             List<Notification> notifications = notificationBean.getNotificationsByUserId(token, userId);
 
             if(notifications != null) {
-                logger.info("Notifications retrieved successfully");
+                logger.info("IP Adress " + ip + "Notifications retrieved successfully by the user with the id" + userId);
                 return Response.status(Response.Status.OK).entity(notifications).build();
             } else {
-                logger.error("Error retrieving notifications");
+                logger.error("IP Adress " + ip + " Error retrieving notifications");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving notifications").build();
             }
         } catch (Exception e) {
-            logger.error("Error retrieving notifications: " + e.getMessage());
+            logger.error("IP Adress " + ip + "Error retrieving notifications: " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

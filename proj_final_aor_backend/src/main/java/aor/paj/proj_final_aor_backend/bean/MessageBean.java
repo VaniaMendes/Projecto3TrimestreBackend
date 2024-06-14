@@ -7,6 +7,7 @@ import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
+import aor.paj.proj_final_aor_backend.websocket.Notifier;
 import com.mysql.cj.Messages;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -58,6 +59,8 @@ public class MessageBean implements Serializable {
     UserProjectDao userProjectDao;
     @EJB
     NotificationBean notificationBean;
+    @EJB
+    Notifier notifier;
 
 
     /**
@@ -104,6 +107,7 @@ public class MessageBean implements Serializable {
 
 
         notificationBean.sendNotificationToOneUser(token, id, MESSAGE_RECEIVED);
+
 
         return true;
     }

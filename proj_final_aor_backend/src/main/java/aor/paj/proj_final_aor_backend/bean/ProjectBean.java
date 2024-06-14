@@ -7,6 +7,7 @@ import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
+import aor.paj.proj_final_aor_backend.websocket.Notifier;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -73,6 +74,8 @@ public class ProjectBean implements Serializable {
 
     @EJB
     private NotificationBean notificationBean;
+    @EJB
+    Notifier notifier;
 
     // Default constructor
     public ProjectBean() {
@@ -119,9 +122,9 @@ public class ProjectBean implements Serializable {
         projectEntity.setLab(labEntity);
 
         userProjectBean.addUserToProject(creator, projectEntity, UserTypeInProject.CREATOR);
-        String message = projectEntity.getName();
-        System.out.println("Message: " + message);
-        notificationBean.sendNotificationToAllUsers(token, NotificationType.NEW_PROJECT, message);
+        notificationBean.sendNotificationToAllUsers(token, NotificationType.NEW_PROJECT, projectEntity.getName());
+        notifier.sendNotification(token, projectEntity.getName());
+
 
         projectDao.persist(projectEntity);
 
