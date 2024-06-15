@@ -9,7 +9,9 @@ import aor.paj.proj_final_aor_backend.dto.UserRegistration;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -18,6 +20,13 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 
 @Path("/users")
@@ -225,6 +234,9 @@ public class UserService {
         }
 
     }
+
+
+
     @PUT
     @Path("/{userId}/biography")
     @Consumes(MediaType.APPLICATION_JSON)
