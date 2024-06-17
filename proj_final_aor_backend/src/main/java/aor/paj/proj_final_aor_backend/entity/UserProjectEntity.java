@@ -35,8 +35,6 @@ import java.util.Set;
 @NamedQuery(name = "UserProject.findProjectCreator", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id AND up.userType = aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject.CREATOR")
 
 @NamedQuery(name = "UserProject.findUserInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.user.id = :userId")
-
-
 @NamedQuery(name = "UserProject.countActiveUsersByProjectId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
