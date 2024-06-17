@@ -1,9 +1,6 @@
 package aor.paj.proj_final_aor_backend.bean;
 
-import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
-import aor.paj.proj_final_aor_backend.dao.LabDao;
-import aor.paj.proj_final_aor_backend.dao.SessionDao;
-import aor.paj.proj_final_aor_backend.dao.UserDao;
+import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
@@ -44,6 +41,8 @@ public class UserBean implements Serializable {
     AuthenticationDao authenticationDao;
     @EJB
     LabDao labDao;
+    @EJB
+    UserInterestDao interestDao;
 
     public UserBean() {
     }
@@ -67,6 +66,7 @@ public class UserBean implements Serializable {
     }
         return u;
     }
+
 
     /**
      * This method is responsible by find one user by id.
