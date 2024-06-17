@@ -55,7 +55,7 @@ public class MessageService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Receiver not found").build();
         }
         // Send the message
-        boolean sent = messageBean.sendMessage(token, message.getContent(), message.getReceiver().getId());
+        boolean sent = messageBean.sendMessage(token, message);
         System.out.println("Message sent: " + sent);
 
         // Check if the message was sent successfully
@@ -142,3 +142,4 @@ public class MessageService {
     }
 
 }
+

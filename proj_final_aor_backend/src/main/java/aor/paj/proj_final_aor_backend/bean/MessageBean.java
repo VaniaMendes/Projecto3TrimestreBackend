@@ -78,7 +78,7 @@ public class MessageBean implements Serializable {
      * @param id      The id of the user who will receive the message.
      * @return Returns true if the message was successfully sent, false otherwise.
      */
-    public boolean sendMessage(String token, String content, long id) {
+    public boolean sendMessage(String token, Message message) {
         // Find the user by token
         UserEntity user = sessionDao.findUserByToken(token);
         // Check if the user exists
@@ -88,25 +88,26 @@ public class MessageBean implements Serializable {
         }
 
         // Find the receiver by id
-        UserEntity receiver = userDao.findUserById(id);
+        UserEntity receiver = userDao.findUserById(message.getReceiver().getId());
         // Check if the receiver exists
         if (receiver == null) {
             logger.error("Receiver not found");
             return false;
         }
         // Create the message
-        MessageEntity message = new MessageEntity();
-        message.setContent(content);
-        message.setSender(user);
-        message.setReceiver(receiver);
-        message.setSendTimestamp(LocalDateTime.now());
-        message.setReadStatus(false);
-        message.setReadTimestamp(null);
+        MessageEntity messageEntity = new MessageEntity();
+        messageEntity.setContent(message.getContent());
+        messageEntity.setSubject(message.getSubject());
+        messageEntity.setSender(user);
+        messageEntity.setReceiver(receiver);
+        messageEntity.setSendTimestamp(LocalDateTime.now());
+        messageEntity.setReadStatus(false);
+        messageEntity.setReadTimestamp(null);
         // Save the message in the database
-        messageDao.createMessage(message);
+        messageDao.createMessage(messageEntity);
 
 
-        notificationBean.sendNotificationToOneUser(token, id, MESSAGE_RECEIVED);
+        notificationBean.sendNotificationToOneUser(token, message.getReceiver().getId(), MESSAGE_RECEIVED);
 
 
         return true;

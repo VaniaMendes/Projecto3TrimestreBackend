@@ -19,6 +19,12 @@ public class Message extends TextEvent{
     private String content;
 
     /**
+     * The subject of the message.
+     */
+    @XmlElement
+    private String subject;
+
+    /**
      * Default constructor.
 
      */
@@ -41,5 +47,13 @@ public class Message extends TextEvent{
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }
