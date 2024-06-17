@@ -1,9 +1,6 @@
 package aor.paj.proj_final_aor_backend.service;
 
-import aor.paj.proj_final_aor_backend.bean.ActivityBean;
-import aor.paj.proj_final_aor_backend.bean.ProjectBean;
-import aor.paj.proj_final_aor_backend.bean.UserBean;
-import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
+import aor.paj.proj_final_aor_backend.bean.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
@@ -26,14 +23,14 @@ public class ProjectService {
 
     @EJB
     private ProjectBean projectBean;
-
     @EJB
     private UserProjectBean userProjectBean;
-
     @EJB
     private ActivityBean activityBean;
     @EJB
     private UserBean userBean;
+    @EJB
+    private ProjectResourceBean projectResourceBean;
 
     @Context
     private HttpServletRequest request;
@@ -395,5 +392,27 @@ public class ProjectService {
         logger.info("Received request to get projects by user id from IP: " + ip);
 
         return Response.status(Response.Status.OK).entity(projectBean.getAllProjectsWithUser(userId, order, vacancies, state)).build();
+    }
+
+    @GET
+    @Path("/{id}/resources")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllResources(@HeaderParam("token") String token,
+                                    @PathParam("id") long projectId) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUSerByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
+        logger.info("Received request from user with ID: '" + user.getId() + "' to get all resources from Project with id: " + projectId + " from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(projectResourceBean.getAllResourcesFromProject(projectId)).build();
     }
 }

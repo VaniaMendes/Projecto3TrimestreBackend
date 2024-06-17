@@ -217,6 +217,10 @@ public class ProjectBean implements Serializable {
             return false;
         }
 
+        if (!userProjectBean.userProjectExists(author.getId(), id)) {
+            return false;
+        }
+
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 

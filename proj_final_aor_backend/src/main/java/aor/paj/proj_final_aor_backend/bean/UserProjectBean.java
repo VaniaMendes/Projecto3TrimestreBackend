@@ -196,7 +196,6 @@ public class UserProjectBean implements Serializable {
             logger.info("User '" + userId + "' exists in project: " + projectId);
             return true;
         }
-
         return false;
     }
 
