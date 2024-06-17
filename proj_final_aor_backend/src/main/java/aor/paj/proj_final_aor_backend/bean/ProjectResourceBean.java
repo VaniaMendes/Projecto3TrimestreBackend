@@ -34,6 +34,8 @@ public class ProjectResourceBean implements Serializable {
 
     @EJB
     private ResourceBean resourceBean;
+    @EJB
+    private ProjectBean projectBean;
 
     /**
      * Default constructor.
@@ -103,7 +105,9 @@ public class ProjectResourceBean implements Serializable {
         projectResourceDao.persist(projectResourceEntity);
     }
 
-    public List<ResourceSmallInfo> findAllResourcesFromProject(ProjectEntity projectEntity) {
+    public List<ResourceSmallInfo> getAllResourcesFromProject(long projectId) {
+        ProjectEntity projectEntity = projectBean.findProject(projectId);
+
         return projectResourceDao.findAllResourcesFromProject(projectEntity.getId())
                 .stream()
                 .map(projectResourceEntity -> {
