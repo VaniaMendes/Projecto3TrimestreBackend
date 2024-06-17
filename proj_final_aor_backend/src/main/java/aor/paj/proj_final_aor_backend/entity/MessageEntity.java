@@ -33,6 +33,9 @@ public class MessageEntity implements Serializable {
     @Column(name = "readStatus", nullable = false)
     private boolean readStatus;
 
+    @Column(name = "subject")
+    private String subject;
+
     /**
      * Send timestamp of the message
      */
@@ -196,5 +199,11 @@ public class MessageEntity implements Serializable {
         this.receiverGroup = receiverGroup;
     }
 
+    public String getSubject() {
+        return subject;
+    }
 
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 }

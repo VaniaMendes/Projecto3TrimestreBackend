@@ -354,7 +354,7 @@ public class ProjectService {
 
 
     @GET
-    @Path("/{userId}")
+    @Path("/user/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsByUserId(@HeaderParam("token") String token,
                                         @PathParam("userId") Long userId,
