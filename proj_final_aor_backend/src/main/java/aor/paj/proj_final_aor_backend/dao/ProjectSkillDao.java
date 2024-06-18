@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.dao;
 
 import aor.paj.proj_final_aor_backend.entity.ProjectSkillEntity;
+import aor.paj.proj_final_aor_backend.entity.SkillEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
 
@@ -42,6 +43,15 @@ public class ProjectSkillDao extends AbstractDao<ProjectSkillEntity>{
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        }
+    }
+
+    public List<SkillEntity> findAllSkillsNotInProject(Long projectId) {
+        try {
+            return em.createNamedQuery("ProjectSkill.findAllSkillsNotInProject", SkillEntity.class)
+                    .setParameter("projectId", projectId).getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
         }
     }
 }

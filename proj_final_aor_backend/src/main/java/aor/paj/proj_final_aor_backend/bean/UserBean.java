@@ -53,7 +53,7 @@ public class UserBean implements Serializable {
      * @param token the token of the user
      * @return the user
      */
-    public User getUSerByToken(String token) {
+    public User getUserByToken(String token) {
         User u = null;
         if (token != null){
             long id = sessionDao.findUserIDbyToken(token);
