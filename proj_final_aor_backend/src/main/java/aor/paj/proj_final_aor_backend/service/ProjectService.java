@@ -322,8 +322,19 @@ public class ProjectService {
     @GET
     @Path("/{id}/activity/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getActivitiesFromProject(@PathParam("id") long projectId) {
+    public Response getActivitiesFromProject(@PathParam("id") long projectId, @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUSerByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
         logger.info("Received request to get activities from project from IP: " + ip);
 
         if (projectBean.findProject(projectId) == null) {
@@ -373,7 +384,7 @@ public class ProjectService {
     }
 
     @GET
-    @Path("/{userId}/info/full")
+    @Path("/user/{userId}/info/full")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsInfoByUserId(@HeaderParam("token") String token,
                                             @PathParam("userId") Long userId,
