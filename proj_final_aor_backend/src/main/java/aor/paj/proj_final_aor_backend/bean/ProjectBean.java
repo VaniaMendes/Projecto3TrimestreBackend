@@ -1,7 +1,6 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
-import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
@@ -351,18 +350,18 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
+
     /**
-     * Adds a skill to a project.
+     * This method is used to associate a skill with a project.
+     * It first retrieves the ProjectEntity and SkillEntity from the database using the provided IDs.
+     * If either entity does not exist, it returns false.
+     * If both entities exist, it associates the skill with the project using the ProjectSkillBean and returns true.
      *
-     * This method first retrieves the ProjectEntity and SkillEntity from the database using the provided IDs.
-     * If either entity does not exist, it logs an error and returns false.
-     * If both entities exist, it adds the skill to the project using the ProjectSkillBean and returns true.
-     *
-     * @param projectId The ID of the project to which the skill will be added.
-     * @param skillId The ID of the skill to be added to the project.
-     * @return true if the skill was successfully added to the project, false otherwise.
+     * @param projectId The ID of the project to which the skill will be associated.
+     * @param skillId The ID of the skill to be associated with the project.
+     * @return true if the skill was successfully associated with the project, false otherwise.
      */
-    public boolean addSkill(Long projectId, Long skillId) {
+    public boolean joinSkill(Long projectId, Long skillId) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
             return false;
@@ -373,22 +372,12 @@ public class ProjectBean implements Serializable {
             return false;
         }
 
-        projectSkillBean.addSkillToProject(projectEntity, skillEntity);
+        projectSkillBean.associateSkillToProject(projectEntity, skillEntity);
         return true;
     }
 
-    /**
-     * Removes a skill from a project.
-     *
-     * This method first retrieves the ProjectEntity and SkillEntity from the database using the provided IDs.
-     * If either entity does not exist, it logs an error and returns false.
-     * If both entities exist, it removes the skill from the project using the ProjectSkillBean and returns true.
-     *
-     * @param projectId The ID of the project from which the skill will be removed.
-     * @param skillId The ID of the skill to be removed from the project.
-     * @return true if the skill was successfully removed from the project, false otherwise.
-     */
-    public boolean removeSkill(Long projectId, Long skillId) {
+
+    public boolean editSkillActiveStatus(Long projectId, Long skillId, boolean activeStatus) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
             return false;
@@ -399,7 +388,7 @@ public class ProjectBean implements Serializable {
             return false;
         }
 
-        projectSkillBean.updateProjectSkillStatus(projectEntity, skillEntity, false);
+        projectSkillBean.updateProjectSkillStatus(projectEntity, skillEntity, activeStatus);
         return true;
     }
 

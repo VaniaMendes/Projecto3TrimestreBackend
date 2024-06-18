@@ -32,11 +32,25 @@ public class ProjectSkillBean implements Serializable {
         this.projectSkillDao = projectSkillDao;
     }
 
+    /**
+     * Checks if a skill is already associated with a project.
+     *
+     * @param projectEntity The project to check.
+     * @param skillEntity The skill to check.
+     * @return true if the skill is already associated with the project, false otherwise.
+     */
     public boolean exists(ProjectEntity projectEntity, SkillEntity skillEntity) {
         return projectSkillDao.findSkillFromProject(projectEntity.getId(), skillEntity.getId()) != null;
     }
 
-    public boolean addSkillToProject(ProjectEntity projectEntity, SkillEntity skillEntity) {
+    /**
+     * Associates a skill with a project.
+     *
+     * @param projectEntity The project to which the skill will be associated.
+     * @param skillEntity The skill to be associated with the project.
+     * @return true if the skill was successfully associated with the project, false otherwise.
+     */
+    public boolean associateSkillToProject(ProjectEntity projectEntity, SkillEntity skillEntity) {
 
         if (exists(projectEntity, skillEntity)) {
             logger.error("Skill already exists in project");
@@ -46,13 +60,21 @@ public class ProjectSkillBean implements Serializable {
         ProjectSkillEntity projectSkillEntity = new ProjectSkillEntity();
         projectSkillEntity.setProject(projectEntity);
         projectSkillEntity.setSkill(skillEntity);
-        projectSkillEntity.setActiveStatus(true);
+        projectSkillEntity.setActiveStatus(false);
 
         projectSkillDao.persist(projectSkillEntity);
         logger.info("Skill added to project");
         return true;
     }
 
+    /**
+     * Updates the status of a skill in a project.
+     *
+     * @param projectEntity The project in which the skill status will be updated.
+     * @param skillEntity The skill whose status will be updated.
+     * @param activeStatus The new status of the skill.
+     * @return true if the skill status was successfully updated, false otherwise.
+     */
     public boolean updateProjectSkillStatus(ProjectEntity projectEntity, SkillEntity skillEntity, boolean activeStatus) {
 
         ProjectSkillEntity projectSkillEntity = projectSkillDao.findSkillFromProject(projectEntity.getId(), skillEntity.getId());
@@ -68,6 +90,12 @@ public class ProjectSkillBean implements Serializable {
         return true;
     }
 
+    /**
+     * Retrieves all skills associated with a project.
+     *
+     * @param projectId The ID of the project whose skills will be retrieved.
+     * @return A list of skills associated with the project.
+     */
     public List<Skill> getSkillsOfProject(Long projectId) {
         List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllSkillsFromProject(projectId);
         ArrayList<Skill> skills = new ArrayList<>();
@@ -78,5 +106,19 @@ public class ProjectSkillBean implements Serializable {
         return skills;
     }
 
+    /**
+     * Retrieves all skills not associated with a project.
+     *
+     * @param projectId The ID of the project whose non-associated skills will be retrieved.
+     * @return A list of skills not associated with the project.
+     */
+    public List<Skill> getSkillsNotInProject(Long projectId) {
+        List<SkillEntity> skillEntities = projectSkillDao.findAllSkillsNotInProject(projectId);
 
+        ArrayList<Skill> skills = new ArrayList<>();
+        for (SkillEntity skillEntity : skillEntities) {
+            skills.add(skillBean.convertToDTO(skillEntity));
+        }
+        return skills;
+    }
 }

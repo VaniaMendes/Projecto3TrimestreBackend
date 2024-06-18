@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.service;
 
+import aor.paj.proj_final_aor_backend.bean.ProjectSkillBean;
 import aor.paj.proj_final_aor_backend.bean.SkillBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Skill;
@@ -22,6 +23,8 @@ public class SkillService {
     private SkillBean skillBean;
     @EJB
     private UserBean userBean;
+    @EJB
+    private ProjectSkillBean projectSkillBean;
     @Context
     private HttpServletRequest request;
 
@@ -31,7 +34,7 @@ public class SkillService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createSkill(@HeaderParam("token") String token, Skill skill, @Context HttpServletRequest request) {
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
 
         if(user == null) {
             logger.error("User not found");
@@ -59,7 +62,7 @@ public class SkillService {
         logger.info("Received request to associate skill to user from IP: " + ip);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null || user.getId() != userId) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -93,7 +96,7 @@ public class SkillService {
         logger.info("Received request to update skill from IP: " + ip);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null) {
             logger.error("IP Adress: " + ip +  "User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -124,14 +127,14 @@ public class SkillService {
 
 
     @GET
-    @Path("/{userId}")
+    @Path("/user/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSkillsByUserId(@HeaderParam("token") String token, @PathParam("userId") Long userId) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get skills by user id from IP: " + ip);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if (user == null || user.getId() != userId) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -140,6 +143,25 @@ public class SkillService {
         // Get the skills by user id
         logger.info("IP Adress: " + ip + "Skills retrieved successfully for user with id: " + userId);
         return Response.status(Response.Status.OK).entity(skillBean.getSkillsByUserId(userId)).build();
+    }
+
+    @GET
+    @Path("/project/{projectId}/not-associated")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSkillsNotInProject(@HeaderParam("token") String token, @PathParam("projectId") Long projectId) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get skills not associated with project from IP: " + ip);
+
+        // Authentication and authorization
+        User user = userBean.getUserByToken(token);
+        if (user == null) {
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Get the skills not associated with the project
+        logger.info("IP Adress: " + ip + "Skills not associated with project retrieved successfully");
+        return Response.status(Response.Status.OK).entity(projectSkillBean.getSkillsNotInProject(projectId)).build();
     }
 
 

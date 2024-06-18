@@ -3,7 +3,6 @@ package aor.paj.proj_final_aor_backend.service;
 import aor.paj.proj_final_aor_backend.bean.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -166,14 +165,57 @@ public class ProjectService {
     @Path("/{id}/skill")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addSkill(@PathParam("id") long projectId,
-                             @HeaderParam("skillId") long skillId) {
+    public Response joinSkill(@PathParam("id") long projectId,
+                             @HeaderParam("skillId") long skillId,
+                             @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
-        logger.info("Received request to add skill to project from IP: " + ip);
 
-        if (projectBean.addSkill(projectId, skillId)){
-            logger.info("Skill added to project successfully");
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
+        logger.info("Received request to associate skill to project from IP: " + ip);
+
+        if (projectBean.joinSkill(projectId, skillId)){
+            logger.info("Skill associated to project successfully");
             return Response.status(Response.Status.OK).entity("Skill added to project successfully").build();
+        } else {
+            logger.error("Failed to associate skill to project");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add skill to project").build();
+        }
+
+    }
+
+    @PUT
+    @Path("/{id}/skill/add")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addSkill(@PathParam("id") long projectId,
+                                     @HeaderParam("skillId") long skillId,
+                                     @HeaderParam("token") String token) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
+        logger.info("Received request to update skill state in project from IP: " + ip);
+
+        if (projectBean.editSkillActiveStatus(projectId, skillId, true)){
+            logger.info("Skill added to Project with id '" + projectId + "' successfully");
+            return Response.status(Response.Status.OK).entity("Skill added successfully").build();
         } else {
             logger.error("Failed to add skill to project");
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add skill to project").build();
@@ -185,12 +227,24 @@ public class ProjectService {
     @Path("/{id}/skill/remove")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateSkillState(@PathParam("id") long projectId,
-                                     @HeaderParam("skillId") long skillId) {
+    public Response removeSkill(@PathParam("id") long projectId,
+                                     @HeaderParam("skillId") long skillId,
+                                     @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
         logger.info("Received request to update skill state in project from IP: " + ip);
 
-        if (projectBean.removeSkill(projectId, skillId)){
+        if (projectBean.editSkillActiveStatus(projectId, skillId, false)){
             logger.info("Skill removed from Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("Skill removed successfully").build();
         } else {
@@ -205,8 +259,20 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addKeyword(@PathParam("id") long projectId,
-                               @HeaderParam("keyword") String keyword) {
+                               @HeaderParam("keyword") String keyword,
+                               @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
         logger.info("Received request to add keyword to project from IP: " + ip);
 
         if (projectBean.addKeyword(projectId, keyword)){
@@ -224,8 +290,20 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response removeKeyword(@PathParam("id") long projectId,
-                                  @HeaderParam("keyword") String keyword) {
+                                  @HeaderParam("keyword") String keyword,
+                                  @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
         logger.info("Received request to remove keyword from project from IP: " + ip);
 
         if (projectBean.removeKeyword(projectId, keyword)){
@@ -325,7 +403,7 @@ public class ProjectService {
     public Response getActivitiesFromProject(@PathParam("id") long projectId, @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
 
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -372,7 +450,7 @@ public class ProjectService {
 
         String ip = request.getRemoteAddr();
 
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null || user.getId() != userId){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -394,7 +472,7 @@ public class ProjectService {
 
         String ip = request.getRemoteAddr();
 
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null || user.getId() != userId){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -412,7 +490,7 @@ public class ProjectService {
                                     @PathParam("id") long projectId) {
         String ip = request.getRemoteAddr();
 
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();

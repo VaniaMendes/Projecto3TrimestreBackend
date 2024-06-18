@@ -2,10 +2,8 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.MessageBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
-import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dto.Message;
 import aor.paj.proj_final_aor_backend.dto.User;
-import com.mysql.cj.Messages;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -38,7 +36,7 @@ public class MessageService {
     public Response sendNewMessage(@HeaderParam("token") String token, Message message, @Context HttpServletRequest request){
 
         // Get the user by token
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         String ip = request.getRemoteAddr();
         logger.info("Received request to send a new message from IP: " + ip);
 
@@ -75,7 +73,7 @@ public class MessageService {
     @Transactional
     public Response getMessagesBetweenTwoUsers(@HeaderParam("token") String token, @PathParam("user_id") long user_id, @Context HttpServletRequest request ){
         //Get the user by token
-        User user1 = userBean.getUSerByToken(token);
+        User user1 = userBean.getUserByToken(token);
         User user2 = userBean.getUserById(user_id);
         String ip = request.getRemoteAddr();
         logger.info("Received request to get messages between two users from IP: " + ip);
@@ -99,7 +97,7 @@ public class MessageService {
     public Response sendMessageToChat(@HeaderParam("token") String token, @PathParam("project_id") long project_id,
                                       Message message, @Context HttpServletRequest request){
         // Get the user by token
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         String ip = request.getRemoteAddr();
         logger.info("Received request to send a message to a chat group from IP: " + ip);
         if(user == null){
@@ -125,7 +123,7 @@ public class MessageService {
     @Transactional
     public Response getMessagesByProject(@HeaderParam("token") String token, @PathParam("project_id") long project_id, @Context HttpServletRequest request){
         // Get the user by token
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         String ip = request.getRemoteAddr();
         logger.info("Received request to get messages by project from IP: " + ip);
         if(user == null){

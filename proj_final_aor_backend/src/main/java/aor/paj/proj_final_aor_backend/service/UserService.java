@@ -2,12 +2,9 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
-import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.Login;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserRegistration;
-import aor.paj.proj_final_aor_backend.entity.LabEntity;
-import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -119,7 +116,7 @@ public class UserService {
 
         try {
 
-            User user = userBean.getUSerByToken(token);
+            User user = userBean.getUserByToken(token);
 
             if (user == null) {
 
@@ -202,7 +199,7 @@ public class UserService {
 
         try {
             //Authentication and authorization
-            User userlogged = userBean.getUSerByToken(token);
+            User userlogged = userBean.getUserByToken(token);
             if(userlogged == null || userlogged.getId() != userId){
                 logger.warn("IP Adress " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
@@ -234,7 +231,7 @@ public class UserService {
 
         try {
             // Authentication and authorization
-            User userLogged = userBean.getUSerByToken(token);
+            User userLogged = userBean.getUserByToken(token);
             if (userLogged == null || userLogged.getId() != userId) {
                 logger.warn("IP Address " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
@@ -263,7 +260,7 @@ public class UserService {
     public Response getUser(@HeaderParam("token") String token, @Context HttpServletRequest request) {
 
         try {
-                   User userlogged = userBean.getUSerByToken(token);
+                   User userlogged = userBean.getUserByToken(token);
             if(userlogged == null){
                 logger.warn("IP Adress " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
@@ -287,7 +284,7 @@ public class UserService {
         String ip = request.getRemoteAddr();
 
         // Check if the token is valid
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null ){
             logger.warn("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
