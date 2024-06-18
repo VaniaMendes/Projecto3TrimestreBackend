@@ -17,6 +17,7 @@ import java.util.Set;
 @NamedQuery(name = "Notification.findNewProjectByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = 'NEW_PROJECT'")
 @NamedQuery(name = "Notification.findProjectStatusByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = 'PROJECT_STATUS'")
 @NamedQuery(name = "Notification.findUnreadNotificationsByUserID", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :id AND n.readStatus = false")
+@NamedQuery(name = "Notification.findNotificationsByUserIDandType", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type = :type")
 //Querys for the NotificationEntity class
 
 public class NotificationEntity implements Serializable {

@@ -2,13 +2,13 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Message;
+import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.entity.MessageEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.websocket.Notifier;
-import com.mysql.cj.Messages;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static aor.paj.proj_final_aor_backend.util.enums.NotificationType.MESSAGE_RECEIVED;
 
@@ -74,8 +73,7 @@ public class MessageBean implements Serializable {
      * This method is used to send a message from one user to another.
      *
      * @param token   The token of the user who is sending the message. This is used to authenticate the user.
-     * @param content The content of the message that is to be sent.
-     * @param id      The id of the user who will receive the message.
+        * @param message The message that is to be sent.
      * @return Returns true if the message was successfully sent, false otherwise.
      */
     public boolean sendMessage(String token, Message message) {
@@ -90,13 +88,14 @@ public class MessageBean implements Serializable {
         // Find the receiver by id
         UserEntity receiver = userDao.findUserById(message.getReceiver().getId());
         // Check if the receiver exists
-        if (receiver == null) {
+        if (receiver == null || receiver.getId()==user.getId()) {
             logger.error("Receiver not found");
             return false;
         }
         // Create the message
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.setContent(message.getContent());
+        messageEntity.setSubject(message.getSubject());
         messageEntity.setSubject(message.getSubject());
         messageEntity.setSender(user);
         messageEntity.setReceiver(receiver);
@@ -121,7 +120,7 @@ public class MessageBean implements Serializable {
      * @param id The id of the user with whom the messages are to be retrieved.
      * @return Returns a list of messages between the two users.
      */
-    public List<Message> getMessagesBetweenTwoUsers(String token, long id) {
+    public List<Message> getMessagesBetweenTwoUsers(String token, long id, int page, int size) {
 
         // Find the user by token
         UserEntity user1 = sessionDao.findUserByToken(token);
@@ -135,7 +134,7 @@ public class MessageBean implements Serializable {
         }
 
         // Get the messages between the two users
-        List<MessageEntity> messageEntities = messageDao.findMessagesBetweenUsers(user1, user2);
+        List<MessageEntity> messageEntities = messageDao.findMessagesBetweenUsers(user1, user2, page, size);
 
         // Convert the message entities to message DTOs
         List<Message> messages = new ArrayList<>();
@@ -240,6 +239,33 @@ public class MessageBean implements Serializable {
 
     }
 
+    public int getMessageCountBetweenTwoUsers(String token, long id) {
+        UserEntity user1 = sessionDao.findUserByToken(token);
+        UserEntity user2 = userDao.findUserById(id);
+        if (user1 == null || user2 == null) {
+            logger.error("User not found");
+            return 0;
+        }
+        return messageDao.findMessagesBetweenUsers(user1, user2, 0, Integer.MAX_VALUE).size();
+    }
+
+    public List<MessageInfoUser> getUsersMessagedByUser(String token) {
+        UserEntity user = sessionDao.findUserByToken(token);
+        if (user == null) {
+            logger.debug("User not found");
+            return null;
+        }
+        List<UserEntity> listOfUsers = messageDao.findMessagesGroupedBySender(user.getId());
+        List<MessageInfoUser> users = new ArrayList<>();
+        if (listOfUsers != null && !listOfUsers.isEmpty()) {
+            for (UserEntity userEntity : listOfUsers) {
+                MessageInfoUser user1 = userBean.convertUserToDTOForMessage(userEntity);
+                users.add(user1);
+            }
+        }
+        return users;
+    }
+
 
     /**
      * This method is used to convert a message entity to a message DTO.
@@ -254,9 +280,12 @@ public class MessageBean implements Serializable {
         messageDto.setReceiver(userBean.convertUserToDTOForMessage(messageEntity.getReceiver()));
         messageDto.setSendTimestamp(messageEntity.getSendTimestamp());
         messageDto.setReadStatus(messageEntity.isReadStatus());
+        messageDto.setSubject(messageEntity.getSubject());
         messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
         return messageDto;
     }
+
+
 
     /**
      * This method is used to convert a message entity to a message DTO for a chat group.

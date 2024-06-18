@@ -287,6 +287,7 @@ public class NotificationBean implements Serializable {
 
         NotificationEntity notification = notificationDao.findNotificationById(notificationId);
 
+
         if(notification == null) {
             logger.error("No notification found with id: " + notificationId);
             return false;
@@ -296,6 +297,17 @@ public class NotificationBean implements Serializable {
         notification.setReadTimestamp(LocalDateTime.now());
         notificationDao.merge(notification);
 
+
+        String typeOfNotification =  NotificationType.MESSAGE_RECEIVED.toString();
+        if(notification.getType().equals(typeOfNotification)){
+            List<NotificationEntity> notificationEntityList = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification );
+
+            for(NotificationEntity notificationEntity : notificationEntityList){
+                notificationEntity.setReadStatus(true);
+                notificationEntity.setReadTimestamp(LocalDateTime.now());
+                notificationDao.merge(notificationEntity);
+            }
+        }
         return true;
     }
 

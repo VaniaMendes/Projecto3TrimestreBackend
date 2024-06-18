@@ -43,6 +43,9 @@ public class SkillBean implements Serializable {
     @EJB
     UserSkillDao userSkillDao;
 
+    @EJB
+    UserBean userBean;
+
     /**
      * Default constructor for the SkillBean class.
      */
@@ -67,7 +70,7 @@ public class SkillBean implements Serializable {
      * @param skill Skill object to be created.
      * @return True if the skill was created successfully, false otherwise.
      */
-    public boolean createNewSkill(Skill skill) {
+    public boolean createNewSkill(String token, Skill skill) {
         // Check if the skill name is null or empty
         if (skill.getName().isEmpty()) {
             logger.error("Skill name is null or empty.");
@@ -92,6 +95,7 @@ public class SkillBean implements Serializable {
         skillEntity.setType(skill.getType());
         // Persist the skill in the database
         skillDao.createSkill(skillEntity);
+        associateSkillToUser(userBean.getUSerByToken(token).getId(), skillEntity.getId());
         return true;
     }
 

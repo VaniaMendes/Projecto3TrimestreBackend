@@ -19,6 +19,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,6 +80,16 @@ public class UserBean implements Serializable {
         if(userEntity != null){
             //Convert the user entity to a user dto
             return convertUserEntityToDto(userEntity);
+        }
+        return null;
+    }
+
+    public MessageInfoUser getInfoUserForMessage(long id){
+        //Retrieve the user from the database
+        UserEntity userEntity = userDao.findUserById(id);
+        if(userEntity != null){
+            //Convert the user entity to a user dto
+            return convertUserToDTOForMessage(userEntity);
         }
         return null;
     }
@@ -559,6 +570,23 @@ public class UserBean implements Serializable {
         }
     }
 
+    public List<User> getUsersByFirstName(String prefix) {
+        List<User> users = new ArrayList<>();
+        List<UserEntity> userEntities = userDao.findUsersByFirstNameStartingWith(prefix);
+
+        if(userEntities != null){
+            for(UserEntity userEntity : userEntities){
+                User user = convertUserEntityToDto(userEntity);
+
+                    if (user.isActiveState()) {
+                        users.add(user);
+                    }
+                }
+        }
+
+        return users;
+    }
+
     public List<UserEntity> getAllUsers(){
         return userDao.findAllAtiveUsers();
     }
@@ -614,6 +642,7 @@ public class UserBean implements Serializable {
         user.setId(userEntity.getId());
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());
+        user.setPhoto(userEntity.getPhoto());
         return user;
     }
 
