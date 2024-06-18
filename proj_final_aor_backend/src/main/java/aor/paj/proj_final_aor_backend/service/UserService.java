@@ -338,7 +338,7 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getUserByName(@HeaderParam("token") String token, @QueryParam("prefix") String prefix) {
         if (token != null) {
-            User user = userBean.getUSerByToken(token);
+            User user = userBean.getUserByToken(token);
             if (user != null) {
                 List<User> users = userBean.getUsersByFirstName(prefix);
                 if (users != null && !users.isEmpty()) {
@@ -360,7 +360,7 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@HeaderParam("token") String token, @PathParam("userId") long userId) {
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if (user != null) {
             MessageInfoUser userById = userBean.getInfoUserForMessage(userId);
             if (userById != null) {

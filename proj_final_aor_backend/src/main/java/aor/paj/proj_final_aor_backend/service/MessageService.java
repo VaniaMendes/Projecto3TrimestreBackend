@@ -5,8 +5,7 @@ import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Message;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
-import com.mysql.cj.Messages;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -169,7 +168,7 @@ public class MessageService {
     public Response getPageCountBetweenTwoUsers(@HeaderParam("token") String token,
                                                 @PathParam("user_id") long user_id, @Context HttpServletRequest request) {
         // Get the user by token
-        User user1 = userBean.getUSerByToken(token);
+        User user1 = userBean.getUserByToken(token);
         User user2 = userBean.getUserById(user_id);
         String ip = request.getRemoteAddr();
         logger.info("Received request to get page count between two users from IP: " + ip);

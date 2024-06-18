@@ -7,6 +7,7 @@ import aor.paj.proj_final_aor_backend.dto.Skill;
 import aor.paj.proj_final_aor_backend.entity.SkillEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserSkillEntity;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -95,7 +96,7 @@ public class SkillBean implements Serializable {
         skillEntity.setType(skill.getType());
         // Persist the skill in the database
         skillDao.createSkill(skillEntity);
-        associateSkillToUser(userBean.getUSerByToken(token).getId(), skillEntity.getId());
+        associateSkillToUser(userBean.getUserByToken(token).getId(), skillEntity.getId());
         return true;
     }
 
