@@ -38,7 +38,7 @@ public class SkillService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
         // Create the skill
-        boolean created = skillBean.createNewSkill(skill);
+        boolean created = skillBean.createNewSkill(token,skill);
 
         // Check if the skill was created successfully
         if (created) {

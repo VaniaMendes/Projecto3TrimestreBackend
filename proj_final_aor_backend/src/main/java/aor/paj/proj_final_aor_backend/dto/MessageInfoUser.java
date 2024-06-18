@@ -30,6 +30,8 @@ public class MessageInfoUser {
      * Default constructor for MessageInfoUser.
      */
 
+    @XmlElement
+    private String photo;
     public MessageInfoUser() {
     }
 
@@ -80,5 +82,21 @@ public class MessageInfoUser {
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    /**
+     * Getter for the 'photo' field.
+     * @return String - The photo of the MessageInfoUser.
+     */
+    public String getPhoto() {
+        return photo;
+    }
+
+    /**
+     * Setter for the 'photo' field.
+     * @param photo - The new photo of the MessageInfoUser.
+     */
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 }
