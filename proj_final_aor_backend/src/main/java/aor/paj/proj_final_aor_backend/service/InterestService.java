@@ -3,7 +3,6 @@ package aor.paj.proj_final_aor_backend.service;
 import aor.paj.proj_final_aor_backend.bean.InterestBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Interest;
-import aor.paj.proj_final_aor_backend.dto.Skill;
 import aor.paj.proj_final_aor_backend.dto.User;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +31,7 @@ public class InterestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createSkill(@HeaderParam("token") String token, Interest interest, @Context HttpServletRequest request) {
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
 
         if(user == null) {
             logger.error("User not found");
@@ -61,7 +60,7 @@ public class InterestService {
         logger.info("Received request to associate interest to user from IP: " + ip);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null || user.getId() != userId) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -91,7 +90,7 @@ public class InterestService {
         logger.info("Received request to remove interest from user from IP: " + ip + "  by user with id: " + userId);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if(user == null || user.getUserType().equals("ADMIN") || user.getId() != userId){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
@@ -137,7 +136,7 @@ public class InterestService {
         logger.info("Received request to get skills by user id from IP: " + ip);
 
         // Authentication and authorization
-        User user = userBean.getUSerByToken(token);
+        User user = userBean.getUserByToken(token);
         if (user == null || user.getId() != userId) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
