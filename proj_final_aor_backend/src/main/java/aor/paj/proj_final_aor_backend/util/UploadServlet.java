@@ -58,7 +58,8 @@ public class UploadServlet extends HttpServlet {
             try (var input = filePart.getInputStream()) {
                 Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-            String photoUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/uploads/" + uniqueFileName; // URL da foto
+            // Constrói a URL completa da foto
+            String photoUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/uploads/" + uniqueFileName;
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("{\"photoUrl\":\"" + photoUrl + "\"}");
@@ -69,4 +70,3 @@ public class UploadServlet extends HttpServlet {
         }
     }
 }
-
