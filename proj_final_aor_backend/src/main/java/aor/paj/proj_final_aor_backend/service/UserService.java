@@ -5,8 +5,13 @@ import aor.paj.proj_final_aor_backend.bean.UserProjectBean;
 import aor.paj.proj_final_aor_backend.dto.Login;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.dto.UserRegistration;
+import aor.paj.proj_final_aor_backend.dto.*;
+import aor.paj.proj_final_aor_backend.entity.LabEntity;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -15,7 +20,16 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Path("/users")
 public class UserService {
@@ -222,12 +236,14 @@ public class UserService {
         }
 
     }
+
+
     @PUT
     @Path("/{userId}/biography")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response updateBiography(@HeaderParam("token") String token, @PathParam("userId") int userId, String biography, @Context HttpServletRequest request) {
+    public Response updateBiography(@HeaderParam("token") String token, @PathParam("userId") int userId, User user, @Context HttpServletRequest request) {
 
         try {
             // Authentication and authorization
@@ -238,7 +254,7 @@ public class UserService {
             }
 
             // Update biography
-            boolean isUpdated = userBean.updateBiography(biography, userId);
+            boolean isUpdated = userBean.updateBiography(user.getBiography(), userId);
             if (isUpdated) {
                 logger.info("IP Address: " + request.getRemoteAddr() + " - Biography updated successfully for user: " + userId + " at " + LocalDateTime.now());
                 return Response.status(Response.Status.OK).entity("Biography updated").build();
@@ -254,9 +270,10 @@ public class UserService {
 
 
     @GET
-    @Path("/profile")
+    @Path("/user")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
+
     public Response getUser(@HeaderParam("token") String token, @Context HttpServletRequest request) {
 
         try {
@@ -315,5 +332,45 @@ public class UserService {
         return Response.status(Response.Status.OK).entity(userProjectBean.countProjectsByUserId(userId, state)).build();
     }
 
+    @GET
+    @Path("/filterByName")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getUserByName(@HeaderParam("token") String token, @QueryParam("prefix") String prefix) {
+        if (token != null) {
+            User user = userBean.getUserByToken(token);
+            if (user != null) {
+                List<User> users = userBean.getUsersByFirstName(prefix);
+                if (users != null && !users.isEmpty()) {
+                    return Response.ok(users).build();
+                } else {
+                    // Retorna uma array vazia se nenhum usuário for encontrado para que no frontend nao dê erro ao imprimir a tabela
+                    return Response.ok(Collections.emptyList()).build();
+                }
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized access").build();
+            }
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing token").build();
+        }
+    }
+
+    @GET
+    @Path("/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserById(@HeaderParam("token") String token, @PathParam("userId") long userId) {
+        User user = userBean.getUserByToken(token);
+        if (user != null) {
+            MessageInfoUser userById = userBean.getInfoUserForMessage(userId);
+            if (userById != null) {
+                return Response.ok(userById).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+            }
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized access").build();
+        }
+    }
 }
 

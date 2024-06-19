@@ -88,4 +88,10 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
     }
 
 
+    public List<NotificationEntity>findNotificationsByUserIDandType(long userId, String type) {
+        return em.createNamedQuery("Notification.findNotificationsByUserIDandType", NotificationEntity.class)
+                .setParameter("userId", userId)
+                .setParameter("type", type)
+                .getResultList();
+    }
 }

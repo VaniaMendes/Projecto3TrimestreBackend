@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 @Table(name="messages")
 
 //Querys for the MessageEntity class
-@NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
-@NamedQuery(name= "Message.findMessagesGroupedBySender", query = "SELECT m FROM MessageEntity m WHERE m.receiver.id = :receiver ORDER BY m.sendTimestamp DESC")
+@NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1) ORDER BY m.sendTimestamp DESC")
+@NamedQuery(name = "Message.findSentMessagesUsers", query = "SELECT m.receiver FROM MessageEntity m WHERE m.sender.id =:id ORDER BY m.sendTimestamp DESC")
+@NamedQuery(name = "Message.findReceivedMessagesUsers", query = "SELECT m.sender FROM MessageEntity m WHERE m.receiver.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp DESC")
 public class MessageEntity implements Serializable {
 
@@ -30,8 +31,11 @@ public class MessageEntity implements Serializable {
     /**
      * Read status of the message
      */
-    @Column(name = "readStatus", nullable = false)
+    @Column(name = "readStatus")
     private boolean readStatus;
+
+    @Column(name = "subject")
+    private String subject;
 
     /**
      * Send timestamp of the message
@@ -196,5 +200,11 @@ public class MessageEntity implements Serializable {
         this.receiverGroup = receiverGroup;
     }
 
+    public String getSubject() {
+        return subject;
+    }
 
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 }

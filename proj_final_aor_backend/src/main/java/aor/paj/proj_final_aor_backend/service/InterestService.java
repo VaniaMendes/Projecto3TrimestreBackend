@@ -38,7 +38,7 @@ public class InterestService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
         // Create the skill
-        boolean created = interestBean.createNewInterest(interest);
+        boolean created = interestBean.createNewInterest(token,interest);
 
         // Check if the skill was created successfully
         if (created) {

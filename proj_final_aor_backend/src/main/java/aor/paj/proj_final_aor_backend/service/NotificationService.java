@@ -88,7 +88,7 @@ public class NotificationService {
                 logger.info("Unread notifications retrieved successfully");
                 return Response.status(Response.Status.OK).entity(notifications).build();
             } else {
-                logger.error("Error retrieving unread notifications");
+                logger.error("Theres is no unread notifications");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving unread notifications").build();
             }
         } catch (Exception e) {

@@ -5,6 +5,7 @@ import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dao.UserInterestDao;
 import aor.paj.proj_final_aor_backend.dto.Interest;
 import aor.paj.proj_final_aor_backend.entity.*;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,8 @@ public class InterestBean {
     @EJB
     UserInterestDao userInterestDao;
 
+    @EJB
+    UserBean userBean;
 
     /**
      * Default constructor for the InterestBean class.
@@ -55,7 +58,7 @@ public class InterestBean {
      * @return True if the interest was created successfully, false otherwise.
      */
 
-    public boolean createNewInterest(Interest interest){
+    public boolean createNewInterest(String token, Interest interest){
         // Check if the interest name is null or empty
         if(interest.getName().isEmpty() ){
             logger.error("Interest name is null or empty.");
@@ -80,6 +83,7 @@ public class InterestBean {
 
         // Persist the interest in the database
         interestDao.createInterest(interestEntity);
+        associateInterestToUser(userBean.getUserByToken(token).getId(), interestEntity.getId());
         return true;
     }
 

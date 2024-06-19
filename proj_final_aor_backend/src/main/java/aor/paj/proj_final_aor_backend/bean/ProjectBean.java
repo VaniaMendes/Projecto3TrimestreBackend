@@ -122,7 +122,7 @@ public class ProjectBean implements Serializable {
 
         userProjectBean.addUserToProject(creator, projectEntity, UserTypeInProject.CREATOR);
         notificationBean.sendNotificationToAllUsers(token, NotificationType.NEW_PROJECT, projectEntity.getName());
-        notifier.sendNotification(token, projectEntity.getName());
+
 
 
         projectDao.persist(projectEntity);
