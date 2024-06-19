@@ -95,7 +95,7 @@ public class UserProjectBean implements Serializable {
 
         // Persist the UserProjectEntity instance
         userProjectDao.persist(userProjectEntity);
-        logger.info("User added to Project");
+        logger.info("User with ID '" + userEntity.getId() + "' added to Project with ID '" + projectEntity.getId() + "'");
         return true;
     }
 
@@ -218,6 +218,43 @@ public class UserProjectBean implements Serializable {
     }
 
     /**
+     * Retrieves a list of users who are not approved in a specific project.
+     *
+     * This method first retrieves a list of UserEntity objects associated with the provided project ID
+     * who are not approved. It then iterates over each UserEntity, converts it to a User DTO object,
+     * and adds it to a list. The list of User DTO objects is then returned.
+     *
+     * @param projectId The ID of the project for which to retrieve the non-approved users.
+     * @return A list of User DTO objects representing the non-approved users in the specified project.
+     */
+    public List<UserInfoInProject> getAllUsersNotApprovedInProject(Long projectId) {
+        List<UserProjectEntity> userProjectEntities = userProjectDao.findUsersNotApprovedInProject(projectId);
+        List<UserInfoInProject> users = new ArrayList<>();
+        for (UserProjectEntity userProjectEntity : userProjectEntities) {
+            users.add(userBean.convertToDTO(userProjectEntity.getUser()));
+        }
+        return users;
+    }
+    /**
+     * Retrieves a list of users who are available for a specific project.
+     *
+     * This method first retrieves a list of UserEntity objects who are available for the provided project ID.
+     * It then iterates over each UserEntity, converts it to a User DTO object, and adds it to a list.
+     * The list of User DTO objects is then returned.
+     *
+     * @param projectId The ID of the project for which to retrieve the available users.
+     * @return A list of User DTO objects representing the available users for the specified project.
+     */
+    public List<UserInfoInProject> getAllUsersAvailableForProject(Long projectId) {
+        List<UserEntity> userEntities = userProjectDao.findAvailableUsersForProject(projectId);
+        List<UserInfoInProject> users = new ArrayList<>();
+        for (UserEntity userEntity : userEntities) {
+            users.add(userBean.convertToDTO(userEntity));
+        }
+        return users;
+    }
+
+    /**
      * Method to get a list of UserProject objects associated with a specific project.
      * @param projectId The ID of the project.
      * @return List of UserProject objects associated with the project.
@@ -246,7 +283,7 @@ public class UserProjectBean implements Serializable {
         List<UserInfoInProject> users = new ArrayList<>();
         for (UserProjectEntity userProjectEntity : userProjectEntities) {
             UserEntity userEntity = userProjectEntity.getUser();
-            users.add(userBean.convertToDTO(userEntity, userProjectEntity.getUserType()));
+            users.add(userBean.convertToDTOWithType(userEntity, userProjectEntity.getUserType()));
         }
         return users;
     }

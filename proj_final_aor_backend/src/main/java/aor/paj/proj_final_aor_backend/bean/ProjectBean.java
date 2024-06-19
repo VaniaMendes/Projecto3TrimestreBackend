@@ -265,6 +265,7 @@ public class ProjectBean implements Serializable {
         }
 
         userProjectBean.addUserToProject(userEntity, projectEntity, userType);
+        cloneMessageEntities(projectEntity);
 
         if (userType != UserTypeInProject.CANDIDATE) {
             projectEntity.setUpdatedAt(LocalDateTime.now());

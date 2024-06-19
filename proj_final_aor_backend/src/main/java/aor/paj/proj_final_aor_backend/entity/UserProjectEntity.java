@@ -2,11 +2,9 @@ package aor.paj.proj_final_aor_backend.entity;
 
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +33,8 @@ import java.util.Set;
 @NamedQuery(name = "UserProject.findProjectCreator", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :id AND up.userType = aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject.CREATOR")
 
 @NamedQuery(name = "UserProject.findUserInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.user.id = :userId")
+@NamedQuery(name = "UserProject.findUsersNotApprovedInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.approved = false")
+@NamedQuery(name = "UserProject.findAvailableUsersForProject", query = "SELECT u FROM UserEntity u WHERE u.id NOT IN (SELECT up.user.id FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.exited = false) AND u.activeState = true")
 @NamedQuery(name = "UserProject.countActiveUsersByProjectId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")

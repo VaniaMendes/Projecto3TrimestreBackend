@@ -484,6 +484,49 @@ public class ProjectService {
     }
 
     @GET
+    @Path("/{projectId}/users/available")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAvailableUsersForProject(@PathParam("projectId") Long projectId,
+                                                @HeaderParam("token") String token){
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+        logger.info("Received request to get available users for project from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(userProjectBean.getAllUsersAvailableForProject(projectId)).build();
+    }
+
+    @GET
+    @Path("/{projectId}/candidates")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCandidatesForProject(@PathParam("projectId") Long projectId,
+                                            @HeaderParam("token") String token){
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+        logger.info("Received request to get candidates for project from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(userProjectBean.getAllUsersNotApprovedInProject(projectId)).build();
+    }
+
+
+    @GET
     @Path("/{id}/resources")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllResources(@HeaderParam("token") String token,

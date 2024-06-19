@@ -41,6 +41,7 @@ public class SessionDao extends AbstractDao<SessionEntity> {
         try {
             return (UserEntity) em.createNamedQuery("Session.findUserByToken").setParameter("token", token).getSingleResult();
         } catch (Exception e) {
+
             return null;
         }
     }
