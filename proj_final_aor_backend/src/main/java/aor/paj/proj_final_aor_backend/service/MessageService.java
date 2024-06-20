@@ -177,7 +177,7 @@ public class MessageService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
         int count = messageBean.getMessageCountBetweenTwoUsers(token, user_id);
-        int pageCount = (count + 3) / 4;
+        int pageCount = (count + 3) / 4; // 4 messages per page
         return Response.status(Response.Status.OK).entity(pageCount).build();
     }
 }

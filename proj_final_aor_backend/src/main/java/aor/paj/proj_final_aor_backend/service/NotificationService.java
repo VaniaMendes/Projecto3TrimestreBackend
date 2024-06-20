@@ -34,11 +34,12 @@ public class NotificationService {
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId, @Context HttpServletRequest request){
+    public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId,
+                                     @QueryParam("page") @DefaultValue("1") int page , @Context HttpServletRequest request){
         String ip = request.getRemoteAddr();
         logger.debug("Received request to get notifications for user with id: " + userId);
         try {
-            List<Notification> notifications = notificationBean.getNotificationsByUserId(token, userId);
+            List<Notification> notifications = notificationBean.getNotificationsByUserId(token, userId, page, 6);
 
             if(notifications != null) {
                 logger.info("IP Adress " + ip + "Notifications retrieved successfully by the user with the id" + userId);
@@ -97,4 +98,32 @@ public class NotificationService {
         }
     }
 
+
+    @GET
+    @Path("/pageCount")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getPageCountOfNotifications(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to get page count of notifications from IP: " + ip);
+
+        User user = userBean.getUserByToken(token);
+        if (user == null) {
+            logger.error("IP Address " + ip + " User not found");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
+        }
+
+        try {
+            int totalCount = notificationBean.getNumberofNotification(user.getId());
+            int pageCount = (int) Math.ceil((double) totalCount / 6); // 6 notifications per page
+            logger.info("IP Address " + ip + " Page count of notifications retrieved successfully: " + pageCount);
+            return Response.status(Response.Status.OK).entity(pageCount).build();
+        } catch (Exception e) {
+            logger.error("IP Address " + ip + " Error retrieving page count of notifications: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+
 }
+

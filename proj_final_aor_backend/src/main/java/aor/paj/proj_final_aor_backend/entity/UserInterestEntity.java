@@ -9,7 +9,7 @@ import java.io.Serializable;
 @IdClass(UserInterestId.class)
 
 @NamedQuery(name = "UserInterestEntity.findUserInterest", query = "SELECT u FROM UserInterestEntity u WHERE u.user.id = :user AND u.interest.id = :interest")
-@NamedQuery(name = "UserInterestEntity.getAllInterestsByUserId", query = "SELECT u.interest FROM UserInterestEntity u WHERE u.user.id = :user")
+@NamedQuery(name = "UserInterestEntity.getAllInterestsByUserId", query = "SELECT u.interest FROM UserInterestEntity u WHERE u.user.id = :user AND u.active = true")
 public class UserInterestEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

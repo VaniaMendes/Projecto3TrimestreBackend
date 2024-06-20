@@ -14,6 +14,8 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 @Path("/skills")
 public class SkillService {
 
@@ -87,11 +89,11 @@ public class SkillService {
     }
 
     @PUT
-    @Path("/softDelete-user")
+    @Path("/{skillId}/users/{userId}/soft-delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateSkill(@HeaderParam("token") String token, @QueryParam("skillId") long skillId,
-                                @QueryParam("userId") long userId, @Context HttpServletRequest request) {
+    public Response updateSkill(@HeaderParam("token") String token, @PathParam("skillId") long skillId,
+                                @PathParam("userId") long userId, @Context HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to update skill from IP: " + ip);
 
@@ -135,14 +137,19 @@ public class SkillService {
 
         // Authentication and authorization
         User user = userBean.getUserByToken(token);
-        if (user == null || user.getId() != userId) {
+        if (user == null) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }
 
-        // Get the skills by user id
-        logger.info("IP Adress: " + ip + "Skills retrieved successfully for user with id: " + userId);
-        return Response.status(Response.Status.OK).entity(skillBean.getSkillsByUserId(userId)).build();
+        List<Skill> listUserSkills = skillBean.getSkillsByUserId(userId);
+
+        if(listUserSkills == null) {
+            logger.error("Skills not found");
+            return Response.status(Response.Status.NOT_FOUND).entity("Skills not found").build();
+        }
+        return Response.status(Response.Status.OK).entity(listUserSkills).build();
+
     }
 
     @GET

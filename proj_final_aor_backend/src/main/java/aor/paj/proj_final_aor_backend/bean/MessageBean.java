@@ -255,7 +255,7 @@ public class MessageBean implements Serializable {
             logger.debug("User not found");
             return null;
         }
-        List<UserEntity> listOfUsers = messageDao.findMessagesGroupedBySender(user.getId());
+        List<UserEntity> listOfUsers = messageDao.findUsersWithExchangedMessages(user.getId());
         List<MessageInfoUser> users = new ArrayList<>();
         if (listOfUsers != null && !listOfUsers.isEmpty()) {
             for (UserEntity userEntity : listOfUsers) {

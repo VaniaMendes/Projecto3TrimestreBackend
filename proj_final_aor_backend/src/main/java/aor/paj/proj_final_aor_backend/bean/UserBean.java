@@ -544,6 +544,24 @@ public class UserBean implements Serializable {
         }
     }
 
+    public boolean updateVisibility(long userId, boolean visibility){
+        UserEntity userEntity = userDao.findUserById(userId);
+        if(userEntity == null){
+            logger.warn("User not found with ID: " + userEntity.getId());
+            return false;
+        }
+        userEntity.setVisibilityState(visibility);
+        try {
+            userDao.updateUser(userEntity);
+            logger.debug("User visibility updated successfully: " + userEntity.getId());
+            return true;
+        } catch (Exception e) {
+            logger.debug("Failed to update user visibility: " + userEntity.getId(), e);
+            return false;
+        }
+    }
+
+
     public boolean updateBiography (String biography, long userId){
         UserEntity userEntity = userDao.findUserById(userId);
 
@@ -628,6 +646,7 @@ public class UserBean implements Serializable {
         user.setLastName(userEntity.getLastName());
         user.setNickname(userEntity.getNickname());
         user.setPhoto(userEntity.getPhoto());
+        user.setVisibilityState(userEntity.isVisibilityState());
 
         Lab lab = new Lab();
         lab.setId(userEntity.getLab().getId());

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * MessageDao is a DAO class that provides methods to access the MessageEntity table in the database.
@@ -45,6 +46,8 @@ public class MessageDao extends AbstractDao<MessageEntity>{
 
 
 
+
+
     /**
      * Method to find messages grouped by sender.
      * @param id the id of the receiver.
@@ -60,12 +63,33 @@ public class MessageDao extends AbstractDao<MessageEntity>{
                     .getResultList();
             Set<UserEntity> allUsers = new HashSet<>(sentMessagesUsers);
             allUsers.addAll(receivedMessagesUsers);
+
             return new ArrayList<>(allUsers);
         } catch (Exception e) {
             return null;
         }
     }
 
+    public List<UserEntity> findUsersWithExchangedMessages(long userId) {
+        try {
+            // Buscar todas as mensagens enviadas e recebidas pelo usuário
+            List<MessageEntity> messages = em.createQuery(
+                            "SELECT m FROM MessageEntity m WHERE m.sender.id = :userId OR m.receiver.id = :userId ORDER BY m.sendTimestamp DESC",
+                            MessageEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+
+            // Mapear as mensagens para uma lista de usuários
+            List<UserEntity> users = messages.stream()
+                    .map(m -> m.getSender().getId() == userId ? m.getReceiver() : m.getSender())
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            return users;
+        } catch (Exception e) {
+            return null;
+        }
+    }
     public List<MessageEntity> findMessagesByProject(long projectId) {
         try {
             List<MessageEntity> messageEntities = em.createNamedQuery("Message.findMessagesByProject").setParameter("projectId", projectId).getResultList();

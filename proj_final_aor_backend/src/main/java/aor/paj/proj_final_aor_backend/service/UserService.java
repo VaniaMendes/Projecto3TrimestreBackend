@@ -239,6 +239,36 @@ public class UserService {
 
 
     @PUT
+    @Path("/{userId}/visibility")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateVisibility(@HeaderParam("token") String token, @PathParam("userId") int userId, @Context HttpServletRequest request) {
+
+        try {
+            // Authentication and authorization
+            User userLogged = userBean.getUserByToken(token);
+            if (userLogged == null || userLogged.getId() != userId) {
+                logger.warn("IP Address " + request.getRemoteAddr() + " - User not found: " + token + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();
+            }
+
+            // Update visibility
+            boolean isUpdated = userBean.updateVisibility(userId, !userLogged.isVisibilityState());
+            if (isUpdated) {
+                logger.info("IP Address: " + request.getRemoteAddr() + " - Visibility updated successfully for user: " + userId + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.OK).entity("Visibility updated").build();
+            } else {
+                logger.warn("IP Address " + request.getRemoteAddr() + " - Failed to update visibility for user: " + userId + " at " + LocalDateTime.now());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update visibility").build();
+            }
+        } catch (Exception e) {
+            logger.error("IP Address: " + request.getRemoteAddr() + " - Failed to update visibility for user: " + userId + " at " + LocalDateTime.now() + " - " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to update visibility").build();
+        }
+    }
+
+
+    @PUT
     @Path("/{userId}/biography")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -362,7 +392,7 @@ public class UserService {
     public Response getUserById(@HeaderParam("token") String token, @PathParam("userId") long userId) {
         User user = userBean.getUserByToken(token);
         if (user != null) {
-            MessageInfoUser userById = userBean.getInfoUserForMessage(userId);
+            User userById = userBean.getUserById(userId);
             if (userById != null) {
                 return Response.ok(userById).build();
             } else {

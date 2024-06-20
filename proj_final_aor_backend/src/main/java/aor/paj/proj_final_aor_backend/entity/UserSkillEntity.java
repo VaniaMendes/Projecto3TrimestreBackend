@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Table(name = "user_skill")
 @IdClass(UserSkillId.class)
 @NamedQuery(name = "UserSkillEntity.findAllUsersWithSkillAndActive", query = "SELECT u FROM UserSkillEntity u WHERE u.skill = :skill AND u.active = :active")
-@NamedQuery(name= "UserSkillEntity.findAllSkillsForUser", query = "SELECT u FROM UserSkillEntity u WHERE u.user = :user")
+@NamedQuery(name= "UserSkillEntity.findAllSkillsForUser", query = "SELECT u.skill FROM UserSkillEntity u WHERE u.user.id = :id AND u.active = true")
 @NamedQuery(name="UserSkillEntity.findUserSkill", query = "SELECT u FROM UserSkillEntity u WHERE u.user.id = :user AND u.skill.id = :skill")
 
 
