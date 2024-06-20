@@ -113,7 +113,7 @@ public class UserEntity implements Serializable {
     /**
      * Notifications of the user.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_notification",
             joinColumns = @JoinColumn(name = "receiver_id", referencedColumnName = "id"),
@@ -124,14 +124,14 @@ public class UserEntity implements Serializable {
      * Messages sent by the user.
      */
 
-    @OneToMany(mappedBy = "sender")
-    private Set<MessageEntity> messagesSent;
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private Set<MessageEntity> messagesSent = new HashSet<>();
 
     /**
      * Messages received by the user.
      */
-    @OneToMany(mappedBy = "receiver")
-    private Set<MessageEntity> messagesReceived;
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<MessageEntity> messagesReceived = new HashSet<>();
 
     /**
      * Sessions of the user.
@@ -148,7 +148,7 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "lab_id", referencedColumnName = "id")
     private LabEntity lab;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserProjectEntity> projects;
 
     @OneToOne(mappedBy = "user")
@@ -162,6 +162,11 @@ public class UserEntity implements Serializable {
      * Default constructor for the UserEntity class.
      */
     public UserEntity() {
+        this.interests = new HashSet<>();
+        this.skills = new HashSet<>();
+        this.notifications = new HashSet<>();
+        this.messagesSent = new HashSet<>();
+        this.messagesReceived = new HashSet<>();
     }
 
     /**

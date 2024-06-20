@@ -72,7 +72,7 @@ public class MessageEntity implements Serializable {
     /**
      * Group Receiver of the message
      */
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name="receiver_project_id", referencedColumnName="project_id")
     })
@@ -82,6 +82,7 @@ public class MessageEntity implements Serializable {
     /**
      * Default constructor for the MessageEntity class.
      */
+    public MessageEntity() {}
 
     public long getId() {
         return id;

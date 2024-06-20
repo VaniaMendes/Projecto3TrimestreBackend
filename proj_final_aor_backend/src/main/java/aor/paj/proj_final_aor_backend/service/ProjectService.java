@@ -346,7 +346,7 @@ public class ProjectService {
         String ip = request.getRemoteAddr();
         logger.info("Received request to remove user from project from IP: " + ip);
 
-        if (userProjectBean.removeUserFromProject(userId, projectId, token)){
+        if (projectBean.removeUser(userId, projectId, token)){
             logger.info("User removed from Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("User removed successfully").build();
         } else {
