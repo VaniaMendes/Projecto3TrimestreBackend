@@ -7,5 +7,6 @@ public enum NotificationType {
     PROJECT_STATE_CHANGE,
     MESSAGE_PROJECT,
     NEW_MEMBER,
+    MEMBER_EXIT
 
 }

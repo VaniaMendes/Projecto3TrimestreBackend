@@ -321,7 +321,6 @@ public class UserService {
     }
 
 
-
     @GET
     @Path("/{id}/projects/count")
     @Produces(MediaType.APPLICATION_JSON)
@@ -371,6 +370,24 @@ public class UserService {
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Unauthorized access").build();
         }
+    }
+
+    @GET
+    @Path("/profile/{userId}/project/{projectId}/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserProjectStatus(@HeaderParam("token") String token,
+                                         @PathParam("userId") Long userId,
+                                         @PathParam("projectId") Long projectId) {
+        String ip = request.getRemoteAddr();
+        User user = userBean.getUserByToken(token);
+        if(user == null ){
+            logger.warn("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        logger.info("Received request to get user project status by user id and project id from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(userProjectBean.getUserProject(userId, projectId)).build();
     }
 }
 

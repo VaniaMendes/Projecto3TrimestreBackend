@@ -34,7 +34,7 @@ import java.util.Set;
 
 @NamedQuery(name = "UserProject.findUserInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.user.id = :userId")
 @NamedQuery(name = "UserProject.findUsersNotApprovedInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.approved = false")
-@NamedQuery(name = "UserProject.findAvailableUsersForProject", query = "SELECT u FROM UserEntity u WHERE u.id NOT IN (SELECT up.user.id FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.exited = false) AND u.activeState = true")
+@NamedQuery(name = "UserProject.findAvailableUsersForProject", query = "SELECT u FROM UserEntity u WHERE u.id NOT IN (SELECT up.user.id FROM UserProjectEntity up WHERE up.project.id = :projectId) AND u.activeState = true")
 @NamedQuery(name = "UserProject.countActiveUsersByProjectId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
@@ -48,7 +48,7 @@ public class UserProjectEntity implements Serializable {
 
     // Represents the user associated with this UserProjectEntity
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
@@ -76,13 +76,12 @@ public class UserProjectEntity implements Serializable {
     private LocalDateTime leftAt;
 
     // Represents the messages received by the user in the project
-    @OneToMany(mappedBy = "receiverGroup")
+    @OneToMany(mappedBy = "receiverGroup", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<MessageEntity> messagesReceived = new HashSet<>();
 
     // Default constructor
     public UserProjectEntity() {
     }
-
     /**
      * Returns the project associated with this UserProjectEntity.
      *

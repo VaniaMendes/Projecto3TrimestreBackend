@@ -272,7 +272,12 @@ public class ProjectBean implements Serializable {
             projectDao.merge(projectEntity);
         }
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+        if (userType == UserTypeInProject.CANDIDATE){
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_CANDIDATE, author);
+        }else {
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+        }
+
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
 
         logger.info("User with id: " + userEntity.getId() + " added to project: " + projectEntity.getName() + " by user with id: " + author.getId());
@@ -299,6 +304,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
+        cloneMessageEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -316,6 +322,33 @@ public class ProjectBean implements Serializable {
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
 
         logger.info("User with id: " + userId + " approved in project: " + projectEntity.getName() + " by user with id: " + author.getId());
+
+        return true;
+    }
+
+    public boolean removeUser(Long userId, Long projectId, String token) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return false;
+        }
+        cloneMessageEntities(projectEntity);
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
+        if (!userProjectBean.removeUserFromProject(userId, projectId)){
+            return false;
+        }
+
+        projectEntity.setUpdatedAt(LocalDateTime.now());
+        projectDao.merge(projectEntity);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.REMOVED_MEMBER, author);
+        notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.MEMBER_EXIT), projectEntity.getName());
+
+        logger.info("User with id: " + userId + " removed from project: " + projectEntity.getName() + " by user with id: " + author.getId());
 
         return true;
     }
@@ -1033,7 +1066,7 @@ public class ProjectBean implements Serializable {
         }
     }
 
-    private void cloneMessageEntities(ProjectEntity project) {
+    public void cloneMessageEntities(ProjectEntity project) {
         Set<UserProjectEntity> userProjects = project.getUserProjects();
         for (UserProjectEntity userProject : userProjects) {
             Set<MessageEntity> originalMessages = userProject.getMessagesReceived();

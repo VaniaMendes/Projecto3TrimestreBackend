@@ -103,19 +103,13 @@ public class UserProjectBean implements Serializable {
      * Method to remove a user from a project.
      * @param userId The ID of the user to be removed.
      * @param projectId The ID of the project from which the user is to be removed.
-     * @param token The token of the user who is removing the user from the project.
      * @return boolean value indicating whether the user was successfully removed from the project.
      */
-    public boolean removeUserFromProject(Long userId, Long projectId, String token) {
+    public boolean removeUserFromProject(Long userId, Long projectId) {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
         // If the user does not exist in the project or is the creator of the project, return false
         if (!userProjectExists(userId, projectId) || isCreator(userId, projectId)) {
-            return false;
-        }
-
-        UserEntity author = sessionDao.findUserByToken(token);
-        if (author == null) {
             return false;
         }
 
@@ -124,11 +118,9 @@ public class UserProjectBean implements Serializable {
         userProjectEntity.setUserType(UserTypeInProject.EXITED);
         userProjectEntity.setLeftAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectBean.findProject(projectId), ProjectActivityType.REMOVED_MEMBER, author);
-
         userProjectDao.merge(userProjectEntity);
 
-        logger.info("User with ID '" + userId + "' removed from Project with ID '" + projectId + "' by User with ID '" + author.getId() + "'");
+        logger.info("User with ID '" + userId + "' removed from Project with ID '" + projectId + "' by User with ID '");
         return true;
     }
 
@@ -197,6 +189,15 @@ public class UserProjectBean implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public UserProject getUserProject(Long userId, Long projectId) {
+        UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
+
+        if(userProjectEntity != null){
+            return convertToDTO(userProjectEntity);
+        }
+        return null;
     }
 
     /**
