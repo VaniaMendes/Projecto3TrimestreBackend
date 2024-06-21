@@ -325,6 +325,16 @@ public class ProjectService {
                                      @PathParam("userType") String userType,
                                      @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
         logger.info("Received request to add user to project from IP: " + ip);
 
         if (projectBean.addUser(projectId, userId, UserTypeInProject.valueOf(userType), token)){
@@ -344,6 +354,16 @@ public class ProjectService {
                                           @PathParam("userId") long userId,
                                           @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
         logger.info("Received request to remove user from project from IP: " + ip);
 
         if (projectBean.removeUser(userId, projectId, token)){
@@ -365,6 +385,16 @@ public class ProjectService {
                                          @PathParam("userType") String userType,
                                          @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
         logger.info("Received request to approve user in project from IP: " + ip);
 
         if (projectBean.approveUser(userId, projectId, UserTypeInProject.valueOf(userType), token)){
@@ -382,12 +412,23 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserTypeInProject(@PathParam("id") long projectId,
-                                           @PathParam("userId") long userId,
-                                           @PathParam("userType") String userType) {
+                                            @PathParam("userId") long userId,
+                                            @PathParam("userType") String userType,
+                                            @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
         logger.info("Received request to update user type in project from IP: " + ip);
 
-        if (userProjectBean.updateUserTypeInProject(userId, projectId, UserTypeInProject.valueOf(userType))){
+        if (projectBean.updateUserRole(userId, projectId, UserTypeInProject.valueOf(userType), token)){
             logger.info("User type updated in Project with id '" + projectId + "' successfully");
             return Response.status(Response.Status.OK).entity("User type updated successfully").build();
         } else {

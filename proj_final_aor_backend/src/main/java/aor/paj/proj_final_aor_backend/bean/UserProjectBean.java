@@ -162,7 +162,7 @@ public class UserProjectBean implements Serializable {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
         // If the user does not exist in the project, return false
-        if (userProjectEntity == null || userProjectEntity.isExited() || isCreator(userId, projectId)) {
+        if (userProjectEntity == null || userProjectEntity.isExited() || isCreator(userId, projectId) || userProjectEntity.getUserType().equals(userType)) {
             logger.warn("Cannot update user type in Project as user does not exist in Project, has exited the Project or is the Creator");
             return false;
         }
