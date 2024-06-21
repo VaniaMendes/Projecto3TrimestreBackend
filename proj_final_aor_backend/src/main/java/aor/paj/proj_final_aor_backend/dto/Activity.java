@@ -33,6 +33,9 @@ public class Activity {
     @XmlElement
     private IdAndNameDTO project;
 
+    @XmlElement
+    private String observation;
+
     // Default constructor
     public Activity() {
     }
@@ -116,5 +119,13 @@ public class Activity {
      */
     public void setProject(IdAndNameDTO project) {
         this.project = project;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 }

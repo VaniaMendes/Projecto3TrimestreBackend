@@ -179,6 +179,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
+        cloneMessageEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -188,7 +189,9 @@ public class ProjectBean implements Serializable {
         projectEntity.setStateId(stateId);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author);
+        String newState = getStateNameFromId(stateId);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author, newState);
 
         projectDao.merge(projectEntity);
         String type = String.valueOf(NotificationType.PROJECT_STATE_CHANGE);
@@ -223,7 +226,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author, null);
 
         projectDao.merge(projectEntity);
 
@@ -273,9 +276,9 @@ public class ProjectBean implements Serializable {
         }
 
         if (userType == UserTypeInProject.CANDIDATE){
-            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_CANDIDATE, author);
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_CANDIDATE, author, author.getFirstName() + " " + author.getLastName() + userEntity.getFirstName() + " " + userEntity.getLastName());
         }else {
-            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author, userEntity.getFirstName() + " " + userEntity.getLastName());
         }
 
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
@@ -318,7 +321,7 @@ public class ProjectBean implements Serializable {
 
         projectDao.merge(projectEntity);
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author, userDao.findUserById(userId).getFirstName() + " " + userDao.findUserById(userId).getLastName());
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
 
         logger.info("User with id: " + userId + " approved in project: " + projectEntity.getName() + " by user with id: " + author.getId());
@@ -345,7 +348,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setUpdatedAt(LocalDateTime.now());
         projectDao.merge(projectEntity);
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.REMOVED_MEMBER, author);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.REMOVED_MEMBER, author, userDao.findUserById(userId).getFirstName() + " " + userDao.findUserById(userId).getLastName());
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.MEMBER_EXIT), projectEntity.getName());
 
         logger.info("User with id: " + userId + " removed from project: " + projectEntity.getName() + " by user with id: " + author.getId());

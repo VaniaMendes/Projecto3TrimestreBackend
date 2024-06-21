@@ -37,12 +37,13 @@ public class ActivityBean implements Serializable {
         this.activityDao = activityDao;
     }
 
-    public void registerActivity(ProjectEntity projectEntity, ProjectActivityType type, UserEntity author) {
+    public void registerActivity(ProjectEntity projectEntity, ProjectActivityType type, UserEntity author, String observation) {
         ActivityEntity activityEntity = new ActivityEntity();
 
         activityEntity.setType(type);
         activityEntity.setAuthor(author);
         activityEntity.setProject(projectEntity);
+        activityEntity.setObservation(observation);
 
         activityDao.persist(activityEntity);
     }
@@ -61,6 +62,7 @@ public class ActivityBean implements Serializable {
         activityEntity.setId(activity.getId());
         activityEntity.setCreatedAt(activity.getCreatedAt());
         activityEntity.setType(activity.getType());
+        activityEntity.setObservation(activity.getObservation());
         return activityEntity;
     }
 
@@ -71,6 +73,7 @@ public class ActivityBean implements Serializable {
         activity.setType(activityEntity.getType());
         activity.setAuthor(convertToDTOAuthorInfo(userBean.findUserById(activityEntity.getAuthor().getId())));
         activity.setProject(convertToDTOProjectInfo(activityEntity.getProject()));
+        activity.setObservation(activityEntity.getObservation());
         return activity;
     }
 

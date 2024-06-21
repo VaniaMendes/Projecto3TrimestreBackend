@@ -36,6 +36,9 @@ public class ActivityEntity implements Serializable {
     @Column(name = "type", nullable = false, unique = false, updatable = false)
     private ProjectActivityType type;
 
+    @Column(name = "observation", nullable = true, unique = false, updatable = true)
+    private String observation;
+
     // Author of the activity
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "id")
@@ -134,5 +137,13 @@ public class ActivityEntity implements Serializable {
      */
     public void setProject(ProjectEntity project) {
         this.project = project;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 }
