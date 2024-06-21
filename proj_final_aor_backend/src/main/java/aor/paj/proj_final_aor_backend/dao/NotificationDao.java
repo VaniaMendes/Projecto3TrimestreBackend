@@ -96,16 +96,22 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
 
     public int numberOfnotificationsByUserID(long userId) {
         try {
-            Long count = em.createNamedQuery("Notification.numberOfnotificationsByUserID", Long.class)
+            // Contar todas as notificações que não são do tipo MESSAGE_RECEIVED
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countNonMessageReceivedByUserID", Long.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
-            return count.intValue();
-        } catch (Exception e) {
 
+            // Contar os remetentes distintos das notificações do tipo MESSAGE_RECEIVED
+            Long countDistinctMessageReceivedSenders = em.createNamedQuery("Notification.countDistinctMessageReceivedSendersByUserID", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Somar os resultados
+            return countNonMessageReceived.intValue() + countDistinctMessageReceivedSenders.intValue();
+        } catch (Exception e) {
             throw new RuntimeException("Error counting notifications", e);
         }
     }
-
 
     public List<NotificationEntity>findNotificationsByUserIDandType(long userId, String type) {
         return em.createNamedQuery("Notification.findNotificationsByUserIDandType", NotificationEntity.class)

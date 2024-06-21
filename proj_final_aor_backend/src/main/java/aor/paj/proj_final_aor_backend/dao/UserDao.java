@@ -78,10 +78,11 @@ public class UserDao extends AbstractDao<UserEntity> {
      * @param prefix the firstName or the lastName of the user to find.
      * @return a list of users with the given firstName or lastName, or null if no users are found.
      */
-    public List<UserEntity> findUsersByFirstNameStartingWith(String prefix) {
+    public List<UserEntity> findUsersByFirstNameStartingWith(long userId, String prefix) {
         try {
             return em.createNamedQuery("User.findUserByNameStartingWith", UserEntity.class)
                     .setParameter("prefix", prefix + "%")
+                    .setParameter("userId", userId)
                     .getResultList();
         } catch (NoResultException e) {
             return null;

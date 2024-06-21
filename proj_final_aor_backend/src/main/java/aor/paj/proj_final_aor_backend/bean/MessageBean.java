@@ -266,6 +266,29 @@ public class MessageBean implements Serializable {
         return users;
     }
 
+    public boolean markMessageAsRead(String token, long messageId) {
+        UserEntity user = sessionDao.findUserByToken(token);
+        System.out.println(user.getId());
+        if (user == null) {
+            logger.error("User not found");
+            return false;
+        }
+        MessageEntity message = messageDao.findMessageById(messageId);
+        System.out.println(messageId);
+        if (message == null) {
+            logger.error("Message not found");
+            return false;
+        }
+        if (message.getReceiver().getId() != user.getId()) {
+            logger.error("User not receiver of message");
+            return false;
+        }
+        message.setReadStatus(true);
+        message.setReadTimestamp(LocalDateTime.now());
+        messageDao.updateMessage(message);
+        return true;
+    }
+
 
     /**
      * This method is used to convert a message entity to a message DTO.

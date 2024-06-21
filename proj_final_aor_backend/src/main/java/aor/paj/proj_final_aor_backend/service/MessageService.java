@@ -180,5 +180,27 @@ public class MessageService {
         int pageCount = (count + 3) / 4; // 4 messages per page
         return Response.status(Response.Status.OK).entity(pageCount).build();
     }
+
+    @PUT
+    @Path("/{messageId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response markMessageAsRead(@HeaderParam("token") String token, @PathParam("messageId") long messageId){
+        logger.info("Received request to mark message with id: " + messageId + " as read");
+        try {
+            boolean updated = messageBean.markMessageAsRead(token, messageId);
+
+            if(updated) {
+                logger.info("Message marked as read successfully");
+                return Response.status(Response.Status.OK).entity("Message marked as read successfully").build();
+            } else {
+                logger.error("Error marking message as read");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error marking message as read").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error marking message as read: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
 }
 

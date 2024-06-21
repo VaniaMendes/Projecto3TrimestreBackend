@@ -370,7 +370,7 @@ public class UserService {
         if (token != null) {
             User user = userBean.getUserByToken(token);
             if (user != null) {
-                List<User> users = userBean.getUsersByFirstName(prefix);
+                List<User> users = userBean.getUsersByFirstName(token,prefix);
                 if (users != null && !users.isEmpty()) {
                     return Response.ok(users).build();
                 } else {

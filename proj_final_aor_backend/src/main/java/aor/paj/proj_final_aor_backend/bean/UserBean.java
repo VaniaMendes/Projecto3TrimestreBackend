@@ -588,17 +588,17 @@ public class UserBean implements Serializable {
         }
     }
 
-    public List<User> getUsersByFirstName(String prefix) {
+    public List<User> getUsersByFirstName(String token, String prefix) {
+
+        UserEntity userRequested = sessionDao.findUserByToken(token);
         List<User> users = new ArrayList<>();
-        List<UserEntity> userEntities = userDao.findUsersByFirstNameStartingWith(prefix);
+        List<UserEntity> userEntities = userDao.findUsersByFirstNameStartingWith(userRequested.getId(),prefix);
 
         if(userEntities != null){
             for(UserEntity userEntity : userEntities){
                 User user = convertUserEntityToDto(userEntity);
-
-                    if (user.isActiveState()) {
                         users.add(user);
-                    }
+
                 }
         }
 

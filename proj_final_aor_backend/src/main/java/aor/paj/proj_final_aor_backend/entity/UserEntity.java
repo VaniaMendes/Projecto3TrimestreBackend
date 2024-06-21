@@ -19,7 +19,7 @@ import java.util.Set;
 @NamedQuery(name="User.findUserById", query = "SELECT u FROM UserEntity u WHERE u.id = :id")
 @NamedQuery(name = "User.findUserByEmail", query = "SELECT u FROM UserEntity u WHERE u.email = :email")
 @NamedQuery(name = "User.findAllAtiveUsers", query = "SELECT u FROM UserEntity u WHERE u.activeState = true ORDER BY u.firstName")
-@NamedQuery(name="User.findUserByNameStartingWith", query = "SELECT u FROM UserEntity u WHERE LOWER (u.firstName) LIKE LOWER (:prefix) OR LOWER (u.lastName) LIKE LOWER (:prefix)")
+@NamedQuery(name="User.findUserByNameStartingWith", query = "SELECT u FROM UserEntity u WHERE u.id != :userId AND u.activeState=true AND (LOWER (u.firstName) LIKE LOWER (:prefix) OR LOWER (u.lastName) LIKE LOWER (:prefix)OR LOWER (u.nickname) LIKE LOWER (:prefix))")
 @NamedQuery(name = "User.findSkillsByUserId", query = "SELECT u.skills FROM UserEntity u WHERE u.id = :id")
 @NamedQuery(name = "User.findInterestsByUserId", query = "SELECT u.interests FROM UserEntity u WHERE u.id = :id")
 @NamedQuery(name = "User.findUserByNickname", query = "SELECT u FROM UserEntity u WHERE u.nickname = :nickname")
@@ -75,7 +75,7 @@ public class UserEntity implements Serializable {
     /**
      * Biography of the user.
      */
-    @Column(name = "biography")
+    @Column(name = "biography", length = 1000)
     private String biography;
 
     /**

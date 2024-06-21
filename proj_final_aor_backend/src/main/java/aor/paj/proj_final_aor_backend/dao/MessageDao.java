@@ -99,6 +99,14 @@ public class MessageDao extends AbstractDao<MessageEntity>{
         }
     }
 
+    public MessageEntity findMessageById(long id) {
+        return em.find(MessageEntity.class, id);
+    }
+
+    public void updateMessage(MessageEntity message) {
+        em.merge(message);
+    }
+
     /**
      * Method to create a new message.
      * It uses the entity manager to persist the message in the database.

@@ -52,7 +52,6 @@ public class Notifier {
         }
     }
 
-
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
         logger.warn("Sessio close with reason  " + closeReason.getCloseCode() + ": " + closeReason.getReasonPhrase());
@@ -70,9 +69,6 @@ public class Notifier {
             sessions.remove(sessionId);
         }
     }
-
-
-
 
 
 

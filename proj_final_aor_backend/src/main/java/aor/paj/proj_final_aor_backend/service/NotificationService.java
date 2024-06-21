@@ -35,24 +35,25 @@ public class NotificationService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getNotifications(@HeaderParam("token") String token, @PathParam("userId") long userId,
-                                     @QueryParam("page") @DefaultValue("1") int page , @Context HttpServletRequest request){
+                                     @QueryParam("page") @DefaultValue("1") int page, @Context HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         logger.debug("Received request to get notifications for user with id: " + userId);
         try {
             List<Notification> notifications = notificationBean.getNotificationsByUserId(token, userId, page, 6);
 
-            if(notifications != null) {
-                logger.info("IP Adress " + ip + "Notifications retrieved successfully by the user with the id" + userId);
+            if (notifications != null) {
+                logger.info("IP Address " + ip + ": Notifications retrieved successfully for user with id " + userId);
                 return Response.status(Response.Status.OK).entity(notifications).build();
             } else {
-                logger.error("IP Adress " + ip + " Error retrieving notifications");
+                logger.error("IP Address " + ip + ": Error retrieving notifications for user with id " + userId);
                 return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving notifications").build();
             }
         } catch (Exception e) {
-            logger.error("IP Adress " + ip + "Error retrieving notifications: " + e.getMessage());
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            logger.error("IP Address " + ip + ": Error retrieving notifications for user with id " + userId + ": " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error retrieving notifications: " + e.getMessage()).build();
         }
     }
+
 
     @PUT
     @Path("/{notificationId}")
@@ -98,7 +99,6 @@ public class NotificationService {
         }
     }
 
-
     @GET
     @Path("/pageCount")
     @Produces(MediaType.APPLICATION_JSON)
@@ -115,6 +115,7 @@ public class NotificationService {
 
         try {
             int totalCount = notificationBean.getNumberofNotification(user.getId());
+            System.out.println("Total count: " + totalCount);
             int pageCount = (int) Math.ceil((double) totalCount / 6); // 6 notifications per page
             logger.info("IP Address " + ip + " Page count of notifications retrieved successfully: " + pageCount);
             return Response.status(Response.Status.OK).entity(pageCount).build();
