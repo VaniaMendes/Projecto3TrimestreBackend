@@ -95,7 +95,7 @@ public class UserProjectBean implements Serializable {
 
         // Persist the UserProjectEntity instance
         userProjectDao.persist(userProjectEntity);
-        logger.info("User added to Project");
+        logger.info("User with ID '" + userEntity.getId() + "' added to Project with ID '" + projectEntity.getId() + "'");
         return true;
     }
 
@@ -103,19 +103,13 @@ public class UserProjectBean implements Serializable {
      * Method to remove a user from a project.
      * @param userId The ID of the user to be removed.
      * @param projectId The ID of the project from which the user is to be removed.
-     * @param token The token of the user who is removing the user from the project.
      * @return boolean value indicating whether the user was successfully removed from the project.
      */
-    public boolean removeUserFromProject(Long userId, Long projectId, String token) {
+    public boolean removeUserFromProject(Long userId, Long projectId) {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
         // If the user does not exist in the project or is the creator of the project, return false
         if (!userProjectExists(userId, projectId) || isCreator(userId, projectId)) {
-            return false;
-        }
-
-        UserEntity author = sessionDao.findUserByToken(token);
-        if (author == null) {
             return false;
         }
 
@@ -124,11 +118,9 @@ public class UserProjectBean implements Serializable {
         userProjectEntity.setUserType(UserTypeInProject.EXITED);
         userProjectEntity.setLeftAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectBean.findProject(projectId), ProjectActivityType.REMOVED_MEMBER, author);
-
         userProjectDao.merge(userProjectEntity);
 
-        logger.info("User with ID '" + userId + "' removed from Project with ID '" + projectId + "' by User with ID '" + author.getId() + "'");
+        logger.info("User with ID '" + userId + "' removed from Project with ID '" + projectId + "' by User with ID '");
         return true;
     }
 
@@ -170,7 +162,7 @@ public class UserProjectBean implements Serializable {
         UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
 
         // If the user does not exist in the project, return false
-        if (userProjectEntity == null || userProjectEntity.isExited() || isCreator(userId, projectId)) {
+        if (userProjectEntity == null || userProjectEntity.isExited() || isCreator(userId, projectId) || userProjectEntity.getUserType().equals(userType)) {
             logger.warn("Cannot update user type in Project as user does not exist in Project, has exited the Project or is the Creator");
             return false;
         }
@@ -199,6 +191,15 @@ public class UserProjectBean implements Serializable {
         return false;
     }
 
+    public UserProject getUserProject(Long userId, Long projectId) {
+        UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
+
+        if(userProjectEntity != null){
+            return convertToDTO(userProjectEntity);
+        }
+        return null;
+    }
+
     /**
      * Method to check if a user is the creator of a project.
      * @param userId The ID of the user to be checked.
@@ -215,6 +216,43 @@ public class UserProjectBean implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Retrieves a list of users who are not approved in a specific project.
+     *
+     * This method first retrieves a list of UserEntity objects associated with the provided project ID
+     * who are not approved. It then iterates over each UserEntity, converts it to a User DTO object,
+     * and adds it to a list. The list of User DTO objects is then returned.
+     *
+     * @param projectId The ID of the project for which to retrieve the non-approved users.
+     * @return A list of User DTO objects representing the non-approved users in the specified project.
+     */
+    public List<UserInfoInProject> getAllUsersNotApprovedInProject(Long projectId) {
+        List<UserProjectEntity> userProjectEntities = userProjectDao.findUsersNotApprovedInProject(projectId);
+        List<UserInfoInProject> users = new ArrayList<>();
+        for (UserProjectEntity userProjectEntity : userProjectEntities) {
+            users.add(userBean.convertToDTO(userProjectEntity.getUser()));
+        }
+        return users;
+    }
+    /**
+     * Retrieves a list of users who are available for a specific project.
+     *
+     * This method first retrieves a list of UserEntity objects who are available for the provided project ID.
+     * It then iterates over each UserEntity, converts it to a User DTO object, and adds it to a list.
+     * The list of User DTO objects is then returned.
+     *
+     * @param projectId The ID of the project for which to retrieve the available users.
+     * @return A list of User DTO objects representing the available users for the specified project.
+     */
+    public List<UserInfoInProject> getAllUsersAvailableForProject(Long projectId) {
+        List<UserEntity> userEntities = userProjectDao.findAvailableUsersForProject(projectId);
+        List<UserInfoInProject> users = new ArrayList<>();
+        for (UserEntity userEntity : userEntities) {
+            users.add(userBean.convertToDTO(userEntity));
+        }
+        return users;
     }
 
     /**
@@ -246,7 +284,7 @@ public class UserProjectBean implements Serializable {
         List<UserInfoInProject> users = new ArrayList<>();
         for (UserProjectEntity userProjectEntity : userProjectEntities) {
             UserEntity userEntity = userProjectEntity.getUser();
-            users.add(userBean.convertToDTO(userEntity, userProjectEntity.getUserType()));
+            users.add(userBean.convertToDTOWithType(userEntity, userProjectEntity.getUserType()));
         }
         return users;
     }

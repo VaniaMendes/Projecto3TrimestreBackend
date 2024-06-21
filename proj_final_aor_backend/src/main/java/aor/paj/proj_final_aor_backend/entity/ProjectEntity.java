@@ -86,7 +86,7 @@ public class ProjectEntity implements Serializable {
     private String name;
 
     // Description of the project
-    @Column(name = "description", length = 500)
+    @Column(name = "description", length = 1000)
     private String description;
 
     // Date and time when the project was created
@@ -153,6 +153,26 @@ public class ProjectEntity implements Serializable {
      * Default constructor for the ProjectEntity class.
      */
     public ProjectEntity() {
+    }
+
+    public ProjectEntity(ProjectEntity other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.description = other.description;
+        this.createdAt = other.createdAt;
+        this.updatedAt = other.updatedAt;
+        this.initialDate = other.initialDate;
+        this.conclusionDate = other.conclusionDate;
+        this.stateId = other.stateId;
+        this.keywords = other.keywords;
+        this.maxMembers = other.maxMembers;
+        this.needs = other.needs;
+        this.activities = new HashSet<>(other.activities);
+        this.lab = other.lab;
+        this.resources = new HashSet<>(other.resources);
+        this.tasks = new HashSet<>(other.tasks);
+        this.userProjects = new HashSet<>(other.userProjects);
+        this.projectSkill = new HashSet<>(other.projectSkill);
     }
 
     // Getter and setter methods for all the properties

@@ -606,7 +606,7 @@ public class UserBean implements Serializable {
     }
 
     public List<UserEntity> getAllUsers(){
-        return userDao.findAllAtiveUsers();
+        return userDao.findAllActiveUsers();
     }
 
     public UserEntity findUserById(long id) {
@@ -665,13 +665,22 @@ public class UserBean implements Serializable {
         return user;
     }
 
-    public UserInfoInProject convertToDTO(UserEntity userEntity, UserTypeInProject userTypeInProject) {
+    public UserInfoInProject convertToDTOWithType(UserEntity userEntity, UserTypeInProject userTypeInProject) {
         UserInfoInProject userInfoInProject = new UserInfoInProject();
         userInfoInProject.setUserId(userEntity.getId());
         userInfoInProject.setFirstName(userEntity.getFirstName());
         userInfoInProject.setLastName(userEntity.getLastName());
         userInfoInProject.setPhoto(userEntity.getPhoto());
         userInfoInProject.setUserType(userTypeInProject);
+        return userInfoInProject;
+    }
+
+    public UserInfoInProject convertToDTO(UserEntity userEntity) {
+        UserInfoInProject userInfoInProject = new UserInfoInProject();
+        userInfoInProject.setUserId(userEntity.getId());
+        userInfoInProject.setFirstName(userEntity.getFirstName());
+        userInfoInProject.setLastName(userEntity.getLastName());
+        userInfoInProject.setPhoto(userEntity.getPhoto());
         return userInfoInProject;
     }
 

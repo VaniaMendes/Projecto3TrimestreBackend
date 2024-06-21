@@ -56,9 +56,9 @@ public class UserDao extends AbstractDao<UserEntity> {
      * It uses a named query "User.findAllAtiveUsers" to find all users with the activeState set to true.
      * @return a list of all active users, or null if no users are found.
      */
-    public List<UserEntity> findAllAtiveUsers (){
+    public List<UserEntity> findAllActiveUsers(){
         try{
-            return em.createNamedQuery("User.findAllAtiveUsers", UserEntity.class).getResultList();
+            return em.createNamedQuery("User.findAllActiveUsers", UserEntity.class).getResultList();
         }catch(NoResultException e){
             return null;
         }

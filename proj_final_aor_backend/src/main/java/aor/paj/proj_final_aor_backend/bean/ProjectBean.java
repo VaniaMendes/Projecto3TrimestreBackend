@@ -179,6 +179,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
+        cloneMessageEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -188,7 +189,9 @@ public class ProjectBean implements Serializable {
         projectEntity.setStateId(stateId);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author);
+        String newState = getStateNameFromId(stateId);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author, newState);
 
         projectDao.merge(projectEntity);
         String type = String.valueOf(NotificationType.PROJECT_STATE_CHANGE);
@@ -223,7 +226,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author, null);
 
         projectDao.merge(projectEntity);
 
@@ -265,13 +268,19 @@ public class ProjectBean implements Serializable {
         }
 
         userProjectBean.addUserToProject(userEntity, projectEntity, userType);
+        cloneMessageEntities(projectEntity);
 
         if (userType != UserTypeInProject.CANDIDATE) {
             projectEntity.setUpdatedAt(LocalDateTime.now());
             projectDao.merge(projectEntity);
         }
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+        if (userType == UserTypeInProject.CANDIDATE){
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_CANDIDATE, author, author.getFirstName() + " " + author.getLastName() + userEntity.getFirstName() + " " + userEntity.getLastName());
+        }else {
+            activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author, userEntity.getFirstName() + " " + userEntity.getLastName());
+        }
+
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
 
         logger.info("User with id: " + userEntity.getId() + " added to project: " + projectEntity.getName() + " by user with id: " + author.getId());
@@ -298,6 +307,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
+        cloneMessageEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -311,10 +321,77 @@ public class ProjectBean implements Serializable {
 
         projectDao.merge(projectEntity);
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_MEMBER, author, userDao.findUserById(userId).getFirstName() + " " + userDao.findUserById(userId).getLastName());
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getName());
 
         logger.info("User with id: " + userId + " approved in project: " + projectEntity.getName() + " by user with id: " + author.getId());
+
+        return true;
+    }
+
+    /**
+     * This method is used to remove a user from a project.
+     *
+     * It first retrieves the ProjectEntity and UserEntity (author) from the database using the provided IDs and token.
+     * If either entity does not exist, it returns false.
+     * If both entities exist, it attempts to remove the user from the project using the UserProjectBean.
+     * If the user removal is unsuccessful, it returns false.
+     * If the user removal is successful, it updates the project's update timestamp and merges the updated project entity back into the database.
+     * It then registers an activity of type REMOVED_MEMBER for the project, sends a notification of type MEMBER_EXIT to all users of the project,
+     * and logs the removal of the user from the project.
+     *
+     * @param userId The ID of the user to be removed from the project.
+     * @param projectId The ID of the project from which the user will be removed.
+     * @param token The token of the user removing the user from the project.
+     * @return true if the user was successfully removed from the project, false otherwise.
+     */
+    public boolean removeUser(Long userId, Long projectId, String token) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return false;
+        }
+        cloneMessageEntities(projectEntity);
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
+        if (!userProjectBean.removeUserFromProject(userId, projectId)){
+            return false;
+        }
+
+        projectEntity.setUpdatedAt(LocalDateTime.now());
+        projectDao.merge(projectEntity);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.REMOVED_MEMBER, author, userDao.findUserById(userId).getFirstName() + " " + userDao.findUserById(userId).getLastName());
+        notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.MEMBER_EXIT), projectEntity.getName());
+
+        logger.info("User with id: " + userId + " removed from project: " + projectEntity.getName() + " by user with id: " + author.getId());
+
+        return true;
+    }
+
+    public boolean updateUserRole(Long userId, Long projectId, UserTypeInProject userType, String token) {
+        ProjectEntity projectEntity = findProject(projectId);
+        if (projectEntity == null) {
+            return false;
+        }
+        cloneMessageEntities(projectEntity);
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
+            return false;
+        }
+
+        if (!userProjectBean.updateUserTypeInProject(userId, projectId, userType)) {
+            return false;
+        }
+
+        projectEntity.setUpdatedAt(LocalDateTime.now());
+        projectDao.merge(projectEntity);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.UPDATED_MEMBER_ROLE, author, userDao.findUserById(userId).getFirstName() + " " + userDao.findUserById(userId).getLastName());
 
         return true;
     }
@@ -377,6 +454,17 @@ public class ProjectBean implements Serializable {
     }
 
 
+    /**
+     * This method is used to update the active status of a skill associated with a project.
+     * It first retrieves the ProjectEntity and SkillEntity from the database using the provided IDs.
+     * If either entity does not exist, it returns false.
+     * If both entities exist, it updates the active status of the skill in the project using the ProjectSkillBean and returns true.
+     *
+     * @param projectId The ID of the project in which the skill's active status will be updated.
+     * @param skillId The ID of the skill whose active status will be updated.
+     * @param activeStatus The new active status to be set for the skill in the project.
+     * @return true if the active status was successfully updated, false otherwise.
+     */
     public boolean editSkillActiveStatus(Long projectId, Long skillId, boolean activeStatus) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
@@ -1032,7 +1120,7 @@ public class ProjectBean implements Serializable {
         }
     }
 
-    private void cloneMessageEntities(ProjectEntity project) {
+    public void cloneMessageEntities(ProjectEntity project) {
         Set<UserProjectEntity> userProjects = project.getUserProjects();
         for (UserProjectEntity userProject : userProjects) {
             Set<MessageEntity> originalMessages = userProject.getMessagesReceived();

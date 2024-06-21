@@ -1,8 +1,10 @@
 package aor.paj.proj_final_aor_backend.dao;
 
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
 import jakarta.ejb.Stateless;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Stateless
@@ -25,7 +27,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         try {
             return em.createNamedQuery("UserProject.findUserProjectByProjectId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -40,7 +42,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         try {
             return em.createNamedQuery("UserProject.findUserProjectByUserId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -55,7 +57,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         try {
             return em.createNamedQuery("UserProject.findActiveUsersByProjectId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -70,7 +72,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         try {
             return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserId", UserProjectEntity.class).setParameter("id", id).getResultList();
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -102,6 +104,39 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
             return em.createNamedQuery("UserProject.findUserInProject", UserProjectEntity.class).setParameter("projectId", projectId).setParameter("userId", userId).getSingleResult();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    /**
+     * Finds all UserEntity instances associated with a specific project ID that are not approved.
+     * This method uses a named query "UserProject.findUsersInProjectNotApproved" to find the UserEntity instances.
+     *
+     * @param projectId The ID of the project.
+     * @return A list of UserEntity instances associated with the specified project ID that are not approved.
+     * Returns an empty list if no match is found or an exception occurs.
+     */
+    public List<UserProjectEntity> findUsersNotApprovedInProject(Long projectId) {
+        try {
+            return em.createNamedQuery("UserProject.findUsersNotApprovedInProject", UserProjectEntity.class).setParameter("projectId", projectId).getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Finds all UserEntity instances that are available for a specific project.
+     * A user is considered available for a project if they are not currently associated with the project and have not exited from it.
+     * This method uses a named query "UserProject.findAvailableUsersForProject" to find the UserEntity instances.
+     *
+     * @param projectId The ID of the project.
+     * @return A list of UserEntity instances that are available for the specified project.
+     * Returns an empty list if no match is found or an exception occurs.
+     */
+    public List<UserEntity> findAvailableUsersForProject(Long projectId) {
+        try {
+            return em.createNamedQuery("UserProject.findAvailableUsersForProject", UserEntity.class).setParameter("projectId", projectId).getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 

@@ -3,6 +3,8 @@ package aor.paj.proj_final_aor_backend.dao;
 import aor.paj.proj_final_aor_backend.entity.SessionEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
+import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 
 @Stateless
 public class SessionDao extends AbstractDao<SessionEntity> {
@@ -37,13 +39,21 @@ public class SessionDao extends AbstractDao<SessionEntity> {
         }
     }
 
+    @Transactional
     public UserEntity findUserByToken(String token) {
         try {
-            return (UserEntity) em.createNamedQuery("Session.findUserByToken").setParameter("token", token).getSingleResult();
+            return em.createNamedQuery("Session.findUserByToken", UserEntity.class)
+                    .setParameter("token", token)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         } catch (Exception e) {
+            System.out.println("Error fetching user by token: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
+
 
     public void update(SessionEntity session) {
         em.merge(session);
