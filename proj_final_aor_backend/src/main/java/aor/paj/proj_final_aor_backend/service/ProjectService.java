@@ -492,7 +492,7 @@ public class ProjectService {
         String ip = request.getRemoteAddr();
 
         User user = userBean.getUserByToken(token);
-        if(user == null || user.getId() != userId){
+        if(user == null ){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }

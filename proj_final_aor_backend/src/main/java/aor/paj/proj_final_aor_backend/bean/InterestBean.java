@@ -105,10 +105,18 @@ public class InterestBean {
             return false;
         }
 
+        if(userHasInterestInactive(userId,interestId)){
+            UserInterestEntity userInterest = userInterestDao.findUserInterestByUserAndInterest(userId, interestId);
+            userInterest.setActive(true);
+            userInterestDao.updateUserInterest(userInterest);
+            return true;
+        }
+
         // Check if the user already has the interest associated
         if(userAlreadyHasInterest(userId,interestId)){
             return false;
         }
+
 
         // Associate the interest to the user
         UserInterestEntity userInterest = new UserInterestEntity();
@@ -143,6 +151,14 @@ public class InterestBean {
             return false;
         }
         return true;
+    }
+
+    public boolean userHasInterestInactive(long userId, long interestId){
+        UserInterestEntity interest = userInterestDao.findUserInterestByUserAndInterest(userId, interestId);
+        if (interest == null) {
+            return false;
+        }
+        return !interest.isActive();
     }
 
     /**

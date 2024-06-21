@@ -255,7 +255,7 @@ public class MessageBean implements Serializable {
             logger.debug("User not found");
             return null;
         }
-        List<UserEntity> listOfUsers = messageDao.findMessagesGroupedBySender(user.getId());
+        List<UserEntity> listOfUsers = messageDao.findUsersWithExchangedMessages(user.getId());
         List<MessageInfoUser> users = new ArrayList<>();
         if (listOfUsers != null && !listOfUsers.isEmpty()) {
             for (UserEntity userEntity : listOfUsers) {
@@ -264,6 +264,29 @@ public class MessageBean implements Serializable {
             }
         }
         return users;
+    }
+
+    public boolean markMessageAsRead(String token, long messageId) {
+        UserEntity user = sessionDao.findUserByToken(token);
+        System.out.println(user.getId());
+        if (user == null) {
+            logger.error("User not found");
+            return false;
+        }
+        MessageEntity message = messageDao.findMessageById(messageId);
+        System.out.println(messageId);
+        if (message == null) {
+            logger.error("Message not found");
+            return false;
+        }
+        if (message.getReceiver().getId() != user.getId()) {
+            logger.error("User not receiver of message");
+            return false;
+        }
+        message.setReadStatus(true);
+        message.setReadTimestamp(LocalDateTime.now());
+        messageDao.updateMessage(message);
+        return true;
     }
 
 
