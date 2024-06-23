@@ -544,6 +544,24 @@ public class UserBean implements Serializable {
         }
     }
 
+    public boolean updateVisibility(long userId, boolean visibility){
+        UserEntity userEntity = userDao.findUserById(userId);
+        if(userEntity == null){
+            logger.warn("User not found with ID: " + userEntity.getId());
+            return false;
+        }
+        userEntity.setVisibilityState(visibility);
+        try {
+            userDao.updateUser(userEntity);
+            logger.debug("User visibility updated successfully: " + userEntity.getId());
+            return true;
+        } catch (Exception e) {
+            logger.debug("Failed to update user visibility: " + userEntity.getId(), e);
+            return false;
+        }
+    }
+
+
     public boolean updateBiography (String biography, long userId){
         UserEntity userEntity = userDao.findUserById(userId);
 
@@ -570,17 +588,17 @@ public class UserBean implements Serializable {
         }
     }
 
-    public List<User> getUsersByFirstName(String prefix) {
+    public List<User> getUsersByFirstName(String token, String prefix) {
+
+        UserEntity userRequested = sessionDao.findUserByToken(token);
         List<User> users = new ArrayList<>();
-        List<UserEntity> userEntities = userDao.findUsersByFirstNameStartingWith(prefix);
+        List<UserEntity> userEntities = userDao.findUsersByFirstNameStartingWith(userRequested.getId(),prefix);
 
         if(userEntities != null){
             for(UserEntity userEntity : userEntities){
                 User user = convertUserEntityToDto(userEntity);
-
-                    if (user.isActiveState()) {
                         users.add(user);
-                    }
+
                 }
         }
 
@@ -628,6 +646,7 @@ public class UserBean implements Serializable {
         user.setLastName(userEntity.getLastName());
         user.setNickname(userEntity.getNickname());
         user.setPhoto(userEntity.getPhoto());
+        user.setVisibilityState(userEntity.isVisibilityState());
 
         Lab lab = new Lab();
         lab.setId(userEntity.getLab().getId());

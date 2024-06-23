@@ -16,17 +16,11 @@ public class UserSkillDao extends AbstractDao<UserSkillEntity>{
         super(UserSkillEntity.class);
     }
 
-    public List<UserEntity> findAllUsersWithSkill(long skillId) {
-        try {
-            return em.createNamedQuery("UserSkillEntity.findAllUsersWithSkill").setParameter("skill", skillId).getResultList();
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 
     public List<SkillEntity> findAllSkillsForUser(long userId) {
         try {
-            return em.createNamedQuery("UserSkillEntity.findAllSkillsForUser").setParameter("user", userId).getResultList();
+            return em.createNamedQuery("UserSkillEntity.findAllSkillsForUser").setParameter("id", userId).getResultList();
         } catch (Exception e) {
             return null;
         }

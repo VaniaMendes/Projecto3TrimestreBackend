@@ -237,7 +237,7 @@ public class NotificationBean implements Serializable {
         return notificationList;
     }
 
-    public List<Notification> getNotificationsByUserId(String token, long userId) {
+    public List<Notification> getNotificationsByUserId(String token, long userId, int page, int size) {
         UserEntity user = sessionDao.findUserByToken(token);
 
         if(user == null) {
@@ -245,7 +245,7 @@ public class NotificationBean implements Serializable {
             return null;
         }
 
-        List<NotificationEntity> notifications = notificationDao.findNotificationsByUserID(userId);
+        List<NotificationEntity> notifications = notificationDao.findNotificationsByUserID(userId, page, size);
 
         if(notifications == null || notifications.isEmpty()) {
             logger.error("No notifications found for user with id: " + userId);
@@ -266,6 +266,7 @@ public class NotificationBean implements Serializable {
             senderEntity.setId(notificationEntity.getSender_id());
             senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
             senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
+            senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
 
 
             MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
@@ -309,6 +310,10 @@ public class NotificationBean implements Serializable {
             }
         }
         return true;
+    }
+
+    public int getNumberofNotification(long userId) {
+        return notificationDao.numberOfnotificationsByUserID(userId);
     }
 
     public NotificationEntity convertDtoTOEntity(Notification notification, UserEntity sender) {

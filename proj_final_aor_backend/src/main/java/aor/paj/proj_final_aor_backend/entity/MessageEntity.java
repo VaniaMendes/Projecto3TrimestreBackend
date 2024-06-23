@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @NamedQuery(name = "Message.findSentMessagesUsers", query = "SELECT m.receiver FROM MessageEntity m WHERE m.sender.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name = "Message.findReceivedMessagesUsers", query = "SELECT m.sender FROM MessageEntity m WHERE m.receiver.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp DESC")
+
 public class MessageEntity implements Serializable {
 
     /**
@@ -52,7 +53,7 @@ public class MessageEntity implements Serializable {
     /**
      * Content of the message
      */
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 1000)
     private String content;
 
     /**

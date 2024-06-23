@@ -13,6 +13,7 @@ import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -62,8 +63,18 @@ public class SkillBean implements Serializable {
         return skillDao.findAllSkills();
     }
 
-    public List<SkillEntity>getSkillsByUserId(long userId){
-        return skillDao.findSkillsByUserId(userId);
+    public List<Skill>getSkillsByUserId(long userId){
+
+       List<SkillEntity> userActiveSkills = userSkillDao.findAllSkillsForUser(userId);
+       if(userActiveSkills == null){
+           return null;
+       }
+
+       List<Skill> userSkills = new ArrayList<>();
+       for(SkillEntity skill : userActiveSkills){
+           userSkills.add(convertToDTO(skill));
+       }
+       return userSkills;
     }
 
     /**
@@ -117,6 +128,14 @@ public class SkillBean implements Serializable {
         // Check if the user or the skill does not exist
         if (user == null || skill == null) {
             return false;
+        }
+
+        //Check if the skill is inactive
+        if(verifyskillIsInative(userId, skillId)){
+            UserSkillEntity userSkill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
+            userSkill.setActive(true);
+            userSkillDao.updateUserSkill(userSkill);
+            return true;
         }
         // Check if the user already has the skill associated
         if(verifySkillExists(userId, skillId)){
@@ -186,5 +205,13 @@ public class SkillBean implements Serializable {
         // Fetch the skill from the database
         UserSkillEntity skill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
         return skill != null;
+    }
+
+    public boolean verifyskillIsInative(Long userId, Long skillId){
+        UserSkillEntity skill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
+        if (skill == null) {
+            return false;
+        }
+        return !skill.isActive();
     }
 }

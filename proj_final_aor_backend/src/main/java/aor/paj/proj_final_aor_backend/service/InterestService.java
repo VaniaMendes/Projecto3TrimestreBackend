@@ -80,18 +80,18 @@ public class InterestService {
     }
 
     @PUT
-    @Path("/softDelete-user")
+    @Path("/{interestId}/users/{userId}/soft-delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeInterestfromUser(@HeaderParam("token") String token, @QueryParam("userId") Long userId,
-                                           @QueryParam("interestId") Long interestId, @Context HttpServletRequest request) {
+    public Response removeInterestfromUser(@HeaderParam("token") String token, @PathParam("userId") Long userId,
+                                           @PathParam("interestId") Long interestId, @Context HttpServletRequest request) {
 
         String ip = request.getRemoteAddr();
         logger.info("Received request to remove interest from user from IP: " + ip + "  by user with id: " + userId);
 
         // Authentication and authorization
         User user = userBean.getUserByToken(token);
-        if(user == null || user.getUserType().equals("ADMIN") || user.getId() != userId){
+        if(user == null || user.getId() != userId){
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }
@@ -137,7 +137,7 @@ public class InterestService {
 
         // Authentication and authorization
         User user = userBean.getUserByToken(token);
-        if (user == null || user.getId() != userId) {
+        if (user == null) {
             logger.error("User not found or unauthorized");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }

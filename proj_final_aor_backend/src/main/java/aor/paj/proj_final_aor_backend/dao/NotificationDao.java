@@ -50,43 +50,68 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
                 .setParameter("id", id)
                 .getResultList();
     }
-    public List<NotificationEntity> findNotificationsByUserID(long userId) {
+    public List<NotificationEntity> findNotificationsByUserID(long userId, int page, int size) {
         List<NotificationEntity> notifications = new ArrayList<>();
 
         try {
-            NotificationEntity latestMessageReceived = em.createNamedQuery("Notification.findMessageReceivedByUserID", NotificationEntity.class)
+            // Combine todas as notificações em uma única lista antes da paginação
+            List<NotificationEntity> allNotifications = new ArrayList<>();
+
+            // Obter notificações de mensagem recebida
+            allNotifications.addAll(em.createNamedQuery("Notification.findMessageReceivedByUserID", NotificationEntity.class)
                     .setParameter("userId", userId)
-                    .setMaxResults(1)
-                    .getSingleResult();
-            if (latestMessageReceived != null) {
-                notifications.add(latestMessageReceived);
+                    .getResultList());
+
+            // Obter notificações de novos projetos
+            allNotifications.addAll(em.createNamedQuery("Notification.findNewProjectByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList());
+
+            // Obter notificações de status do projeto
+            allNotifications.addAll(em.createNamedQuery("Notification.findProjectStatusByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList());
+
+            // Ordenar as notificações pela data de envio
+            allNotifications.sort((n1, n2) -> n2.getSendTimestamp().compareTo(n1.getSendTimestamp()));
+
+            // Aplicar paginação manualmente na lista combinada
+            int fromIndex = page * size;
+            int toIndex = Math.min(fromIndex + size, allNotifications.size());
+
+            if (fromIndex < toIndex) {
+                notifications = allNotifications.subList(fromIndex, toIndex);
             }
         } catch (Exception e) {
             // handle exception
+            e.printStackTrace();
         }
 
-        try {
-            List<NotificationEntity> newProjectNotifications = em.createNamedQuery("Notification.findNewProjectByUserID", NotificationEntity.class)
-                    .setParameter("userId", userId)
-                    .getResultList();
-            notifications.addAll(newProjectNotifications);
-        } catch (Exception e) {
-            // handle exception
-        }
-
-        try {
-            List<NotificationEntity> projectStatusNotifications = em.createNamedQuery("Notification.findProjectStatusByUserID", NotificationEntity.class)
-                    .setParameter("userId", userId)
-                    .getResultList();
-            notifications.addAll(projectStatusNotifications);
-        } catch (Exception e) {
-
-        }
-
-        notifications.sort((n1, n2) -> n2.getSendTimestamp().compareTo(n1.getSendTimestamp()));
         return notifications;
     }
 
+
+
+
+
+    public int numberOfnotificationsByUserID(long userId) {
+        try {
+            // Contar todas as notificações que não são do tipo MESSAGE_RECEIVED
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countNonMessageReceivedByUserID", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Contar os remetentes distintos das notificações do tipo MESSAGE_RECEIVED
+            Long countDistinctMessageReceivedSenders = em.createNamedQuery("Notification.countDistinctMessageReceivedSendersByUserID", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Somar os resultados
+            return countNonMessageReceived.intValue() + countDistinctMessageReceivedSenders.intValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting notifications", e);
+        }
+    }
 
     public List<NotificationEntity>findNotificationsByUserIDandType(long userId, String type) {
         return em.createNamedQuery("Notification.findNotificationsByUserIDandType", NotificationEntity.class)
