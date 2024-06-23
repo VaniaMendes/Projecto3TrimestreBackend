@@ -194,4 +194,12 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
         }
     }
 
+    public List<String> findAllBrands() {
+        try {
+            return em.createNamedQuery("Resource.findAllBrands").getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
 }

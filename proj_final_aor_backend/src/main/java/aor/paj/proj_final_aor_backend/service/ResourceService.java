@@ -110,6 +110,17 @@ public class ResourceService {
         return Response.status(Response.Status.OK).entity(resources).build();
     }
 
+    @GET
+    @Path("/brands")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBrands() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to retrieve all brands from IP: " + ip);
+
+        // Retrieve all brands
+        return Response.status(Response.Status.OK).entity(resourceBean.getAllBrands()).build();
+    }
+
     @PUT
     @Path("/{id}/update")
     @Consumes(MediaType.APPLICATION_JSON)

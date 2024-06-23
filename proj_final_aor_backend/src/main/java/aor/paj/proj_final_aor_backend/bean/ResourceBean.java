@@ -360,6 +360,9 @@ public class ResourceBean implements Serializable {
         resourceSupplierDao.persist(resourceSupplier);
     }
 
+    public List<String> getAllBrands() {
+        return resourceDao.findAllBrands();
+    }
 
     /**
      * This method is used to convert a Resource object into a ResourceEntity object.

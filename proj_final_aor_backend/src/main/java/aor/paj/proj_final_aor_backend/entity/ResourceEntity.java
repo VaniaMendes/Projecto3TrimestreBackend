@@ -25,6 +25,7 @@ import java.util.Set;
 @NamedQuery(name = "Resource.findResourcesByBrand", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand")
 @NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.name = :supplierName")
 @NamedQuery(name = "Resource.findResourcesBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
+@NamedQuery(name = "Resource.findAllBrands", query = "SELECT DISTINCT r.brand FROM ResourceEntity r ORDER BY r.brand ASC")
 
 //Combinations
 @NamedQuery(name = "Resource.findResourcesByTypeAndBrand", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand")
@@ -60,7 +61,7 @@ public class ResourceEntity implements Serializable {
     /**
      * The type of the resource.
      */
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "type", nullable = false, updatable = false)
     private ResourceType type;
 
