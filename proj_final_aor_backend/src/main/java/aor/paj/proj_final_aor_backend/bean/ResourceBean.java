@@ -1,9 +1,11 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.ProjectResourceDao;
 import aor.paj.proj_final_aor_backend.dao.ResourceDao;
 import aor.paj.proj_final_aor_backend.dao.ResourceSupplierDao;
 import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
+import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfoUser;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
 import aor.paj.proj_final_aor_backend.entity.ResourceSupplierEntity;
@@ -32,6 +34,9 @@ public class ResourceBean implements Serializable {
     // Injected ResourceDao EJB
     @EJB
     private ResourceDao resourceDao;
+
+    @EJB
+    private ProjectResourceDao projectResourceDao;
 
     @EJB
     private ResourceSupplierDao resourceSupplierDao;
@@ -108,16 +113,29 @@ public class ResourceBean implements Serializable {
     }
 
     /**
+     * This method retrieves all resources from the database and converts them into a list of ResourceSmallInfo objects.
+     * For each resource, it also counts the number of projects that use the resource by calling the countProjectsFromResource method from the ProjectResourceDao.
+     * The conversion of each resource into a ResourceSmallInfo object is done by the convertToDTOInfo method.
+     *
+     * @return A list of ResourceSmallInfo objects representing all resources in the database. Each ResourceSmallInfo object includes the number of projects that use the corresponding resource.
+     */
+    public List<ResourceSmallInfo> getAllResourcesInfo() {
+        return resourceDao.findAllResources().stream()
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Fetches resources from the database that match the given type, brand, and supplier name.
      *
      * @param type The type of the resources to fetch.
      * @param brand The brand of the resources to fetch.
-     * @param supplierName The name of the supplier of the resources to fetch.
+     * @param supplierId The id of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, String supplierName) {
-        return resourceDao.findResourcesByTypeAndBrandAndSupplier(type, brand, supplierName).stream()
-                .map(this::convertToDTO)
+    public List<ResourceSmallInfo> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, long supplierId) {
+        return resourceDao.findResourcesByTypeAndBrandAndSupplier(type, brand, supplierId).stream()
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -128,9 +146,9 @@ public class ResourceBean implements Serializable {
      * @param brand The brand of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByTypeAndBrand(ResourceType type, String brand) {
+    public List<ResourceSmallInfo> findResourcesByTypeAndBrand(ResourceType type, String brand) {
         return resourceDao.findResourcesByTypeAndBrand(type, brand).stream()
-                .map(this::convertToDTO)
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -138,12 +156,12 @@ public class ResourceBean implements Serializable {
      * Fetches resources from the database that match the given type and supplier name.
      *
      * @param type The type of the resources to fetch.
-     * @param supplierName The name of the supplier of the resources to fetch.
+     * @param supplierId The id of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByTypeAndSupplier(ResourceType type, String supplierName) {
-        return resourceDao.findResourcesByTypeAndSupplier(type, supplierName).stream()
-                .map(this::convertToDTO)
+    public List<ResourceSmallInfo> findResourcesByTypeAndSupplier(ResourceType type, long supplierId) {
+        return resourceDao.findResourcesByTypeAndSupplier(type, supplierId).stream()
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -151,12 +169,12 @@ public class ResourceBean implements Serializable {
      * Fetches resources from the database that match the given brand and supplier name.
      *
      * @param brand The brand of the resources to fetch.
-     * @param supplierName The name of the supplier of the resources to fetch.
+     * @param supplierId The name of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByBrandAndSupplier(String brand, String supplierName) {
-        return resourceDao.findResourcesByBrandAndSupplier(brand, supplierName).stream()
-                .map(this::convertToDTO)
+    public List<ResourceSmallInfo> findResourcesByBrandAndSupplier(String brand, long supplierId) {
+        return resourceDao.findResourcesByBrandAndSupplier(brand, supplierId).stream()
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -166,9 +184,9 @@ public class ResourceBean implements Serializable {
      * @param type The type of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByType(ResourceType type) {
+    public List<ResourceSmallInfo> findResourcesByType(ResourceType type) {
         return resourceDao.findResourcesByType(type).stream()
-                .map(this::convertToDTO)
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -178,21 +196,21 @@ public class ResourceBean implements Serializable {
      * @param brand The brand of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesByBrand(String brand) {
+    public List<ResourceSmallInfo> findResourcesByBrand(String brand) {
         return resourceDao.findResourcesByBrand(brand).stream()
-                .map(this::convertToDTO)
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
     /**
      * Fetches resources from the database that match the given supplier name.
      *
-     * @param supplierName The name of the supplier of the resources to fetch.
+     * @param supplierId The id of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<Resource> findResourcesBySupplier(String supplierName) {
-        return resourceDao.findResourcesBySupplier(supplierName).stream()
-                .map(this::convertToDTO)
+    public List<ResourceSmallInfo> findResourcesBySupplier(long supplierId) {
+        return resourceDao.findResourcesBySupplier(supplierId).stream()
+                .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -257,13 +275,13 @@ public class ResourceBean implements Serializable {
         return resourceDao.findResourceByName(name) != null;
     }
 
-    public ResourceSmallInfo findResourceById(Long id, int quantity) {
+    public ResourceSmallInfoUser findResourceById(Long id, int quantity) {
         ResourceEntity resourceEntity = resourceDao.findResourceById(id);
         if (resourceEntity == null) {
             logger.error("Resource with id '" + id + "' does not exist");
             return null;
         }
-        return convertToDTO(resourceEntity, quantity);
+        return convertToDTOInfoUser(resourceEntity, quantity);
     }
 
 
@@ -412,12 +430,23 @@ public class ResourceBean implements Serializable {
         return resource;
     }
 
-    private ResourceSmallInfo convertToDTO(ResourceEntity resourceEntity, int quantity) {
-        ResourceSmallInfo r = new ResourceSmallInfo();
+    private ResourceSmallInfoUser convertToDTOInfoUser(ResourceEntity resourceEntity, int quantity) {
+        ResourceSmallInfoUser r = new ResourceSmallInfoUser();
         r.setId(resourceEntity.getId());
         r.setName(resourceEntity.getName());
         r.setBrand(resourceEntity.getBrand());
         r.setQuantity(quantity);
+        return r;
+    }
+
+    private ResourceSmallInfo convertToDTOInfo(ResourceEntity resourceEntity, long numberProjects) {
+        ResourceSmallInfo r = new ResourceSmallInfo();
+        r.setId(resourceEntity.getId());
+        r.setName(resourceEntity.getName());
+        r.setBrand(resourceEntity.getBrand());
+        r.setPhoto(resourceEntity.getPhoto());
+        r.setType(resourceEntity.getType());
+        r.setProjectsNumber(numberProjects);
         return r;
     }
 

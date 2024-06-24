@@ -1,11 +1,10 @@
 package aor.paj.proj_final_aor_backend.dto;
 
-import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class ResourceSmallInfo {
+public class ResourceSmallInfoUser {
 
     @XmlElement
     private long id;
@@ -20,15 +19,9 @@ public class ResourceSmallInfo {
 
     // Quantity of the resource
     @XmlElement
-    private String photo;
+    private int quantity;
 
-    @XmlElement
-    private long projectsNumber;
-
-    @XmlElement
-    private ResourceType type;
-
-    public ResourceSmallInfo() {
+    public ResourceSmallInfoUser() {
     }
 
     public long getId() {
@@ -55,27 +48,11 @@ public class ResourceSmallInfo {
         this.brand = brand;
     }
 
-    public String getPhoto() {
-        return photo;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public long getProjectsNumber() {
-        return projectsNumber;
-    }
-
-    public void setProjectsNumber(long projectsNumber) {
-        this.projectsNumber = projectsNumber;
-    }
-
-    public ResourceType getType() {
-        return type;
-    }
-
-    public void setType(ResourceType type) {
-        this.type = type;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

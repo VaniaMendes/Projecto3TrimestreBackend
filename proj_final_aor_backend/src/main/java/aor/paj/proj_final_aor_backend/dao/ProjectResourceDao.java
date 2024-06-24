@@ -44,4 +44,14 @@ public class ProjectResourceDao extends AbstractDao<ProjectResourceEntity>{
             return null;
         }
     }
+
+    public Long countProjectsFromResource(Long resourceId) {
+        try {
+            return em.createNamedQuery("ProjectResource.countProjectsFromResource", Long.class)
+                    .setParameter("resourceId", resourceId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return 0L;
+        }
+    }
 }

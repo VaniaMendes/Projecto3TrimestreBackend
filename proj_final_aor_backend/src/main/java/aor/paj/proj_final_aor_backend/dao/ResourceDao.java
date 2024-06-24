@@ -107,12 +107,12 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
 
     /**
      * Retrieves resources by their supplier.
-     * @param supplierName the name of the supplier.
+     * @param supplierId the id of the supplier.
      * @return a list of resources with the given supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesBySupplier(String supplierName) {
+    public List<ResourceEntity> findResourcesBySupplier(long supplierId) {
         try {
-            return em.createNamedQuery("Resource.findResourcesBySupplier", ResourceEntity.class).setParameter("supplierName", supplierName)
+            return em.createNamedQuery("Resource.findResourcesBySupplier", ResourceEntity.class).setParameter("supplierId", supplierId)
                     .getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();
@@ -151,13 +151,13 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
     /**
      * Retrieves resources by their type and supplier.
      * @param type the type of the resources.
-     * @param supplierName the name of the supplier.
+     * @param supplierId the id of the supplier.
      * @return a list of resources with the given type and supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByTypeAndSupplier(ResourceType type, String supplierName) {
+    public List<ResourceEntity> findResourcesByTypeAndSupplier(ResourceType type, long supplierId) {
         try {
             return em.createNamedQuery("Resource.findResourcesByTypeAndSupplier", ResourceEntity.class).setParameter("type", type)
-                    .setParameter("supplierName", supplierName).getResultList();
+                    .setParameter("supplierId", supplierId).getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();
         }
@@ -166,13 +166,13 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
     /**
      * Retrieves resources by their brand and supplier.
      * @param brand the brand of the resources.
-     * @param supplierName the name of the supplier.
+     * @param supplierId the id of the supplier.
      * @return a list of resources with the given brand and supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByBrandAndSupplier(String brand, String supplierName) {
+    public List<ResourceEntity> findResourcesByBrandAndSupplier(String brand, long supplierId) {
         try {
             return em.createNamedQuery("Resource.findResourcesByBrandAndSupplier", ResourceEntity.class).setParameter("brand", brand)
-                    .setParameter("supplierName", supplierName).getResultList();
+                    .setParameter("supplierId", supplierId).getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();
         }
@@ -182,13 +182,13 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
      * Retrieves resources by their type, brand, and supplier.
      * @param type the type of the resources.
      * @param brand the brand of the resources.
-     * @param supplierName the name of the supplier.
+     * @param supplierId the id of the supplier.
      * @return a list of resources with the given type, brand, and supplier, or an empty list if no such resources are found.
      */
-    public List<ResourceEntity> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, String supplierName) {
+    public List<ResourceEntity> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, long supplierId) {
         try {
             return em.createNamedQuery("Resource.findResourcesByTypeAndBrandAndSupplier", ResourceEntity.class).setParameter("type", type)
-                    .setParameter("brand", brand).setParameter("supplierName", supplierName).getResultList();
+                    .setParameter("brand", brand).setParameter("supplierId", supplierId).getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();
         }

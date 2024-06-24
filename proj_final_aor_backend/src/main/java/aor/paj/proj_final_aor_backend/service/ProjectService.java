@@ -147,11 +147,12 @@ public class ProjectService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addResource(@PathParam("id") long projectId,
                                 @HeaderParam("resourceId") long resourceId,
-                                @HeaderParam("quantity") int quantity) {
+                                @HeaderParam("quantity") int quantity,
+                                @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
         logger.info("Received request to add resource to project from IP: " + ip);
 
-        if (projectBean.addResource(projectId, resourceId, quantity)){
+        if (projectBean.addResource(projectId, resourceId, quantity, token)){
             logger.info("Resource added to project successfully");
             return Response.status(Response.Status.OK).entity("Resource added to project successfully").build();
         } else {
