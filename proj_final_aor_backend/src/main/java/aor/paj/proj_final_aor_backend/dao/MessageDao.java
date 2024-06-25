@@ -4,10 +4,7 @@ import aor.paj.proj_final_aor_backend.entity.MessageEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -70,26 +67,29 @@ public class MessageDao extends AbstractDao<MessageEntity>{
         }
     }
 
-    public List<UserEntity> findUsersWithExchangedMessages(long userId) {
+
+    public int findTotalMessagesBetweenTwoUsers(UserEntity user1, UserEntity user2) {
         try {
-            // Buscar todas as mensagens enviadas e recebidas pelo usuário
-            List<MessageEntity> messages = em.createQuery(
-                            "SELECT m FROM MessageEntity m WHERE m.sender.id = :userId OR m.receiver.id = :userId ORDER BY m.sendTimestamp DESC",
-                            MessageEntity.class)
-                    .setParameter("userId", userId)
-                    .getResultList();
-
-            // Mapear as mensagens para uma lista de usuários
-            List<UserEntity> users = messages.stream()
-                    .map(m -> m.getSender().getId() == userId ? m.getReceiver() : m.getSender())
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            return users;
+            return em.createNamedQuery("Message.findTotalMessagesBetweenTwoUsers", Long.class)
+                    .setParameter("user1", user1.getId())
+                    .setParameter("user2", user2.getId())
+                    .getSingleResult().intValue();
         } catch (Exception e) {
-            return null;
+            return 0;
         }
     }
+
+    public List<UserEntity> findUsersWithExchangedMessages(long userId) {
+        try {
+            return em.createNamedQuery("Message.findUsersWithExchangedMessages", UserEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
     public List<MessageEntity> findMessagesByProject(long projectId) {
         try {
             List<MessageEntity> messageEntities = em.createNamedQuery("Message.findMessagesByProject").setParameter("projectId", projectId).getResultList();
