@@ -1,12 +1,16 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+
 
 /**
  * This class represents a notification, which extends a TextEvent.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 public class Notification extends TextEvent{
 

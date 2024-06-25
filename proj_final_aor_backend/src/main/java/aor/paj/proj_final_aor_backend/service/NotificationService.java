@@ -84,9 +84,9 @@ public class NotificationService {
     public Response getUnreadNotifications(@HeaderParam("token") String token){
         logger.info("Received request to get unread notifications");
         try {
-            List<Notification> notifications = notificationBean.getUnreadNotifications(token);
+            long notifications = notificationBean.getUnreadNotifications(token);
 
-            if(notifications != null) {
+            if(notifications !=0) {
                 logger.info("Unread notifications retrieved successfully");
                 return Response.status(Response.Status.OK).entity(notifications).build();
             } else {
@@ -114,7 +114,7 @@ public class NotificationService {
         }
 
         try {
-            int totalCount = notificationBean.getNumberofNotification(user.getId());
+            long totalCount = notificationBean.getNumberofNotification(user.getId());
             System.out.println("Total count: " + totalCount);
             int pageCount = (int) Math.ceil((double) totalCount / 6); // 6 notifications per page
             logger.info("IP Address " + ip + " Page count of notifications retrieved successfully: " + pageCount);

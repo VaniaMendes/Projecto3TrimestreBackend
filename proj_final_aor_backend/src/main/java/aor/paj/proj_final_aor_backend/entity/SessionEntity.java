@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @NamedQuery(name = "Session.findUserByToken", query = "SELECT s.user FROM SessionEntity s WHERE s.token = :token")
 @NamedQuery(name = "Session.findSessionByUserId", query = "SELECT s FROM SessionEntity s WHERE s.user.id = :userId")
 @NamedQuery(name = "Session.findSessionByToken", query = "SELECT s FROM SessionEntity s WHERE s.token = :token")
+@NamedQuery(name = "Session.findTokenByUserId", query = "SELECT s.token FROM SessionEntity s WHERE s.user.id = :userId")
+@NamedQuery(name = "Session.findTokensByUserId", query = "SELECT s.token FROM SessionEntity s WHERE s.user.id = :userId")
 public class SessionEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

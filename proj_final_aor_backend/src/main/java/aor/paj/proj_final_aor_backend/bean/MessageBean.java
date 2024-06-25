@@ -9,6 +9,8 @@ import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.websocket.Notifier;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +19,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static aor.paj.proj_final_aor_backend.util.enums.NotificationType.MESSAGE_RECEIVED;
 
@@ -33,6 +37,10 @@ public class MessageBean implements Serializable {
      * Logger for the MessageBean class.
      */
     private static final Logger logger = LogManager.getLogger(MessageBean.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     /**
      * Data access object for messages.
@@ -105,9 +113,16 @@ public class MessageBean implements Serializable {
         // Save the message in the database
         messageDao.createMessage(messageEntity);
 
-
         notificationBean.sendNotificationToOneUser(token, message.getReceiver().getId(), MESSAGE_RECEIVED);
 
+
+        try {
+            String jsonMsg = mapper.writeValueAsString(convertMessageToDto(messageEntity));
+            notifier.sendMessageTOUser(jsonMsg);
+            logger.debug("Notification sent to user with id: " + user.getId());
+        } catch (Exception e) {
+            logger.error("Erro ao serializar a mensagem: " + e.getMessage());
+        }
 
         return true;
     }
@@ -169,7 +184,7 @@ public class MessageBean implements Serializable {
 
         //Check if the project exists
         ProjectEntity project = projectDao.findProjectById(project_id);
-        System.out.println(project_id);
+
         if (project == null) {
             logger.debug("Project not found");
             return false;
@@ -182,6 +197,7 @@ public class MessageBean implements Serializable {
             return false;
         }
 
+        cloneMessageEntities(project);
         // Create the message
         MessageEntity message = new MessageEntity();
         message.setContent(content);
@@ -190,8 +206,16 @@ public class MessageBean implements Serializable {
         message.setSendTimestamp(LocalDateTime.now());
         message.setReadStatus(false);
         message.setReadTimestamp(null);
+
+
+
+        // Add the new message to the userProject's messagesReceived
+        userProject.addMessageReceived(message);
+
         // Save the message in the database
         messageDao.createMessage(message);
+        userProjectDao.merge(userProject);
+
         String nameOfProject = project.getName();
         String type = String.valueOf(NotificationType.MESSAGE_PROJECT);
         notificationBean.sendNotificationToProjectUsers(token, project_id, type, nameOfProject );
@@ -236,7 +260,6 @@ public class MessageBean implements Serializable {
             }
         }
         return messages;
-
     }
 
     public int getMessageCountBetweenTwoUsers(String token, long id) {
@@ -246,21 +269,31 @@ public class MessageBean implements Serializable {
             logger.error("User not found");
             return 0;
         }
-        return messageDao.findMessagesBetweenUsers(user1, user2, 0, Integer.MAX_VALUE).size();
+        return messageDao.findTotalMessagesBetweenTwoUsers(user1, user2);
     }
 
-    public List<MessageInfoUser> getUsersMessagedByUser(String token) {
+    public List<MessageInfoUser> getListOfUsersWithExchangeMessages(String token) {
         UserEntity user = sessionDao.findUserByToken(token);
         if (user == null) {
-            logger.debug("User not found");
+            logger.debug("User not found ffffffffffffffffffffffff");
             return null;
         }
         List<UserEntity> listOfUsers = messageDao.findUsersWithExchangedMessages(user.getId());
+        if(listOfUsers.isEmpty()){
+            logger.info("No users found with exchanged messages");
+            return null;
+        }
+        System.out.println(listOfUsers.size());
+
         List<MessageInfoUser> users = new ArrayList<>();
         if (listOfUsers != null && !listOfUsers.isEmpty()) {
             for (UserEntity userEntity : listOfUsers) {
-                MessageInfoUser user1 = userBean.convertUserToDTOForMessage(userEntity);
-                users.add(user1);
+                if (userEntity != null) {
+                    MessageInfoUser user1 = userBean.convertUserToDTOForMessage(userEntity);
+                    users.add(user1);
+                } else {
+                    logger.warn("Null UserEntity found in listOfUsers");
+                }
             }
         }
         return users;
@@ -268,7 +301,7 @@ public class MessageBean implements Serializable {
 
     public boolean markMessageAsRead(String token, long messageId) {
         UserEntity user = sessionDao.findUserByToken(token);
-        System.out.println(user.getId());
+        System.out.println(user.getFirstName());
         if (user == null) {
             logger.error("User not found");
             return false;
@@ -309,7 +342,6 @@ public class MessageBean implements Serializable {
     }
 
 
-
     /**
      * This method is used to convert a message entity to a message DTO for a chat group.
      * @param messageEntity The message entity that is to be converted.
@@ -325,5 +357,14 @@ public class MessageBean implements Serializable {
         messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
         return messageDto;
 
+    }
+
+    public void cloneMessageEntities(ProjectEntity project) {
+        Set<UserProjectEntity> userProjects = project.getUserProjects();
+        for (UserProjectEntity userProject : userProjects) {
+            Set<MessageEntity> originalMessages = userProject.getMessagesReceived();
+            Set<MessageEntity> clonedMessages = new HashSet<>(originalMessages);
+            userProject.setMessagesReceived(clonedMessages);
+        }
     }
 }

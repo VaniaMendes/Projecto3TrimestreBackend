@@ -82,6 +82,13 @@ public class UserProjectEntity implements Serializable {
     // Default constructor
     public UserProjectEntity() {
     }
+
+    public void addMessageReceived(MessageEntity message) {
+        this.messagesReceived.add(message);
+        message.setReceiverGroup(this);
+    }
+
+
     /**
      * Returns the project associated with this UserProjectEntity.
      *
@@ -225,4 +232,6 @@ public class UserProjectEntity implements Serializable {
     public void setLeftAt(LocalDateTime leftAt) {
         this.leftAt = leftAt;
     }
+
+
 }
