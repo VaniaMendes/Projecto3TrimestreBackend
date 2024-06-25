@@ -17,7 +17,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,10 +122,43 @@ public class ResourceBean implements Serializable {
      *
      * @return A list of ResourceSmallInfo objects representing all resources in the database. Each ResourceSmallInfo object includes the number of projects that use the corresponding resource.
      */
-    public List<ResourceSmallInfo> getAllResourcesInfo() {
+    private List<ResourceSmallInfo> getAllResourcesInfo() {
         return resourceDao.findAllResources().stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * This method retrieves all resources from the database and sorts them based on the provided parameters.
+     * The method name is dynamically constructed based on the sort parameters and then invoked on the ResourceDao class.
+     * If the constructed method name does not correspond to a method that actually exists in the ResourceDao class, a NoSuchMethodException will be thrown.
+     *
+     * @param sort The sort order for the resources. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param nameSort The sort order for the resources based on name. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param projectsSort The sort order for the resources based on projects. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @return A list of resources sorted according to the provided parameters, converted to ResourceSmallInfo DTOs. If an exception occurs, an empty list is returned.
+     */
+    public List<ResourceSmallInfo> getAllResourcesInfoSorted(String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findAllResources" : "findAllResourcesOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findAllResourcesOrderedByNameASC" : "findAllResourcesOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findAllResourcesOrderedByProjectsASC" : "findAllResourcesOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod(methodName);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -133,10 +169,33 @@ public class ResourceBean implements Serializable {
      * @param supplierId The id of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<ResourceSmallInfo> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, long supplierId) {
+    private List<ResourceSmallInfo> findResourcesByTypeAndBrandAndSupplier(ResourceType type, String brand, long supplierId) {
         return resourceDao.findResourcesByTypeAndBrandAndSupplier(type, brand, supplierId).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public List<ResourceSmallInfo> findResourcesByTypeAndBrandAndSupplierSorted(ResourceType type, String brand, long supplierId, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesByTypeAndBrandAndSupplier" : "findResourcesByTypeAndBrandAndSupplierOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesByTypeAndBrandAndSupplierOrderedByNameASC" : "findResourcesByTypeAndBrandAndSupplierOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesByTypeAndBrandAndSupplierOrderedByProjectsASC" : "findResourcesByTypeAndBrandAndSupplierOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod (methodName, ResourceType.class, String.class, long.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, type, brand, supplierId);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -146,10 +205,33 @@ public class ResourceBean implements Serializable {
      * @param brand The brand of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<ResourceSmallInfo> findResourcesByTypeAndBrand(ResourceType type, String brand) {
+    private List<ResourceSmallInfo> findResourcesByTypeAndBrand(ResourceType type, String brand) {
         return resourceDao.findResourcesByTypeAndBrand(type, brand).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public List<ResourceSmallInfo> findResourcesByTypeAndBrandSorted(ResourceType type, String brand, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesByTypeAndBrand" : "findResourcesByTypeAndBrandOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesByTypeAndBrandOrderedByNameASC" : "findResourcesByTypeAndBrandOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesByTypeAndBrandOrderedByProjectsASC" : "findResourcesByTypeAndBrandOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod (methodName, ResourceType.class, String.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, type, brand);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -163,6 +245,29 @@ public class ResourceBean implements Serializable {
         return resourceDao.findResourcesByTypeAndSupplier(type, supplierId).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    public List<ResourceSmallInfo> findResourcesByTypeAndSupplierSorted(ResourceType type, long supplierId, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesByTypeAndSupplier" : "findResourcesByTypeAndSupplierOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesByTypeAndSupplierOrderedByNameASC" : "findResourcesByTypeAndSupplierOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesByTypeAndSupplierOrderedByProjectsASC" : "findResourcesByTypeAndSupplierOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod (methodName, ResourceType.class, long.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, type, supplierId);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -184,10 +289,44 @@ public class ResourceBean implements Serializable {
      * @param type The type of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<ResourceSmallInfo> findResourcesByType(ResourceType type) {
+    private List<ResourceSmallInfo> findResourcesByType(ResourceType type) {
         return resourceDao.findResourcesByType(type).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * This method is used to fetch resources from the database based on the resource type and sort them based on the provided parameters.
+     * The method name is dynamically constructed based on the sort parameters and then invoked on the ResourceDao class.
+     * If the constructed method name does not correspond to a method that actually exists in the ResourceDao class, a NoSuchMethodException will be thrown.
+     *
+     * @param type The type of the resources to fetch.
+     * @param sort The sort order for the resources. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param nameSort The sort order for the resources based on name. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param projectsSort The sort order for the resources based on projects. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @return A list of resources matching the type and sorted according to the provided parameters, converted to ResourceSmallInfo DTOs. If an exception occurs, an empty list is returned.
+     */
+    public List<ResourceSmallInfo> findResourcesByTypeSorted(ResourceType type, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesByType" : "findResourcesByTypeOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesByTypeOrderedByNameASC" : "findResourcesByTypeOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesByTypeOrderedByProjectsASC" : "findResourcesByTypeOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod(methodName, ResourceType.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, type);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -196,10 +335,44 @@ public class ResourceBean implements Serializable {
      * @param brand The brand of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<ResourceSmallInfo> findResourcesByBrand(String brand) {
+    private List<ResourceSmallInfo> findResourcesByBrand(String brand) {
         return resourceDao.findResourcesByBrand(brand).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * This method is used to fetch resources from the database based on the brand and sort them based on the provided parameters.
+     * The method name is dynamically constructed based on the sort parameters and then invoked on the ResourceDao class.
+     * If the constructed method name does not correspond to a method that actually exists in the ResourceDao class, a NoSuchMethodException will be thrown.
+     *
+     * @param brand The brand of the resources to fetch.
+     * @param sort The sort order for the resources. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param nameSort The sort order for the resources based on name. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param projectsSort The sort order for the resources based on projects. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @return A list of resources matching the brand and sorted according to the provided parameters, converted to ResourceSmallInfo DTOs. If an exception occurs, an empty list is returned.
+     */
+    public List<ResourceSmallInfo> findResourcesByBrandSorted(String brand, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesByBrand" : "findResourcesByBrandOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesByBrandOrderedByNameASC" : "findResourcesByBrandOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesByBrandOrderedByProjectsASC" : "findResourcesByBrandOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod(methodName, String.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, brand);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -208,10 +381,45 @@ public class ResourceBean implements Serializable {
      * @param supplierId The id of the supplier of the resources to fetch.
      * @return A list of matching resources, converted to DTOs.
      */
-    public List<ResourceSmallInfo> findResourcesBySupplier(long supplierId) {
+    private List<ResourceSmallInfo> findResourcesBySupplier(long supplierId) {
         return resourceDao.findResourcesBySupplier(supplierId).stream()
                 .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * This method is used to fetch resources from the database based on the supplier ID and sort them based on the provided parameters.
+     * The method name is dynamically constructed based on the sort parameters and then invoked on the ResourceDao class.
+     * If the constructed method name does not correspond to a method that actually exists in the ResourceDao class, a NoSuchMethodException will be thrown.
+     *
+     * @param supplierId The ID of the supplier of the resources to fetch.
+     * @param sort The sort order for the resources. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param nameSort The sort order for the resources based on name. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @param projectsSort The sort order for the resources based on projects. If "asc", resources are sorted in ascending order. If "desc", resources are sorted in descending order.
+     * @return A list of resources matching the supplier ID and sorted according to the provided parameters, converted to ResourceSmallInfo DTOs. If an exception occurs, an empty list is returned.
+     */
+    public List<ResourceSmallInfo> findResourcesBySupplierSorted(long supplierId, String sort, String nameSort, String projectsSort) {
+        String methodName = "";
+        if (sort != null) {
+            methodName = sort.equals("asc") ? "findResourcesBySupplier" : "findResourcesBySupplierOrderedDESC";
+        } else if (nameSort != null) {
+            methodName = nameSort.equals("asc") ? "findResourcesBySupplierOrderedByNameASC" : "findResourcesBySupplierOrderedByNameDESC";
+        } else if (projectsSort != null) {
+            methodName = projectsSort.equals("asc") ? "findResourcesBySupplierOrderedByProjectsASC" : "findResourcesBySupplierOrderedByProjectsDESC";
+        }
+
+        try {
+            Method method = resourceDao.getClass().getMethod(methodName, long.class);
+            List<ResourceEntity> resourceEntities = (List<ResourceEntity>) method.invoke(resourceDao, supplierId);
+            return resourceEntities.stream()
+                    .map(resourceEntity -> convertToDTOInfo(resourceEntity, projectResourceDao.countProjectsFromResource(resourceEntity.getId())))
+                    .collect(Collectors.toList());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
     }
 
     /**

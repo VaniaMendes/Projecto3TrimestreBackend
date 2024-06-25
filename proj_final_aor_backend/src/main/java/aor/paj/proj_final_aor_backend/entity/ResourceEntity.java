@@ -27,12 +27,65 @@ import java.util.Set;
 @NamedQuery(name = "Resource.findResourcesBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
 @NamedQuery(name = "Resource.findAllBrands", query = "SELECT DISTINCT r.brand FROM ResourceEntity r ORDER BY r.brand ASC")
 
+//All resources ordered
+@NamedQuery(name = "Resource.findAllResourcesOrderedByNameASC", query = "SELECT r FROM ResourceEntity r order by r.name ASC")
+@NamedQuery(name = "Resource.findAllResourcesOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r order by r.name DESC")
+@NamedQuery(name = "Resource.findAllResourcesOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r order by size(r.projects) ASC")
+@NamedQuery(name = "Resource.findAllResourcesOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r order by size(r.projects) DESC")
+
+//All resources ordered by type
+@NamedQuery(name = "Resource.findResourcesByTypeOrderedDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeOrderedByNameASC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type ORDER BY size(r.projects) DESC")
+
+//All resources ordered by brand
+@NamedQuery(name = "Resource.findResourcesByBrandOrderedDESC", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesByBrandOrderedByNameASC", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByBrandOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesByBrandOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByBrandOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r WHERE r.brand = :brand ORDER BY size(r.projects) DESC")
+
+//All resources ordered by projects
+@NamedQuery(name = "Resource.findResourcesBySupplierOrderedDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesBySupplierOrderedByNameASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesBySupplierOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesBySupplierOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesBySupplierOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId ORDER BY size(r.projects) DESC")
+
+
 //Combinations
 @NamedQuery(name = "Resource.findResourcesByTypeAndBrand", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand")
 @NamedQuery(name = "Resource.findResourcesByTypeAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId")
 @NamedQuery(name = "Resource.findResourcesByBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId")
 @NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId")
 
+//Comb with order desc
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandOrderedDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplierOrderedDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplierOrderedDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId ORDER BY r.createdAt DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplierOrderedDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId ORDER BY r.createdAt DESC")
+
+//Comb with order name
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandOrderedByNameASC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplierOrderedByNameASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplierOrderedByNameASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplierOrderedByNameASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId ORDER BY r.name ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplierOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplierOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId ORDER BY r.name DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplierOrderedByNameDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId ORDER BY r.name DESC")
+
+//Comb with order projects
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplierOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplierOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplierOrderedByProjectsASC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId ORDER BY size(r.projects) ASC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r WHERE r.type = :type AND r.brand = :brand ORDER BY size(r.projects) DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndSupplierOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND s.id = :supplierId ORDER BY size(r.projects) DESC")
+@NamedQuery(name = "Resource.findResourcesByBrandAndSupplierOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.brand = :brand AND s.id = :supplierId ORDER BY size(r.projects) DESC")
+@NamedQuery(name = "Resource.findResourcesByTypeAndBrandAndSupplierOrderedByProjectsDESC", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE r.type = :type AND r.brand = :brand AND s.id = :supplierId ORDER BY size(r.projects) DESC")
 
 public class ResourceEntity implements Serializable {
 
