@@ -45,11 +45,33 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
     }
 
 
-    public List<NotificationEntity> findUnreadNotificationsByUserID(long id) {
-        return em.createNamedQuery("Notification.findUnreadNotificationsByUserID", NotificationEntity.class)
-                .setParameter("id", id)
-                .getResultList();
+
+
+    public long findUnreadNotificationsByUserID(long userId) {
+        try {
+            // Contar todas as notificações do tipo MESSAGE_RECEIVED
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countUnreadForTypeMessage", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Contar todas as notificações do tipo MESSAGE_PROJECT
+            Long countNonMessageReceivedProject = em.createNamedQuery("Notification.countUnreadForTypeMessageProject", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Contar os remetentes distintos das notificações do tipo MESSAGE_RECEIVED
+            Long countDistinctMessageReceivedSenders = em.createNamedQuery("Notification.countUnreadNotifications", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Somar os resultados
+            return countNonMessageReceived.intValue() + countNonMessageReceivedProject.intValue() + countDistinctMessageReceivedSenders.intValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting notifications", e);
+        }
     }
+
+
     public List<NotificationEntity> findNotificationsByUserID(long userId, int page, int size) {
         List<NotificationEntity> notifications = new ArrayList<>();
 
@@ -58,26 +80,27 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
             List<NotificationEntity> allNotifications = new ArrayList<>();
 
             // Obter notificações de mensagem recebida
-            allNotifications.addAll(em.createNamedQuery("Notification.findMessageReceivedByUserID", NotificationEntity.class)
+            allNotifications.addAll(em.createNamedQuery("Notification.findLatestMessageReceivedByUserID", NotificationEntity.class)
                     .setParameter("userId", userId)
                     .getResultList());
 
-            // Obter notificações de novos projetos
-            allNotifications.addAll(em.createNamedQuery("Notification.findNewProjectByUserID", NotificationEntity.class)
+            // Obter notificações de mensagem recebida no projecto
+            allNotifications.addAll(em.createNamedQuery("Notification.findLatestMessageReceivedByProject", NotificationEntity.class)
                     .setParameter("userId", userId)
                     .getResultList());
 
-            // Obter notificações de status do projeto
-            allNotifications.addAll(em.createNamedQuery("Notification.findProjectStatusByUserID", NotificationEntity.class)
+            // Obter notificações dos restantes tipos
+            allNotifications.addAll(em.createNamedQuery("Notification.findAllNotificationsExceptMessageReceived", NotificationEntity.class)
                     .setParameter("userId", userId)
                     .getResultList());
 
             // Ordenar as notificações pela data de envio
             allNotifications.sort((n1, n2) -> n2.getSendTimestamp().compareTo(n1.getSendTimestamp()));
 
-            // Aplicar paginação manualmente na lista combinada
-            int fromIndex = page * size;
+            // Ajustar os índices para que a paginação comece na página 1
+            int fromIndex = (page - 1) * size;
             int toIndex = Math.min(fromIndex + size, allNotifications.size());
+
 
             if (fromIndex < toIndex) {
                 notifications = allNotifications.subList(fromIndex, toIndex);
@@ -97,17 +120,23 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
     public int numberOfnotificationsByUserID(long userId) {
         try {
             // Contar todas as notificações que não são do tipo MESSAGE_RECEIVED
-            Long countNonMessageReceived = em.createNamedQuery("Notification.countNonMessageReceivedByUserID", Long.class)
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countLatestMessageReceivedByUserID", Long.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
 
+            // Contar todas as notificações que não são do tipo MESSAGE_PROJECT
+            Long countNonMessageReceivedProject = em.createNamedQuery("Notification.countUnreadForTypeMessageProject", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+
             // Contar os remetentes distintos das notificações do tipo MESSAGE_RECEIVED
-            Long countDistinctMessageReceivedSenders = em.createNamedQuery("Notification.countDistinctMessageReceivedSendersByUserID", Long.class)
+            Long countDistinctMessageReceivedSenders = em.createNamedQuery("Notification.countAllNotificationsExceptMessageReceived", Long.class)
                     .setParameter("userId", userId)
                     .getSingleResult();
 
             // Somar os resultados
-            return countNonMessageReceived.intValue() + countDistinctMessageReceivedSenders.intValue();
+            return countNonMessageReceived.intValue() + countDistinctMessageReceivedSenders.intValue() + countNonMessageReceivedProject.intValue();
         } catch (Exception e) {
             throw new RuntimeException("Error counting notifications", e);
         }

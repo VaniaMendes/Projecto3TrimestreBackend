@@ -84,9 +84,9 @@ public class NotificationService {
     public Response getUnreadNotifications(@HeaderParam("token") String token){
         logger.info("Received request to get unread notifications");
         try {
-            List<Notification> notifications = notificationBean.getUnreadNotifications(token);
+            long notifications = notificationBean.getUnreadNotifications(token);
 
-            if(notifications != null) {
+            if(notifications !=0) {
                 logger.info("Unread notifications retrieved successfully");
                 return Response.status(Response.Status.OK).entity(notifications).build();
             } else {

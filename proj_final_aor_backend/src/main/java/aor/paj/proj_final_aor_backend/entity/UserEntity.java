@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -113,6 +114,7 @@ public class UserEntity implements Serializable {
     /**
      * Notifications of the user.
      */
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_notification",

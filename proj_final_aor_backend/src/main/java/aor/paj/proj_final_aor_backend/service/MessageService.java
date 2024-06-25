@@ -145,14 +145,16 @@ public class MessageService {
     }
 
 
+    //Get the list of users that the user logged sent or received messages
     @GET
-    @Path("/messagedUsers")
+    @Path("/users")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getMessagedUsers(@HeaderParam("token") String token, @Context HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get messaged users from IP: " + ip);
-        List<MessageInfoUser> users = messageBean.getUsersMessagedByUser(token);
+        List<MessageInfoUser> users = messageBean.getListOfUsersWithExchangeMessages(token);
+
         if (users == null) {
             logger.error("User not found");
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
@@ -177,7 +179,7 @@ public class MessageService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
         int count = messageBean.getMessageCountBetweenTwoUsers(token, user_id);
-        int pageCount = (count + 3) / 4; // 4 messages per page
+        int pageCount = (int) Math.ceil((double) count / 4); // 4 messages per page, starting from page 1
         return Response.status(Response.Status.OK).entity(pageCount).build();
     }
 

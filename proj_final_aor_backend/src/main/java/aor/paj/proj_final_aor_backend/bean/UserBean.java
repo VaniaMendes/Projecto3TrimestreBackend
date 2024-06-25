@@ -588,6 +588,17 @@ public class UserBean implements Serializable {
         }
     }
 
+
+
+    public List<String> findSessionTokensOfUser(long userId) {
+        List<String> tokens =  sessionDao.getSessionTokensOfUser(userId);
+        if(tokens == null){
+            return null;
+
+        }
+        return tokens;
+    }
+
     public List<User> getUsersByFirstName(String token, String prefix) {
 
         UserEntity userRequested = sessionDao.findUserByToken(token);

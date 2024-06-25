@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,6 +18,13 @@ import java.time.LocalDateTime;
 @NamedQuery(name = "Message.findSentMessagesUsers", query = "SELECT m.receiver FROM MessageEntity m WHERE m.sender.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name = "Message.findReceivedMessagesUsers", query = "SELECT m.sender FROM MessageEntity m WHERE m.receiver.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp DESC")
+
+@NamedQuery(name="Message.findTotalMessagesBetweenTwoUsers",  query = "SELECT COUNT(m) FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
+
+@NamedQuery(name = "Message.findUsersWithExchangedMessages", query =  "SELECT DISTINCT u " +
+        "FROM UserEntity u " +
+        "JOIN MessageEntity m ON u.id = m.sender.id OR u.id = m.receiver.id " +
+        "WHERE (m.sender.id = :userId OR m.receiver.id = :userId) AND u.id != :userId " )
 
 public class MessageEntity implements Serializable {
 

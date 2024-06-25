@@ -5,14 +5,17 @@ import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.Notification;
-import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.dto.UserInfoInProject;
+
 import aor.paj.proj_final_aor_backend.entity.NotificationEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.websocket.Notifier;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import jakarta.xml.bind.SchemaOutputResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +31,10 @@ public class NotificationBean implements Serializable {
      * Logger for the MessageBean class.
      */
     private static final Logger logger = LogManager.getLogger(NotificationBean.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @EJB
     NotificationDao notificationDao;
@@ -48,6 +55,8 @@ public class NotificationBean implements Serializable {
      */
     public NotificationBean() {
     }
+
+
 
     /**
      * Method to send a notification to a specific user.
@@ -84,7 +93,17 @@ public class NotificationBean implements Serializable {
         notificationEntity.getUsers().add(user);
 
         userDao.updateUser(user);
+        System.out.println("id of notification" + notification.getId());
+        notification.setId(notificationEntity.getId());
 
+
+        try {
+            String jsonMsg = mapper.writeValueAsString(notification);
+            notifier.sendNotificationToUser(jsonMsg);
+            logger.debug("Notification sent to user with id: " + user.getId());
+        } catch (Exception e) {
+            logger.error("Erro ao serializar a mensagem: " + e.getMessage());
+        }
 
         return true;
     }
@@ -141,6 +160,15 @@ public class NotificationBean implements Serializable {
                     userDao.updateUser(user);
 
                     sentNotifications.add(notification);
+                    notification.setId(notificationEntity.getId());
+                    try {
+                        String jsonMsg = mapper.writeValueAsString(notification);
+                        notifier.sendNotificationToAllExceptTheSender(jsonMsg);
+                        logger.debug("Notification sent to user with id: " + user.getId());
+                    } catch (Exception e) {
+                        logger.error("Erro ao serializar a mensagem: " + e.getMessage());
+                    }
+
 
                 }
             } catch (Exception e) {
@@ -197,7 +225,6 @@ public class NotificationBean implements Serializable {
 
                 sentNotifications.add(notification);
 
-
             } catch (Exception e) {
                 logger.error("Error sending notification to user with id: " + user.getId(), e);
             }
@@ -206,35 +233,24 @@ public class NotificationBean implements Serializable {
         return true;
     }
 
-    public List<Notification> getUnreadNotifications(String token) {
+    public long getUnreadNotifications(String token) {
         UserEntity user = sessionDao.findUserByToken(token);
 
         if (user == null) {
             logger.error("No user found with token: " + token);
-            return null;
+            return 0;
         }
 
-        List<NotificationEntity> notifications = notificationDao.findUnreadNotificationsByUserID(user.getId());
+        long notifications = notificationDao.findUnreadNotificationsByUserID(user.getId());
+        System.out.println(notifications);
 
-        if (notifications == null || notifications.isEmpty()) {
+        if (notifications == 0) {
             logger.error("No unread notifications found for user with id: " + user.getId());
-            return null;
+            return 0;
         }
 
-        List<Notification> notificationList = new ArrayList<>();
 
-        for (NotificationEntity notificationEntity : notifications) {
-
-            Notification notification = new Notification();
-            notification.setId(notificationEntity.getId());
-            notification.setReadStatus(notificationEntity.isReadStatus());
-            notification.setSendTimestamp(notificationEntity.getSendTimestamp());
-            notification.setType(NotificationType.valueOf(notificationEntity.getType().toString()));
-            notification.setRelatedEntityName(notificationEntity.getRelatedEntityName());
-
-            notificationList.add(notification);
-        }
-        return notificationList;
+        return notifications;
     }
 
     public List<Notification> getNotificationsByUserId(String token, long userId, int page, int size) {
@@ -268,7 +284,6 @@ public class NotificationBean implements Serializable {
             senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
             senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
 
-
             MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
 
             notification.setSender(senderDto);
@@ -287,7 +302,6 @@ public class NotificationBean implements Serializable {
         }
 
         NotificationEntity notification = notificationDao.findNotificationById(notificationId);
-
 
         if(notification == null) {
             logger.error("No notification found with id: " + notificationId);
