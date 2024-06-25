@@ -55,7 +55,7 @@ import java.util.Set;
                 "   GROUP BY n2.sender_id" +
                 ")")
 
-@NamedQuery(name = "Notification.countAllNotificationsExceptMessageReceived", query = "SELECT COUNT(n) FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.type != 'MESSAGE_RECEIVED'")
+@NamedQuery(name = "Notification.countAllNotificationsExceptMessageReceived", query = "SELECT COUNT(n) FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND (n.type != 'MESSAGE_RECEIVED' AND n.type != 'MESSAGE_PROJECT')")
 
 @NamedQuery(name = "Notification.countUnreadForTypeMessage", query =
         "SELECT COUNT(n) FROM NotificationEntity n " +

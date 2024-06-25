@@ -117,7 +117,7 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
 
 
 
-    public int numberOfnotificationsByUserID(long userId) {
+    public long numberOfnotificationsByUserID(long userId) {
         try {
             // Contar todas as notificações que não são do tipo MESSAGE_RECEIVED
             Long countNonMessageReceived = em.createNamedQuery("Notification.countLatestMessageReceivedByUserID", Long.class)
@@ -136,7 +136,7 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
                     .getSingleResult();
 
             // Somar os resultados
-            return countNonMessageReceived.intValue() + countDistinctMessageReceivedSenders.intValue() + countNonMessageReceivedProject.intValue();
+            return countNonMessageReceived.longValue() + countDistinctMessageReceivedSenders.longValue() + countNonMessageReceivedProject.longValue();
         } catch (Exception e) {
             throw new RuntimeException("Error counting notifications", e);
         }

@@ -114,7 +114,7 @@ public class NotificationService {
         }
 
         try {
-            int totalCount = notificationBean.getNumberofNotification(user.getId());
+            long totalCount = notificationBean.getNumberofNotification(user.getId());
             System.out.println("Total count: " + totalCount);
             int pageCount = (int) Math.ceil((double) totalCount / 6); // 6 notifications per page
             logger.info("IP Address " + ip + " Page count of notifications retrieved successfully: " + pageCount);

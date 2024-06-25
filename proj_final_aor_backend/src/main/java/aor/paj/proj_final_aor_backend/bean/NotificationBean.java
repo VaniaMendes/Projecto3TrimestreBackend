@@ -326,7 +326,7 @@ public class NotificationBean implements Serializable {
         return true;
     }
 
-    public int getNumberofNotification(long userId) {
+    public long getNumberofNotification(long userId) {
         return notificationDao.numberOfnotificationsByUserID(userId);
     }
 
