@@ -69,12 +69,14 @@ public class ResourceService {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllResources() {
+    public Response getAllResources(@QueryParam("sort") String sort,
+                                    @QueryParam("name") String name,
+                                    @QueryParam("projects") String projects) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to retrieve all resources from IP: " + ip);
 
         // Retrieve all resources
-        return Response.status(Response.Status.OK).entity(resourceBean.getAllResourcesInfo()).build();
+        return Response.status(Response.Status.OK).entity(resourceBean.getAllResourcesInfoSorted(sort,name,projects)).build();
     }
 
     @GET
@@ -82,25 +84,28 @@ public class ResourceService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response filterResources(@QueryParam("type") ResourceType type,
                                     @QueryParam("brand") String brand,
-                                    @QueryParam("supplier") Long supplierId) {
+                                    @QueryParam("supplier") Long supplierId,
+                                    @QueryParam("sort") String sort,
+                                    @QueryParam("name") String name,
+                                    @QueryParam("projects") String projects){
         String ip = request.getRemoteAddr();
         logger.info("Received request to filter resources from IP: " + ip);
 
         List<ResourceSmallInfo> resources;
         if (type != null && brand != null && supplierId != null) {
-            resources = resourceBean.findResourcesByTypeAndBrandAndSupplier(type, brand, supplierId);
+            resources = resourceBean.findResourcesByTypeAndBrandAndSupplierSorted(type, brand, supplierId, sort, name, projects);
         } else if (type != null && brand != null) {
-            resources = resourceBean.findResourcesByTypeAndBrand(type, brand);
+            resources = resourceBean.findResourcesByTypeAndBrandSorted(type, brand, sort, name, projects);
         } else if (type != null && supplierId != null) {
-            resources = resourceBean.findResourcesByTypeAndSupplier(type, supplierId);
+            resources = resourceBean.findResourcesByTypeAndSupplierSorted(type, supplierId, sort, name, projects);
         } else if (brand != null && supplierId != null) {
             resources = resourceBean.findResourcesByBrandAndSupplier(brand, supplierId);
         } else if (type != null) {
-            resources = resourceBean.findResourcesByType(type);
+            resources = resourceBean.findResourcesByTypeSorted(type, sort, name, projects);
         } else if (brand != null) {
-            resources = resourceBean.findResourcesByBrand(brand);
+            resources = resourceBean.findResourcesByBrandSorted(brand, sort, name, projects);
         } else if (supplierId != null) {
-            resources = resourceBean.findResourcesBySupplier(supplierId);
+            resources = resourceBean.findResourcesBySupplierSorted(supplierId, sort, name, projects);
         } else {
             resources = new ArrayList<>();
         }
