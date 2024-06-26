@@ -3,6 +3,7 @@ package aor.paj.proj_final_aor_backend.service;
 import aor.paj.proj_final_aor_backend.bean.ResourceBean;
 import aor.paj.proj_final_aor_backend.bean.SupplierBean;
 import aor.paj.proj_final_aor_backend.dto.Resource;
+import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
 import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
@@ -68,12 +69,14 @@ public class ResourceService {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllResources() {
+    public Response getAllResources(@QueryParam("sort") String sort,
+                                    @QueryParam("name") String name,
+                                    @QueryParam("projects") String projects) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to retrieve all resources from IP: " + ip);
 
         // Retrieve all resources
-        return Response.status(Response.Status.OK).entity(resourceBean.getAllResources()).build();
+        return Response.status(Response.Status.OK).entity(resourceBean.getAllResourcesInfoSorted(sort,name,projects)).build();
     }
 
     @GET
@@ -81,33 +84,44 @@ public class ResourceService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response filterResources(@QueryParam("type") ResourceType type,
                                     @QueryParam("brand") String brand,
-                                    @QueryParam("supplier") String supplierName,
-                                    @QueryParam("sourceId") String sourceId) {
+                                    @QueryParam("supplier") Long supplierId,
+                                    @QueryParam("sort") String sort,
+                                    @QueryParam("name") String name,
+                                    @QueryParam("projects") String projects){
         String ip = request.getRemoteAddr();
         logger.info("Received request to filter resources from IP: " + ip);
 
-        List<Resource> resources;
-        if (type != null && brand != null && supplierName != null) {
-            resources = resourceBean.findResourcesByTypeAndBrandAndSupplier(type, brand, supplierName);
+        List<ResourceSmallInfo> resources;
+        if (type != null && brand != null && supplierId != null) {
+            resources = resourceBean.findResourcesByTypeAndBrandAndSupplierSorted(type, brand, supplierId, sort, name, projects);
         } else if (type != null && brand != null) {
-            resources = resourceBean.findResourcesByTypeAndBrand(type, brand);
-        } else if (type != null && supplierName != null) {
-            resources = resourceBean.findResourcesByTypeAndSupplier(type, supplierName);
-        } else if (brand != null && supplierName != null) {
-            resources = resourceBean.findResourcesByBrandAndSupplier(brand, supplierName);
+            resources = resourceBean.findResourcesByTypeAndBrandSorted(type, brand, sort, name, projects);
+        } else if (type != null && supplierId != null) {
+            resources = resourceBean.findResourcesByTypeAndSupplierSorted(type, supplierId, sort, name, projects);
+        } else if (brand != null && supplierId != null) {
+            resources = resourceBean.findResourcesByBrandAndSupplier(brand, supplierId);
         } else if (type != null) {
-            resources = resourceBean.findResourcesByType(type);
+            resources = resourceBean.findResourcesByTypeSorted(type, sort, name, projects);
         } else if (brand != null) {
-            resources = resourceBean.findResourcesByBrand(brand);
-        } else if (supplierName != null) {
-            resources = resourceBean.findResourcesBySupplier(supplierName);
-        } else if (sourceId != null) {
-            resources = resourceBean.findResourceBySourceId(sourceId);
+            resources = resourceBean.findResourcesByBrandSorted(brand, sort, name, projects);
+        } else if (supplierId != null) {
+            resources = resourceBean.findResourcesBySupplierSorted(supplierId, sort, name, projects);
         } else {
             resources = new ArrayList<>();
         }
 
         return Response.status(Response.Status.OK).entity(resources).build();
+    }
+
+    @GET
+    @Path("/brands")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBrands() {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to retrieve all brands from IP: " + ip);
+
+        // Retrieve all brands
+        return Response.status(Response.Status.OK).entity(resourceBean.getAllBrands()).build();
     }
 
     @PUT

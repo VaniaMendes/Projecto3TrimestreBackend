@@ -15,6 +15,8 @@ import java.io.Serializable;
 @NamedQuery(name = "ProjectResource.findAllResourcesFromProject", query = "SELECT pr FROM ProjectResourceEntity pr WHERE pr.project.id = :projectId")
 @NamedQuery(name = "ProjectResource.findAllProjectsFromResource", query = "SELECT pr FROM ProjectResourceEntity pr WHERE pr.resource.id = :resourceId")
 @NamedQuery(name = "ProjectResource.findResourceFromProject", query = "SELECT pr FROM ProjectResourceEntity pr WHERE pr.project.id = :projectId AND pr.resource.id = :resourceId")
+
+@NamedQuery(name = "ProjectResource.countProjectsFromResource", query = "SELECT COUNT(pr) FROM ProjectResourceEntity pr WHERE pr.resource.id = :resourceId AND pr.quantity > 0")
 public class ProjectResourceEntity implements Serializable {
 
     // Project associated with the resource

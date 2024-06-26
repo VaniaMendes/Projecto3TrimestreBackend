@@ -401,9 +401,15 @@ public class ProjectBean implements Serializable {
      * @param quantity The quantity of the resource to be added.
      * @return true if the addition was successful, false otherwise.
      */
-    public boolean addResource(Long projectId, Long resourceId, int quantity) {
+    public boolean addResource(Long projectId, Long resourceId, int quantity, String token) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
+            return false;
+        }
+        cloneMessageEntities(projectEntity);
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null) {
             return false;
         }
 
@@ -422,6 +428,8 @@ public class ProjectBean implements Serializable {
 
         projectEntity.setUpdatedAt(LocalDateTime.now());
         projectDao.merge(projectEntity);
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.ADDED_RESOURCE, author, resourceEntity.getName());
         return true;
     }
 

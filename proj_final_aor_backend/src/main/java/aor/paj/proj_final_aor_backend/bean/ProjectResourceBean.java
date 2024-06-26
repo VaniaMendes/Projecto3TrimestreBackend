@@ -1,8 +1,7 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectResourceDao;
-import aor.paj.proj_final_aor_backend.dto.Resource;
-import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
+import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfoUser;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectResourceEntity;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
@@ -105,7 +104,7 @@ public class ProjectResourceBean implements Serializable {
         projectResourceDao.persist(projectResourceEntity);
     }
 
-    public List<ResourceSmallInfo> getAllResourcesFromProject(long projectId) {
+    public List<ResourceSmallInfoUser> getAllResourcesFromProject(long projectId) {
         ProjectEntity projectEntity = projectBean.findProject(projectId);
 
         return projectResourceDao.findAllResourcesFromProject(projectEntity.getId())
