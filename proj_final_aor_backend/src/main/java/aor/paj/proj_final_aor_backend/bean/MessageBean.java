@@ -332,6 +332,7 @@ public class MessageBean implements Serializable {
         message.setReadStatus(true);
         message.setReadTimestamp(LocalDateTime.now());
         messageDao.updateMessage(message);
+
         return true;
     }
 

@@ -314,7 +314,8 @@ public class NotificationBean implements Serializable {
 
 
         String typeOfNotification =  NotificationType.MESSAGE_RECEIVED.toString();
-        if(notification.getType().equals(typeOfNotification)){
+        String typeOfNotification2 =  NotificationType.MESSAGE_PROJECT.toString();
+        if(notification.getType().equals(typeOfNotification) || notification.getType().equals(typeOfNotification2)){
             List<NotificationEntity> notificationEntityList = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification );
 
             for(NotificationEntity notificationEntity : notificationEntityList){
