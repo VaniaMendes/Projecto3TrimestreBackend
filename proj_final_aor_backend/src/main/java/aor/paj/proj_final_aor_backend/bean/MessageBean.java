@@ -9,6 +9,8 @@ import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.websocket.Notifier;
+import aor.paj.proj_final_aor_backend.websocket.WebsocketMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.ejb.EJB;
@@ -69,6 +71,9 @@ public class MessageBean implements Serializable {
     @EJB
     Notifier notifier;
 
+    @EJB
+    WebsocketMessage websocketMessage;
+
 
     /**
      * Default constructor for the MessageBean class.
@@ -84,7 +89,7 @@ public class MessageBean implements Serializable {
         * @param message The message that is to be sent.
      * @return Returns true if the message was successfully sent, false otherwise.
      */
-    public boolean sendMessage(String token, Message message) {
+    public boolean sendMessage(String token, Message message)  {
         // Find the user by token
         UserEntity user = sessionDao.findUserByToken(token);
         // Check if the user exists
@@ -116,9 +121,11 @@ public class MessageBean implements Serializable {
         notificationBean.sendNotificationToOneUser(token, message.getReceiver().getId(), MESSAGE_RECEIVED);
 
 
+
+
         try {
             String jsonMsg = mapper.writeValueAsString(convertMessageToDto(messageEntity));
-            notifier.sendMessageTOUser(jsonMsg);
+            websocketMessage.sendMessageTOUser(jsonMsg);
             logger.debug("Notification sent to user with id: " + user.getId());
         } catch (Exception e) {
             logger.error("Erro ao serializar a mensagem: " + e.getMessage());
@@ -208,7 +215,6 @@ public class MessageBean implements Serializable {
         message.setReadTimestamp(null);
 
 
-
         // Add the new message to the userProject's messagesReceived
         userProject.addMessageReceived(message);
 
@@ -219,6 +225,13 @@ public class MessageBean implements Serializable {
         String nameOfProject = project.getName();
         String type = String.valueOf(NotificationType.MESSAGE_PROJECT);
         notificationBean.sendNotificationToProjectUsers(token, project_id, type, nameOfProject );
+        try {
+            String jsonMsg = mapper.writeValueAsString(convertMessageChatGroupToDTO(message));
+            websocketMessage.sendMessageToProject(jsonMsg, project_id);
+            logger.debug("Message sent to project with id: " + project_id);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing the message: " + e.getMessage());
+        }
         return true;
 
     }
@@ -355,6 +368,7 @@ public class MessageBean implements Serializable {
         messageDto.setSendTimestamp(messageEntity.getSendTimestamp());
         messageDto.setReadStatus(messageEntity.isReadStatus());
         messageDto.setReadTimestamp(messageEntity.getReadTimestamp());
+        messageDto.setProjectId(messageEntity.getReceiverGroup().getProject().getId());
         return messageDto;
 
     }
