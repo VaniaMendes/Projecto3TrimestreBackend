@@ -15,6 +15,7 @@ import java.util.Set;
 @NamedQuery(name = "Supplier.findAllSuppliers", query = "SELECT s FROM SupplierEntity s ORDER BY s.name ASC")
 @NamedQuery(name = "Supplier.findSupplierById", query = "SELECT s FROM SupplierEntity s WHERE s.id = :id")
 @NamedQuery(name = "Supplier.findSupplierByName", query = "SELECT s FROM SupplierEntity s WHERE s.name = :name")
+@NamedQuery(name = "Supplier.findSupplierByNameStartingWith", query = "SELECT s FROM SupplierEntity s WHERE s.name LIKE CONCAT(:namePrefix, '%')")
 public class SupplierEntity implements Serializable {
 
     // Unique identifier for serialization

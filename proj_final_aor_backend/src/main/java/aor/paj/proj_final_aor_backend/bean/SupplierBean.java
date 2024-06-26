@@ -108,6 +108,15 @@ public class SupplierBean implements Serializable {
         return supplierDao.findSupplierByName(name);
     }
 
+    public List<Supplier> searchSuppliers(String name) {
+        List<SupplierEntity> supplierEntities = supplierDao.findSuppliersByNameStartingWith(name);
+        List<Supplier> suppliers = new ArrayList<>();
+        for (SupplierEntity supplierEntity : supplierEntities) {
+            suppliers.add(convertToDTO(supplierEntity));
+        }
+        return suppliers;
+    }
+
     /**
      * Retrieves a supplier from the database by its ID.
      *

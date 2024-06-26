@@ -66,4 +66,31 @@ public class SupplierDao extends AbstractDao<SupplierEntity>{
             return null;
         }
     }
+
+    /**
+     * Finds suppliers whose names start with a given string.
+     *
+     * This method uses a named query defined in the SupplierEntity class,
+     * "Supplier.findSupplierByNameStartingWith", which selects suppliers from the database
+     * whose names start with the provided string. The string is passed as a parameter to the
+     * named query.
+     *
+     * If the query returns results, they are collected into a list and returned by the method.
+     * If the query does not return any results (i.e., there are no suppliers whose names start
+     * with the provided string), a NoResultException is thrown. In this case, the method
+     * catches the exception and returns an empty list.
+     *
+     * @param namePrefix The string to search for at the start of supplier names.
+     * @return A list of SupplierEntity objects whose names start with the provided string.
+     *         If no such suppliers are found, an empty list is returned.
+     */
+    public List<SupplierEntity> findSuppliersByNameStartingWith(String namePrefix) {
+        try {
+            return em.createNamedQuery("Supplier.findSupplierByNameStartingWith", SupplierEntity.class)
+                    .setParameter("namePrefix", namePrefix)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
 }
