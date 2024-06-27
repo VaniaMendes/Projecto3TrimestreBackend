@@ -21,10 +21,12 @@ import java.time.LocalDateTime;
 
 @NamedQuery(name="Message.findTotalMessagesBetweenTwoUsers",  query = "SELECT COUNT(m) FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
 
-@NamedQuery(name = "Message.findUsersWithExchangedMessages", query =  "SELECT DISTINCT u " +
-        "FROM UserEntity u " +
-        "JOIN MessageEntity m ON u.id = m.sender.id OR u.id = m.receiver.id " +
-        "WHERE (m.sender.id = :userId OR m.receiver.id = :userId) AND u.id != :userId " )
+@NamedQuery(name = "Message.findUsersWithExchangedMessages", query =
+        "SELECT u " +
+                "FROM UserEntity u " +
+                "JOIN MessageEntity m ON u.id = m.sender.id OR u.id = m.receiver.id " +
+                "WHERE (m.sender.id = :userId OR m.receiver.id = :userId) AND u.id != :userId " +
+                "ORDER BY m.sendTimestamp DESC")
 
 public class MessageEntity implements Serializable {
 

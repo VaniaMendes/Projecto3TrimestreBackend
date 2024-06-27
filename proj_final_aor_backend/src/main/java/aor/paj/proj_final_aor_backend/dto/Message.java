@@ -23,6 +23,11 @@ public class Message extends TextEvent{
      */
     @XmlElement
     private String subject;
+    /**
+     * The id of the project.
+     */
+    @XmlElement
+    private long projectId;
 
     /**
      * Default constructor.
@@ -55,5 +60,13 @@ public class Message extends TextEvent{
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId) {
+        this.projectId = projectId;
     }
 }
