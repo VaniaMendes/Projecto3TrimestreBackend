@@ -9,6 +9,7 @@ import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
+import aor.paj.proj_final_aor_backend.util.enums.Workplace;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -597,6 +598,23 @@ public class UserBean implements Serializable {
 
         }
         return tokens;
+    }
+
+    public void createAdminUser() {
+        // Check if the admin user already exists
+        UserEntity admin = userDao.findUserByEmail("admin@example.com");
+        if (admin == null) {
+            // Create the admin user
+            UserEntity newAdmin = new UserEntity();
+            newAdmin.setEmail("admin@example.com");
+            newAdmin.setPassword(encryptPassword("Password1234%"));
+            newAdmin.setUserType(UserType.ADMIN);
+            newAdmin.setActiveState(true);
+            LabEntity lab = new LabEntity();
+            lab.setId(1);
+            newAdmin.setLab(lab);
+            userDao.persist(newAdmin);
+        }
     }
 
     public List<User> getUsersByFirstName(String token, String prefix) {
