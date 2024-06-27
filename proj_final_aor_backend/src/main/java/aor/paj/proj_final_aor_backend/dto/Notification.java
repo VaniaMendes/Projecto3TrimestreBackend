@@ -25,7 +25,7 @@ public class Notification extends TextEvent{
      * The name of the related entity.
      */
     @XmlElement
-    private String relatedEntityName;
+    private long relatedIDEntity;
 
 
     /**
@@ -50,19 +50,11 @@ public class Notification extends TextEvent{
         this.type = type;
     }
 
-    /**
-     * Returns the name of the related entity.
-     * @return the name of the related entity.
-     */
-    public String getRelatedEntityName() {
-        return relatedEntityName;
+    public long getRelatedIDEntity() {
+        return relatedIDEntity;
     }
 
-    /**
-     * Sets the name of the related entity.
-     * @param relatedEntityName the name of the related entity.
-     */
-    public void setRelatedEntityName(String relatedEntityName) {
-        this.relatedEntityName = relatedEntityName;
+    public void setRelatedIDEntity(long relatedIDEntity) {
+        this.relatedIDEntity = relatedIDEntity;
     }
 }

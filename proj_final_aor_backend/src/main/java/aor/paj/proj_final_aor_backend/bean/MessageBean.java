@@ -222,9 +222,9 @@ public class MessageBean implements Serializable {
         messageDao.createMessage(message);
         userProjectDao.merge(userProject);
 
-        String nameOfProject = project.getName();
+        long idPoject = project.getId();
         String type = String.valueOf(NotificationType.MESSAGE_PROJECT);
-        notificationBean.sendNotificationToProjectUsers(token, project_id, type, nameOfProject );
+        notificationBean.sendNotificationToProjectUsers(token, project_id, type, idPoject );
         try {
             String jsonMsg = mapper.writeValueAsString(convertMessageChatGroupToDTO(message));
             websocketMessage.sendMessageToProject(jsonMsg, project_id);
@@ -288,7 +288,7 @@ public class MessageBean implements Serializable {
     public List<MessageInfoUser> getListOfUsersWithExchangeMessages(String token) {
         UserEntity user = sessionDao.findUserByToken(token);
         if (user == null) {
-            logger.debug("User not found ffffffffffffffffffffffff");
+            logger.debug("User not found ");
             return null;
         }
         List<UserEntity> listOfUsers = messageDao.findUsersWithExchangedMessages(user.getId());

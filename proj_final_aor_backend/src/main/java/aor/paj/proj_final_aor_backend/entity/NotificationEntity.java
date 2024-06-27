@@ -123,8 +123,8 @@ public class NotificationEntity implements Serializable {
     /**
      * Related entity id
      */
-    @Column(name = "relatedEntityName")
-    private String relatedEntityName;
+    @Column(name = "relatedEntityId")
+    private long relatedEntityId;
 
     /**
      * Type of the notification
@@ -254,11 +254,11 @@ public class NotificationEntity implements Serializable {
         this.users = users;
     }
 
-    public String getRelatedEntityName() {
-        return relatedEntityName;
+    public long getRelatedEntityId() {
+        return relatedEntityId;
     }
 
-    public void setRelatedEntityName(String relatedEntityName) {
-        this.relatedEntityName = relatedEntityName;
+    public void setRelatedEntityId(long relatedEntityId) {
+        this.relatedEntityId = relatedEntityId;
     }
 }
