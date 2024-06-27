@@ -1,8 +1,11 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.AppSettingsDao;
 import aor.paj.proj_final_aor_backend.dao.LabDao;
+import aor.paj.proj_final_aor_backend.dto.AppSettings;
 import aor.paj.proj_final_aor_backend.dto.Lab;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
+import aor.paj.proj_final_aor_backend.entity.AppSettingsEntity;
 import aor.paj.proj_final_aor_backend.entity.LabEntity;
 import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import aor.paj.proj_final_aor_backend.util.enums.Workplace;
@@ -28,6 +31,11 @@ public class LabBean implements Serializable {
     // Injecting the Lab Data Access Object
     @EJB
     private LabDao labDao;
+
+    @EJB
+    AppSettingsDao appSettingsDao;
+    @EJB
+    UserBean userBean;
 
     /**
      * Default constructor
@@ -59,6 +67,12 @@ public class LabBean implements Serializable {
                 logger.info("Lab already exists: " + workplace.name());
             }
         }
+        AppSettingsEntity appSettings = new AppSettingsEntity();
+        appSettings.setSessionTimeout(30);
+        appSettings.setMaxUsersPerProject(5);
+
+        appSettingsDao.createSettings(appSettings);
+        userBean.createAdminUser();
     }
 
     /**

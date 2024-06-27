@@ -115,8 +115,6 @@ public class NotificationDao extends AbstractDao<NotificationEntity>{
 
 
 
-
-
     public long numberOfnotificationsByUserID(long userId) {
         try {
             // Contar todas as notificações que não são do tipo MESSAGE_RECEIVED

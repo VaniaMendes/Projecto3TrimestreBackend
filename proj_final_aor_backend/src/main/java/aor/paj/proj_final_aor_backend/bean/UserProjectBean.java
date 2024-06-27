@@ -393,6 +393,10 @@ public class UserProjectBean implements Serializable {
         return users;
     }
 
+    public boolean isUserInAProject (long userId, long projectId) {
+        return userProjectDao.isUserInAProject(userId, projectId);
+    }
+
     /**
      * Method to convert a UserProjectEntity object to a UserProject object.
      * @param userProjectEntity The UserProjectEntity object to be converted.

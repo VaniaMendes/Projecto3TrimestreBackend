@@ -186,4 +186,18 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
+    /**
+     * Checks if a user is in a project.
+     * @param userId The ID of the user.
+     * @param projectId The ID of the project.
+     * @return True if the user is in the project, false otherwise.
+     */
+    public boolean isUserInAProject(long userId, long projectId){
+        try {
+            return em.createNamedQuery("UserProject.isUserInAProject", UserProjectEntity.class).setParameter("userId", userId).setParameter("projectId", projectId).getSingleResult() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -116,7 +116,7 @@ public class NotificationBean implements Serializable {
      * @throws Exception If no user is found with the given token, if there are no users to send the notification to, or if no type is specified for the notification.
      */
 
-    public boolean sendNotificationToAllUsers(String token, NotificationType type, String message) {
+    public boolean sendNotificationToAllUsers(String token, NotificationType type, long projectId) {
 
         UserEntity sender = sessionDao.findUserByToken(token);
 
@@ -148,8 +148,9 @@ public class NotificationBean implements Serializable {
                     notification.setSender(userBean.convertUserToDTOForMessage(sender));
                     notification.setType(type);
                     notification.setReceiver(userBean.convertUserToDTOForMessage(user));
+                    notification.setRelatedIDEntity(projectId);
 
-                    notification.setRelatedEntityName(message);
+
 
                     NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
                     notificationDao.create(notificationEntity);
@@ -181,7 +182,7 @@ public class NotificationBean implements Serializable {
 
 
 
-    public boolean sendNotificationToProjectUsers(String token, long project_id, String type, String nameOfProject) {
+    public boolean sendNotificationToProjectUsers(String token, long project_id, String type, long projectID) {
         UserEntity sender = sessionDao.findUserByToken(token);
 
         if(sender == null) {
@@ -213,7 +214,7 @@ public class NotificationBean implements Serializable {
                 notification.setSendTimestamp(LocalDateTime.now());
                 notification.setSender(userBean.convertUserToDTOForMessage(sender));
                 notification.setType(NotificationType.valueOf(type));
-                notification.setRelatedEntityName(nameOfProject);
+                notification.setRelatedIDEntity(projectID);
 
                 NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
                 notificationDao.create(notificationEntity);
@@ -277,7 +278,7 @@ public class NotificationBean implements Serializable {
             notification.setReadStatus(notificationEntity.isReadStatus());
             notification.setSendTimestamp(notificationEntity.getSendTimestamp());
             notification.setType(NotificationType.valueOf(notificationEntity.getType().toString()));
-            notification.setRelatedEntityName(notificationEntity.getRelatedEntityName());
+            notification.setRelatedIDEntity(notificationEntity.getRelatedEntityId());
             UserEntity senderEntity = new UserEntity();
             senderEntity.setId(notificationEntity.getSender_id());
             senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
@@ -314,7 +315,8 @@ public class NotificationBean implements Serializable {
 
 
         String typeOfNotification =  NotificationType.MESSAGE_RECEIVED.toString();
-        if(notification.getType().equals(typeOfNotification)){
+        String typeOfNotification2 =  NotificationType.MESSAGE_PROJECT.toString();
+        if(notification.getType().equals(typeOfNotification) || notification.getType().equals(typeOfNotification2)){
             List<NotificationEntity> notificationEntityList = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification );
 
             for(NotificationEntity notificationEntity : notificationEntityList){
@@ -337,7 +339,7 @@ public class NotificationBean implements Serializable {
         notificationEntity.setReadStatus(notification.isReadStatus());
         notificationEntity.setSendTimestamp(notification.getSendTimestamp());
         notificationEntity.setType(notification.getType().toString());
-        notificationEntity.setRelatedEntityName(notification.getRelatedEntityName());
+        notificationEntity.setRelatedEntityId(notification.getRelatedIDEntity());
         notificationEntity.setSender_id(userBean.convertUserToDTOForMessage(sender).getId());
         return notificationEntity;
     }
