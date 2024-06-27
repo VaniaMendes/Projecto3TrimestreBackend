@@ -478,8 +478,6 @@ public class UserBean implements Serializable {
         return hashedPassword;
     }
 
-
-
     //Methods for update user´s fields
     /**
      * This method is responsible for updating a user´s fields.

@@ -1,7 +1,9 @@
 package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.SupplierBean;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,15 +22,25 @@ public class SupplierService {
     @EJB
     SupplierBean supplierBean;
 
+    @EJB
+    UserBean userBean;
+
     @Context
     private HttpServletRequest request;
 
     @POST
-    @Path("/register")
+    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerSupplier(Supplier supplier) {
+    public Response registerSupplier(Supplier supplier, @HeaderParam("token") String token){
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
         logger.info("Received request to register supplier from IP: " + ip);
 
         // Create the supplier
@@ -74,6 +86,25 @@ public class SupplierService {
             logger.error("Failed to update supplier: " + name);
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update supplier").build();
         }
+    }
+
+    @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchSuppliers(@QueryParam("name") String name,
+                                    @HeaderParam("token") String token) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        logger.info("Received request to search suppliers from IP: " + ip);
+
+        // Retrieve all suppliers
+        return Response.ok(supplierBean.searchSuppliers(name)).build();
     }
 
 
