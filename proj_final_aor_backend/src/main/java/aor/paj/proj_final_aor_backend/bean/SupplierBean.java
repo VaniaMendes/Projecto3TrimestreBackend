@@ -108,6 +108,20 @@ public class SupplierBean implements Serializable {
         return supplierDao.findSupplierByName(name);
     }
 
+    /**
+     * Searches for suppliers whose names start with a given string.
+     *
+     * This method uses the `findSuppliersByNameStartingWith` method of the `supplierDao` to retrieve a list of
+     * `SupplierEntity` objects from the database whose names start with the provided string. Each `SupplierEntity`
+     * is then converted to a `Supplier` DTO using the `convertToDTO` method. The resulting list of `Supplier` DTOs
+     * is returned.
+     *
+     * If no suppliers are found whose names start with the provided string, an empty list is returned.
+     *
+     * @param name The string to search for at the start of supplier names.
+     * @return A list of `Supplier` DTOs whose names start with the provided string. If no such suppliers are found,
+     *         an empty list is returned.
+     */
     public List<Supplier> searchSuppliers(String name) {
         List<SupplierEntity> supplierEntities = supplierDao.findSuppliersByNameStartingWith(name);
         List<Supplier> suppliers = new ArrayList<>();

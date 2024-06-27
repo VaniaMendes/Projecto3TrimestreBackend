@@ -2,10 +2,13 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.ResourceBean;
 import aor.paj.proj_final_aor_backend.bean.SupplierBean;
+import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.dto.ResourceSmallInfo;
 import aor.paj.proj_final_aor_backend.dto.Supplier;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
+import aor.paj.proj_final_aor_backend.entity.SupplierEntity;
 import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,15 +33,27 @@ public class ResourceService {
     @EJB
     private SupplierBean supplierBean;
 
+    @EJB
+    private UserBean userBean;
+
     @Context
     private HttpServletRequest request;
 
     @POST
-    @Path("/register")
+    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerResource(Resource resource) {
+    public Response registerResource(Resource resource,
+                                     @HeaderParam("token") String token){
+
         String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
         logger.info("Received request to register resource from IP: " + ip);
 
         if (resourceBean.exists(resource.getName())) {
@@ -48,8 +63,19 @@ public class ResourceService {
 
         for (Supplier supplier : resource.getSuppliers()) {
             if (!supplierBean.exists(supplier.getName())) {
-                logger.error("Supplier does not exist: " + supplier.getName());
-                return Response.status(Response.Status.BAD_REQUEST).entity("Supplier does not exist, please create supplier first").build();
+
+                Supplier newSupplier = new Supplier();
+                newSupplier.setName(resource.getSuppliers().get(0).getName());
+                newSupplier.setContact(resource.getSuppliers().get(0).getContact());
+
+                SupplierEntity createdSupplier = supplierBean.createSupplier(newSupplier);
+
+                if (createdSupplier == null) {
+                    logger.error("Failed to register supplier: " + supplier.getName());
+                    return Response.status(Response.Status.BAD_REQUEST).entity("Failed to register supplier").build();
+                }else {
+                    logger.info("Supplier registered successfully: " + supplier.getName());
+                }
             }
         }
 
