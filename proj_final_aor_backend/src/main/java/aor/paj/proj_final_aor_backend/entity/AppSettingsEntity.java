@@ -1,8 +1,10 @@
 package aor.paj.proj_final_aor_backend.entity;
 
+import jakarta.ejb.Stateless;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+
 
 @Entity
 @Table(name = "settings")

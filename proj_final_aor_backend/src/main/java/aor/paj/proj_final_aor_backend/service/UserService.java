@@ -107,7 +107,7 @@ public class UserService {
 
            }
 
-           String token = userBean.loginUser(user.getEmail(), user.getPassword());
+           String token = userBean.loginUser(user.getEmail(), user.getPassword(), request);
            if(token == null){
                logger.warn("IP Adress " + request.getRemoteAddr() + " - User failed to login: " + user.getEmail() + " at " + LocalDateTime.now());
                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid data").build();

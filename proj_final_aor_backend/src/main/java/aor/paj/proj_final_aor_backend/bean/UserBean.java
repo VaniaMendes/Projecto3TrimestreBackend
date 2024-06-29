@@ -13,6 +13,8 @@ import aor.paj.proj_final_aor_backend.util.enums.Workplace;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
@@ -45,6 +47,8 @@ public class UserBean implements Serializable {
     LabDao labDao;
     @EJB
     UserInterestDao interestDao;
+    @EJB
+    SettingsBean settingsBean;
 
     public UserBean() {
     }
@@ -180,7 +184,7 @@ public class UserBean implements Serializable {
      * @param password The password of the user trying to login. It should be a valid password.
      * @return A string value representing the token of the user. Returns null if the email does not exist, the user is not active, or the password is incorrect.
      */
-    public String loginUser(String email, String password) {
+    public String loginUser(String email, String password, HttpServletRequest request) {
         UserEntity user = userDao.findUserByEmail(email);
         if (user != null && user.isActiveState()) {
 
@@ -189,11 +193,18 @@ public class UserBean implements Serializable {
             if (BCrypt.checkpw(password, user.getPassword())) {
                 String token = UUID.randomUUID().toString();
                 //Create a new session
-                SessionEntity session = new SessionEntity();
-                session.setUser(user);
-                session.setToken(token);
-                session.setInitSession(LocalDateTime.now());
-                sessionDao.create(session);
+                SessionEntity sessionEntity = new SessionEntity();
+                sessionEntity.setUser(user);
+                sessionEntity.setToken(token);
+                sessionEntity.setInitSession(LocalDateTime.now());
+                sessionDao.create(sessionEntity);
+
+
+                HttpSession session = request.getSession(true);
+                session.setMaxInactiveInterval((settingsBean.getSessionTimeout())*60);
+                session.setAttribute("sessionTimeout", settingsBean.getSessionTimeout());
+                session.setAttribute("token", token);
+
                 return token;
             }
         }
