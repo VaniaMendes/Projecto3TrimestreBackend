@@ -1,8 +1,5 @@
 package aor.paj.proj_final_aor_backend.util;
 
-import aor.paj.proj_final_aor_backend.bean.UserBean;
-import aor.paj.proj_final_aor_backend.entity.AppSettingsEntity;
-import jakarta.inject.Inject;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,24 +10,36 @@ import java.io.IOException;
 @WebFilter("/*")
 public class ActivityFilter implements Filter {
 
-    @Inject
-    SessionListener sessionListener;
+
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+        System.out.println("ActivityFilter initialized");
+    }
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
-            HttpSession session = httpRequest.getSession(true);
+            HttpSession session = httpRequest.getSession(false);
 
             if (session != null) {
-                SessionListener sessionListener = new SessionListener();
-                sessionListener.updateLastActivityTime(session);
+                session.setAttribute("lastActivityTime", System.currentTimeMillis());
+
+                System.out.println("ActivityFilter: Tempo de última atividade atualizado para a sessão " + session.getId());
+            } else {
+                System.out.println("ActivityFilter: Sessão não encontrada");
             }
         }
-
         chain.doFilter(request, response);
     }
 
+    @Override
+    public void destroy() {
+        // Limpeza do filtro, se necessário
+        System.out.println("ActivityFilter destroyed");
+    }
 
 
 }

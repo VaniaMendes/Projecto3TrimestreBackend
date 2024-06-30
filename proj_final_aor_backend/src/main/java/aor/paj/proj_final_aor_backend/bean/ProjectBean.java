@@ -582,6 +582,10 @@ public class ProjectBean implements Serializable {
         return convertToDTO(projectEntity);
     }
 
+    public ProjectEntity findProjectById(Long projectId) {
+        return projectDao.findProjectById(projectId);
+    }
+
     /**
      * Finds a SkillEntity by its id.
      *
@@ -1066,7 +1070,7 @@ public class ProjectBean implements Serializable {
      * @param project The project DTO to be converted.
      * @return The converted project entity.
      */
-    private ProjectEntity convertToEntity(Project project) {
+    public ProjectEntity convertToEntity(Project project) {
         ProjectEntity projectEntity = new ProjectEntity();
         projectEntity.setName(project.getName());
         projectEntity.setDescription(project.getDescription());

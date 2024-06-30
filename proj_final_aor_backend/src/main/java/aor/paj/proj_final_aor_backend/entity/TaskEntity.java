@@ -103,7 +103,7 @@ public class TaskEntity implements Serializable {
     /**
      * The project of the task. It is a many-to-one relationship with the ProjectEntity.
      */
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "project_id", referencedColumnName = "id")
     private ProjectEntity project;
 
@@ -342,5 +342,9 @@ public class TaskEntity implements Serializable {
      */
     public void setResponsibleUser(UserEntity responsibleUser) {
         this.responsibleUser = responsibleUser;
+    }
+
+    public Boolean getErased() {
+        return erased;
     }
 }

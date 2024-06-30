@@ -201,9 +201,15 @@ public class UserBean implements Serializable {
 
 
                 HttpSession session = request.getSession(true);
-                session.setMaxInactiveInterval((settingsBean.getSessionTimeout())*60);
-                session.setAttribute("sessionTimeout", settingsBean.getSessionTimeout());
+                int sessionTimeoutInMinutes = settingsBean.getSessionTimeout();
+                session.setMaxInactiveInterval(sessionTimeoutInMinutes * 60);
+                session.setAttribute("sessionTimeout", sessionTimeoutInMinutes);
                 session.setAttribute("token", token);
+                session.setAttribute("lastActivityTime", System.currentTimeMillis());
+
+                System.out.println("loginUser: Sessão criada com ID " + session.getId());
+                System.out.println("loginUser: SessionTimeout definido para " + sessionTimeoutInMinutes + " minutos");
+
 
                 return token;
             }

@@ -2,6 +2,8 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.TaskDao;
 import aor.paj.proj_final_aor_backend.dto.Task;
+import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskEntity;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -19,10 +21,14 @@ public class TaskBean implements Serializable {
     private static Logger logger = LogManager.getLogger(TaskBean.class);
 
     @EJB
-    private TaskDao taskDao;
+   TaskDao taskDao;
 
     @EJB
-    private UserBean userBean;
+    UserBean userBean;
+
+    @EJB
+    ProjectBean projectBean;
+
 
     public TaskBean() {
     }
@@ -31,14 +37,31 @@ public class TaskBean implements Serializable {
         this.taskDao = taskDao;
     }
 
-    public void registerTask(TaskEntity taskEntity) {
+    public boolean registerTask(Task task, long projectId) {
 
-        if (!validateTask(convertToDTO(taskEntity))) {
+        if (!validateTask(task)) {
             logger.debug("Task validation failed");
-            return;
+            return false;
         }
 
+        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+
+        if(projectEntity == null) {
+            logger.debug("Project with ID " + projectId + " not found");
+            return false;
+        }
+        // Criar a entidade da tarefa e associar ao projeto existente
+        TaskEntity taskEntity = convertToEntity(task);
+        taskEntity.setErased(false);
+        taskEntity.setUpdatedAt(LocalDateTime.now());
+        taskEntity.setCreatedAt(LocalDateTime.now());
+        taskEntity.setProject(projectEntity);
+
+        // Persistir a entidade da tarefa
         taskDao.persist(taskEntity);
+
+        logger.info("Task registered successfully: " + taskEntity.getId());
+        return true;
     }
 
     public boolean updateTaskStatus(Long taskId, int newStatus) {
@@ -82,6 +105,8 @@ public class TaskBean implements Serializable {
         return tasks;
     }
 
+
+
     private boolean validateTask(Task task) {
         return task.getTitle() != null
                 && task.getDescription() != null
@@ -90,7 +115,7 @@ public class TaskBean implements Serializable {
                 && !task.getStartDate().isAfter(task.getDeadline());
     }
 
-    private TaskEntity convertToEntity(Task task) {
+    public TaskEntity convertToEntity(Task task) {
         TaskEntity taskEntity = new TaskEntity();
         taskEntity.setTitle(task.getTitle());
         taskEntity.setDescription(task.getDescription());
@@ -100,6 +125,10 @@ public class TaskBean implements Serializable {
         taskEntity.setDeadline(task.getDeadline());
         taskEntity.setResponsibleUser(userBean.convertUserDtoToEntity(task.getOwner()));
         taskEntity.setAdditionalExecutors(task.getAdditionalExecutors());
+        taskEntity.setErased(task.getErased());
+        taskEntity.setUpdatedAt(task.getUpdatedAt());
+        
+
 
         return taskEntity;
     }

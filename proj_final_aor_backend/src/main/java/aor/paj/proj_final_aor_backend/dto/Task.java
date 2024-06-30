@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -286,6 +287,7 @@ public class Task {
 
     /**
      * Getter for the project associated with the task.
+     *
      * @return project associated with the task.
      */
     public Project getProject() {
