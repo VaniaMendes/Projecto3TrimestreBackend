@@ -140,6 +140,30 @@ public class ResourceService {
     }
 
     @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getResourceById(@PathParam("id") long id, @HeaderParam("token") String token) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to retrieve resource with ID " + id + " from IP: " + ip);
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        // Retrieve the resource
+        Resource resource = resourceBean.getResourceById(id);
+
+        // Check if the resource was found
+        if (resource != null) {
+            return Response.status(Response.Status.OK).entity(resource).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Resource not found").build();
+        }
+    }
+
+    @GET
     @Path("/brands")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBrands() {
@@ -151,10 +175,18 @@ public class ResourceService {
     }
 
     @PUT
-    @Path("/{id}/update")
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateResource(@PathParam("id") long id, Resource resource) {
+    public Response updateResource(@PathParam("id") long id,
+                                   @HeaderParam("token") String token,
+                                   Resource resource) {
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
 
         if (resourceBean.updateResource(id, resource.getDescription(), resource.getBrand(), resource.getObservation(), resource.getPhoto(), resource.getSourceId()) != null) {
             return Response.status(Response.Status.OK).entity("Resource updated successfully").build();
@@ -164,10 +196,18 @@ public class ResourceService {
     }
 
     @PUT
-    @Path("/{id}/supplier")
+    @Path("/{id}/supplier/{supplierId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateResourceSupplier(@PathParam("id") Long resourceId, @HeaderParam("supplierId") Long supplierId) {
+    public Response updateResourceSupplier(@PathParam("id") Long resourceId,
+                                           @PathParam("supplierId") Long supplierId,
+                                           @HeaderParam("token") String token){
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
 
         if (supplierId != null) {
             resourceBean.addSupplierToResource(resourceId, supplierId);
