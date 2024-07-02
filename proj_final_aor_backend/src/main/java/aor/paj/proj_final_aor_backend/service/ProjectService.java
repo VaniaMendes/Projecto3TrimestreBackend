@@ -2,7 +2,9 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +32,8 @@ public class ProjectService {
     private UserBean userBean;
     @EJB
     private ProjectResourceBean projectResourceBean;
+    @EJB
+    private ResourceBean resourceBean;
 
     @Context
     private HttpServletRequest request;
@@ -146,20 +150,23 @@ public class ProjectService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addResource(@PathParam("id") long projectId,
-                                @HeaderParam("resourceId") long resourceId,
                                 @HeaderParam("quantity") int quantity,
-                                @HeaderParam("token") String token){
-        String ip = request.getRemoteAddr();
-        logger.info("Received request to add resource to project from IP: " + ip);
+                                @HeaderParam("token") String token,
+                                Resource resource){
 
-        if (projectBean.addResource(projectId, resourceId, quantity, token)){
-            logger.info("Resource added to project successfully");
-            return Response.status(Response.Status.OK).entity("Resource added to project successfully").build();
-        } else {
-            logger.error("Failed to add resource to project");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add resource to project").build();
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
         }
 
+        if (resourceBean.getResourceById(resource.getId()) == null) {
+            resourceBean.createResource(resource);
+        }
+
+        if (projectBean.addResource(projectId, resource.getId(), quantity, token)){
+            return Response.status(Response.Status.OK).entity("Resource added to project successfully").build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add resource to project").build();
+        }
     }
 
     @POST

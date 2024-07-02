@@ -103,6 +103,24 @@ public class ResourceBean implements Serializable {
         return resourceEntity;
     }
 
+    /**
+     * This method is used to find a resource by its ID.
+     * It first calls the findResourceById method of the resourceDao to fetch the ResourceEntity from the database.
+     * If the ResourceEntity is not found, it logs an error and returns null.
+     * If the ResourceEntity is found, it converts it to a Resource object using the convertToDTO method and returns it.
+     *
+     * @param id The ID of the resource to be found. It should be a valid Long.
+     * @return The Resource object corresponding to the found ResourceEntity. If the ResourceEntity is not found, it returns null.
+     */
+    public Resource getResourceById(Long id) {
+        ResourceEntity resourceEntity = resourceDao.findResourceById(id);
+        if (resourceEntity == null) {
+            logger.error("Resource with id '" + id + "' does not exist");
+            return null;
+        }
+        return convertToDTO(resourceEntity);
+    }
+
 
     /**
      * Fetches all resources from the database.
