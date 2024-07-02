@@ -152,17 +152,17 @@ public class ProjectService {
     public Response addResource(@PathParam("id") long projectId,
                                 @HeaderParam("quantity") int quantity,
                                 @HeaderParam("token") String token,
-                                Resource resource){
+                                @HeaderParam("resourceId") long resourceId) {
 
         if (projectBean.findProject(projectId) == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
         }
 
-        if (resourceBean.getResourceById(resource.getId()) == null) {
-            resourceBean.createResource(resource);
+        if (resourceBean.getResourceById(resourceId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Resource not found").build();
         }
 
-        if (projectBean.addResource(projectId, resource.getId(), quantity, token)){
+        if (projectBean.addResource(projectId, resourceId, quantity, token)){
             return Response.status(Response.Status.OK).entity("Resource added to project successfully").build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to add resource to project").build();
