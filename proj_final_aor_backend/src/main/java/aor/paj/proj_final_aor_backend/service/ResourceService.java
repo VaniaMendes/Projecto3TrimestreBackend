@@ -196,25 +196,26 @@ public class ResourceService {
     }
 
     @PUT
-    @Path("/{id}/supplier/{supplierId}")
+    @Path("/{id}/supplier")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateResourceSupplier(@PathParam("id") Long resourceId,
-                                           @PathParam("supplierId") Long supplierId,
-                                           @HeaderParam("token") String token){
+    public Response updateResourceSupplier(@PathParam("id") Long resourceId, @HeaderParam("token") String token, Supplier supplier) {
 
-        User user = userBean.getUserByToken(token);
-        if(user == null){
-            logger.error("User not found or unauthorized");
+        if (userBean.getUserByToken(token) == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
         }
 
-        if (supplierId != null) {
-            resourceBean.addSupplierToResource(resourceId, supplierId);
-            return Response.status(Response.Status.OK).entity("Resource supplier updated successfully").build();
+        if (supplier.getId() != null) {
+            resourceBean.addSupplierToResource(resourceId, supplier.getId());
+        } else {
+            SupplierEntity createdSupplier = supplierBean.createSupplier(supplier);
+            if (createdSupplier == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Failed to register supplier").build();
+            }
+            resourceBean.addSupplierToResource(resourceId, createdSupplier.getId());
         }
 
-        return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update resource supplier").build();
+        return Response.status(Response.Status.OK).entity("Resource supplier updated successfully").build();
     }
 
 
