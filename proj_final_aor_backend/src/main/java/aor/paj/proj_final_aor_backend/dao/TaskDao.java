@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dao;
 
+import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
@@ -56,7 +57,8 @@ public class TaskDao extends AbstractDao<TaskEntity>{
      */
     public List<TaskEntity> findTasksByProject(Long projectId) {
         try {
-            return em.createNamedQuery("Task.findTasksByProject", TaskEntity.class).setParameter("project", projectId).getResultList();
+            ProjectEntity projectEntity = em.find(ProjectEntity.class, projectId);
+            return em.createNamedQuery("Task.findTasksByProject", TaskEntity.class).setParameter("project", projectEntity).getResultList();
         } catch (NoResultException e) {
             return new ArrayList<>();
         }

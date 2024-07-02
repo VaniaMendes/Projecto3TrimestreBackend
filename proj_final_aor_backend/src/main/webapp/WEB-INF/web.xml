@@ -19,5 +19,15 @@
         <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
+    <filter>
+        <filter-name>ActivityFilter</filter-name>
+        <filter-class>aor.paj.proj_final_aor_backend.util.ActivityFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ActivityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
 
 </web-app>
