@@ -73,6 +73,40 @@ public class TaskBean implements Serializable {
         return true;
     }
 
+
+
+    public boolean updateTask(long taskId, Task task, List<Long> taskIdList, long projectId) {
+
+        if (!validateTask(task)) {
+            logger.debug("Task validation failed");
+            return false;
+        }
+
+        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+
+        if(projectEntity == null) {
+            logger.debug("Project with ID " + projectId + " not found");
+            return false;
+        }
+
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        if (taskEntity == null || taskEntity.isErased()) {
+            logger.debug("Task with ID " + taskId + " not found");
+            return false;
+        }
+
+        taskEntity = convertToEntity(task);
+
+        // Persistir a entidade da tarefa
+        taskDao.merge(taskEntity);
+        if(taskIdList != null) {
+            addDependentTask(taskEntity.getId(), taskIdList);
+        }
+
+        logger.info("Task updated successfully: " + taskEntity.getId());
+        return true;
+    }
+
     public boolean updateTaskStatus(Long taskId, int newStatus) {
 
         if (newStatus != 10 && newStatus != 20 && newStatus != 30) {
@@ -80,7 +114,7 @@ public class TaskBean implements Serializable {
         }
 
         TaskEntity taskEntity = taskDao.findTaskById(taskId);
-        if (taskEntity == null) {
+        if (taskEntity == null || taskEntity.isErased()) {
             return false;
         }else {
             taskEntity.setStateId(newStatus);
@@ -154,6 +188,17 @@ public class TaskBean implements Serializable {
     }
 
 
+    public boolean softDeleteTask(Long taskId) {
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        if (taskEntity == null) {
+            return false;
+        } else {
+            taskEntity.setErased(true);
+            taskDao.merge(taskEntity);
+            logger.info("Task erased: " + taskEntity.getId());
+            return true;
+        }
+    }
 
     private boolean validateTask(Task task) {
         return task.getTitle() != null
