@@ -18,7 +18,7 @@ public class AppSettingsDao extends AbstractDao<ActivityEntity>{
         return em.find(AppSettingsEntity.class, id);
     }
     public void createSettings(AppSettingsEntity settings) {
-        em.persist(settings);
+        em.merge(settings);
     }
 
    public void updateSettings (AppSettingsEntity settings) {

@@ -43,4 +43,23 @@ public class SettingsBean implements Serializable {
         appSettingsDao.updateSettings(appSettingsEntity);
         return true;
     }
+    public void createDefaultSettings() {
+        AppSettingsEntity appSettingsEntity = appSettingsDao.findSettingsById(1);
+
+        if (appSettingsEntity == null) {
+            appSettingsEntity = new AppSettingsEntity();
+            appSettingsEntity.setId(Long.valueOf(1));
+            appSettingsEntity.setSessionTimeout(30);
+            appSettingsEntity.setMaxUsersPerProject(5);
+            appSettingsDao.createSettings(appSettingsEntity);
+        }
+    }
+
+    public int getSessionTimeout() {
+        AppSettingsEntity appSettingsEntity = appSettingsDao.findSettingsById(1);
+        if(appSettingsEntity == null) {
+            return 0;
+        }
+        return appSettingsEntity.getSessionTimeout();
+    }
 }

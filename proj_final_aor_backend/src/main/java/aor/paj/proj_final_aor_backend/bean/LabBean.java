@@ -67,12 +67,8 @@ public class LabBean implements Serializable {
                 logger.info("Lab already exists: " + workplace.name());
             }
         }
-        AppSettingsEntity appSettings = new AppSettingsEntity();
-        appSettings.setSessionTimeout(30);
-        appSettings.setMaxUsersPerProject(5);
 
-        appSettingsDao.createSettings(appSettings);
-        userBean.createAdminUser();
+
     }
 
     /**

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "task")
 @NamedQuery(name = "Task.findAllTasks", query = "SELECT t FROM TaskEntity t")
 @NamedQuery(name = "Task.findTaskById", query = "SELECT t FROM TaskEntity t WHERE t.id = :id")
-@NamedQuery(name = "Task.findTasksByProject", query = "SELECT t FROM TaskEntity t WHERE t.project = :project")
+@NamedQuery(name = "Task.findTasksByProject", query = "SELECT t FROM TaskEntity t WHERE t.project = :project ORDER BY t.startDate ASC")
 @NamedQuery(name = "Task.findTasksByUser", query = "SELECT t FROM TaskEntity t WHERE t.responsibleUser = :responsibleUser")
 @NamedQuery(name = "Task.findTasksByState", query = "SELECT t FROM TaskEntity t WHERE t.stateId = :stateId")
 @NamedQuery(name = "Task.findTasksByPriority", query = "SELECT t FROM TaskEntity t WHERE t.priorityId = :priorityId")
@@ -103,7 +103,7 @@ public class TaskEntity implements Serializable {
     /**
      * The project of the task. It is a many-to-one relationship with the ProjectEntity.
      */
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "project_id", referencedColumnName = "id")
     private ProjectEntity project;
 
@@ -342,5 +342,9 @@ public class TaskEntity implements Serializable {
      */
     public void setResponsibleUser(UserEntity responsibleUser) {
         this.responsibleUser = responsibleUser;
+    }
+
+    public Boolean getErased() {
+        return erased;
     }
 }
