@@ -41,7 +41,7 @@ public class TaskBean implements Serializable {
         this.taskDao = taskDao;
     }
 
-    public boolean registerTask(Task task, long projectId, User user) {
+    public boolean registerTask(Task task, long projectId, User user, List<Long> taskIdList) {
 
         if (!validateTask(task)) {
             logger.debug("Task validation failed");
@@ -65,6 +65,9 @@ public class TaskBean implements Serializable {
 
         // Persistir a entidade da tarefa
         taskDao.persist(taskEntity);
+        if(taskIdList != null) {
+            addDependentTask(taskEntity.getId(), taskIdList);
+        }
 
         logger.info("Task registered successfully: " + taskEntity.getId());
         return true;
@@ -97,7 +100,13 @@ public class TaskBean implements Serializable {
         List<TaskEntity> taskEntities = taskDao.findTasksByProject(projectId);
         ArrayList<Task> tasks = new ArrayList<>();
         for (TaskEntity taskEntity : taskEntities) {
-            tasks.add(convertToDTO(taskEntity));
+            List<Task> getDependencies = getDependenciesForTask(taskEntity.getId());
+            Task task = convertToDTO(taskEntity);
+            if(getDependencies != null) {
+                task.setDependencies(getDependencies);
+            }
+
+            tasks.add(task);
         }
         return tasks;
     }
@@ -110,31 +119,37 @@ public class TaskBean implements Serializable {
         }
         return tasks;
     }
-    public boolean addDependentTask(Task dependency, long taskId) {
+    public boolean addDependentTask( long taskId, List<Long> taskIdList) {
         //Check if the principal tasks exists
         TaskEntity taskEntity = taskDao.findTaskById(taskId);
         if (taskEntity == null) {
             return false;
         }
 
-        // Verifica se a tarefa dependente existe
-        TaskEntity dependentTaskEntity = taskDao.findTaskById(dependency.getId());
+        for (Long dependentTaskId : taskIdList) {
+            // Check if the dependent task exists
+            TaskEntity dependentTaskEntity = taskDao.findTaskById(dependentTaskId);
+            if (dependentTaskEntity == null || dependentTaskEntity.getId() == taskId){
+                logger.error("Dependent task not found: " + dependentTaskId);
+                continue; // Skip to the next dependent task if not found
+            }
 
+            // Check if the dependency already exists
+            TaskDependencyEntity dependencyAlreadyExists = taskDependencyDao.dependencyExists(taskId, dependentTaskId);
+            if (dependencyAlreadyExists != null) {
+                logger.warn("Dependency already exists between tasks: " + taskId + " and " + dependentTaskId);
+                continue; // Skip to the next dependent task if dependency already exists
+            }
 
-        TaskDependencyEntity dependencyAlreadyExists = taskDependencyDao.dependencyExists(taskId, dependency.getId());
+            // Create the task dependency entity
+            TaskDependencyEntity taskDependencyEntity = new TaskDependencyEntity();
+            taskDependencyEntity.setTask(taskEntity);
+            taskDependencyEntity.setDependentTask(dependentTaskEntity);
 
-        if(dependencyAlreadyExists != null) {
-            return false;
+            // Persist the dependency
+            taskDependencyDao.createTaskDependency(taskDependencyEntity);
+            logger.debug("Dependent task added successfully: " + taskDependencyEntity.getId());
         }
-
-        // Cria a entidade de dependência de tarefas
-        TaskDependencyEntity taskDependencyEntity = new TaskDependencyEntity();
-        taskDependencyEntity.setTask(taskEntity);
-        taskDependencyEntity.setDependentTask(dependentTaskEntity);
-
-        // Persiste a dependência
-        taskDependencyDao.createTaskDependency(taskDependencyEntity);
-        logger.debug("Dependent task added successfully: " + taskDependencyEntity.getId());
         return true;
     }
 
@@ -164,6 +179,15 @@ public class TaskBean implements Serializable {
         return taskEntity;
     }
 
+    public List<Task> getDependenciesForTask(Long taskId) {
+        List<TaskEntity> dependencies = taskDependencyDao.findDependenciesByTaskId(taskId);
+        List<Task> dependentTasks = new ArrayList<>();
+        for (TaskEntity dependency : dependencies) {
+            dependentTasks.add(convertToDTO(dependency));
+        }
+        return dependentTasks;
+    }
+
     private Task convertToDTO(TaskEntity taskEntity) {
         Task task = new Task();
         task.setId(taskEntity.getId());
@@ -177,6 +201,7 @@ public class TaskBean implements Serializable {
         task.setAdditionalExecutors(taskEntity.getAdditionalExecutors());
         task.setErased(taskEntity.isErased());
         task.setUpdatedAt(taskEntity.getUpdatedAt());
+
         return task;
     }
 

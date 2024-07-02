@@ -3,6 +3,9 @@ package aor.paj.proj_final_aor_backend.dao;
 import aor.paj.proj_final_aor_backend.entity.TaskDependencyEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskEntity;
 import jakarta.ejb.Stateless;
+import jakarta.persistence.NoResultException;
+
+import java.util.List;
 
 @Stateless
 public class TaskDependencyDao extends AbstractDao<TaskDependencyEntity> {
@@ -17,14 +20,31 @@ public class TaskDependencyDao extends AbstractDao<TaskDependencyEntity> {
 
     public TaskDependencyEntity dependencyExists(long taskId, long dependencyId) {
         try {
-            return (TaskDependencyEntity) em.createNamedQuery("TaskDependency.findDependency")
+            return em.createNamedQuery("TaskDependency.findDependency", TaskDependencyEntity.class)
                     .setParameter("taskId", taskId)
                     .setParameter("dependentTaskId", dependencyId)
                     .getSingleResult();
-        } catch (Exception e) {
-            e.printStackTrace(); // print the exception
+        } catch (NoResultException e) {
+
+
             return null;
+        } catch (Exception e) {
+
+            throw new RuntimeException("Error checking dependency", e);
         }
     }
+
+    public List<TaskEntity> findDependenciesByTaskId(long taskId) {
+        try {
+            return em.createNamedQuery("TaskDependency.findDependenciesByTaskId", TaskEntity.class)
+                    .setParameter("taskId", taskId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding dependencies", e);
+        }
+    }
+
 
 }

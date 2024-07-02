@@ -51,6 +51,9 @@ import jakarta.servlet.http.HttpSessionListener;
         }
 
 
+        public void updateSessionTimeout(HttpSession session, int timeout) {
+            session.setMaxInactiveInterval( timeout *60);
+        }
 
     }
 

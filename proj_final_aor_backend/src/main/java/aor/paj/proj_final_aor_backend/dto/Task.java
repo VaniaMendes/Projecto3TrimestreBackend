@@ -5,6 +5,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * This class represents a Task in the system.
@@ -84,6 +85,8 @@ public class Task {
     // Flag indicating if the task is erased
     @XmlElement
     private Boolean erased;
+    @XmlElement
+    private List<Task> dependencies;
 
     /**
      * Default constructor for the Task class.
@@ -316,5 +319,13 @@ public class Task {
      */
     public void setErased(Boolean erased) {
         this.erased = erased;
+    }
+
+    public List<Task> getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(List<Task> dependencies) {
+        this.dependencies = dependencies;
     }
 }

@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "task_dependency")
 @NamedQuery(name = "TaskDependency.findDependency", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.dependentTask.id = :dependentTaskId")
+@NamedQuery(name= "TaskDependency.findDependenciesByTaskId", query = "SELECT td.dependentTask FROM TaskDependencyEntity td WHERE td.task.id = :taskId")
 public class TaskDependencyEntity implements Serializable {
 
     // Unique identifier for serialization
