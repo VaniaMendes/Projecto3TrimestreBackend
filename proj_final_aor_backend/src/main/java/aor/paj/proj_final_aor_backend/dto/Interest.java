@@ -13,7 +13,7 @@ public class Interest {
      * The id of the interest.
      */
     @XmlElement
-    private long id;
+    private Long id;
 
     /**
      * The name of the interest.
@@ -31,7 +31,7 @@ public class Interest {
      * Returns the ID of the interest.
      * @return the ID of the interest.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -40,7 +40,7 @@ public class Interest {
      * Sets the ID of the interest.
      * @param id the ID of the interest.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
