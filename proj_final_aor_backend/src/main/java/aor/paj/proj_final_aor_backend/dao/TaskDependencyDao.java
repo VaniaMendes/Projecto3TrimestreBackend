@@ -26,7 +26,6 @@ public class TaskDependencyDao extends AbstractDao<TaskDependencyEntity> {
                     .getSingleResult();
         } catch (NoResultException e) {
 
-
             return null;
         } catch (Exception e) {
 
@@ -37,6 +36,18 @@ public class TaskDependencyDao extends AbstractDao<TaskDependencyEntity> {
     public List<TaskEntity> findDependenciesByTaskId(long taskId) {
         try {
             return em.createNamedQuery("TaskDependency.findDependenciesByTaskId", TaskEntity.class)
+                    .setParameter("taskId", taskId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding dependencies", e);
+        }
+    }
+
+    public List<TaskDependencyEntity> findTaskDependenciesEntitesByTaskId(long taskId) {
+        try {
+            return em.createNamedQuery("TaskDependency.findTaskDependenciesByTaskId", TaskDependencyEntity.class)
                     .setParameter("taskId", taskId)
                     .getResultList();
         } catch (NoResultException e) {

@@ -4,8 +4,6 @@ import aor.paj.proj_final_aor_backend.bean.TaskBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Task;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.dto.UserRegistration;
-
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,42 +56,30 @@ public class TaskService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting tasks: " + e.getMessage()).build();
         }
     }
-    @POST
-    @Path("/{projectId}/{taskId}/dependent-task")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @GET
+    @Path("/{projectId}/tasks-info")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response addDependentTask(@HeaderParam("token") String token, @PathParam("projectId") long projectId,
-                                     @PathParam("taskId") long taskId, List<Long> tasksIdList,
-                                     @Context HttpServletRequest request) {
+    public Response getTasksInfo(@HeaderParam("token") String token, @PathParam("projectId") long projectId, @Context HttpServletRequest request) {
         String ip = request.getRemoteAddr();
-        logger.debug("Received request to add a dependent task");
+        logger.debug("Received request to get tasks");
         User user = userBean.getUserByToken(token);
 
         try {
-            if (tasksIdList.isEmpty()) {
-                logger.error("IP Address " + ip + ": Error adding dependent task: Task object is null");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Task object is null").build();
-            }
             if (user == null) {
-                logger.error("IP Address " + ip + ": Error adding dependent task: User not found");
+                logger.error("IP Address " + ip + ": Error getting tasks: User not found");
                 return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
             }
 
-            boolean dependentTaskAdded = taskBean.addDependentTask( taskId, tasksIdList);
-
-            if (!dependentTaskAdded) {
-                logger.error("IP Address " + ip + ": Error adding dependent task");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Error adding dependent task").build();
-            }
-
-            logger.info("IP Address " + ip + ": Dependent task added successfully");
-            return Response.status(Response.Status.CREATED).entity("Dependent task added successfully").build();
+            logger.info("IP Address " + ip + ": Tasks retrieved successfully");
+            return Response.status(Response.Status.OK).entity(taskBean.getTasksFromProjectMinimalInfo(projectId)).build();
         } catch (Exception e) {
-            logger.error("IP Address " + ip + ": Error adding dependent task: " + e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error adding dependent task: " + e.getMessage()).build();
+            logger.error("IP Address " + ip + ": Error getting tasks: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting tasks: " + e.getMessage()).build();
         }
     }
+
 
     @POST
     @Path("/{projectId}/add-task")
@@ -204,8 +190,17 @@ public class TaskService {
         }
     }
 
+    /**
+     * Method to update a task
+     * @param token - user token
+     * @param projectId - project id
+     * @param taskId - task id
+     * @param requestBody - request body
+     * @param request - http request
+     * @return
+     */
     @PUT
-    @Path("/{projectId}/{taskId}/update-task")
+    @Path("/{projectId}/{taskId}/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
 
@@ -228,26 +223,65 @@ public class TaskService {
             List<Long> tasksIdList = objectMapper.readValue(tasksIdListJson.toString(), new TypeReference<List<Long>>() {});
 
             if (task == null) {
-                logger.error("IP Address " + ip + ": Error registering task: Task object is null");
+                logger.error("IP Address " + ip + ": Error updating task: Task object is null");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Task object is null").build();
             }
             if (user == null) {
-                logger.error("IP Address " + ip + ": Error registering task: User not found");
+                logger.error("IP Address " + ip + ": Error updating task: User not found");
                 return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
             }
 
             boolean taskUpdated = taskBean.updateTask(taskId, task, tasksIdList, projectId);
 
             if (!taskUpdated) {
-                logger.error("IP Address " + ip + ": Error registering task");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Error registering task").build();
+                logger.error("IP Address " + ip + ": Error updating task");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error updating task").build();
             }
 
-            logger.info("IP Address " + ip + ": Task registered successfully");
-            return Response.status(Response.Status.CREATED).entity("Task registered successfully").build();
+            logger.info("IP Address " + ip + ": Task updating successfully");
+            return Response.status(Response.Status.CREATED).entity("Task updating successfully").build();
         } catch (Exception e) {
-            logger.error("IP Address " + ip + ": Error registering task: " + e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error registering task: " + e.getMessage()).build();
+            logger.error("IP Address " + ip + ": Error updating task: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error updating task: " + e.getMessage()).build();
+        }
+    }
+
+    /**
+     * Method to get the task info for fill the update task modal
+     * @param token - user token
+     * @param projectId - project id
+     * @param taskId - task id
+     * @param request - http request
+     * @return - task info
+     */
+    @GET
+    @Path("/{projectId}/tasks/{taskId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTaskInfo(@HeaderParam("token") String token, @PathParam("projectId") long projectId,
+                                @PathParam("taskId") long taskId, @Context HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        logger.debug("Received request to get task info");
+        User user = userBean.getUserByToken(token);
+
+        try {
+            if (user == null) {
+                logger.error("IP Address " + ip + ": Error getting task info: User not found");
+                return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
+            }
+
+            Task task = taskBean.getTaskInfo(taskId);
+
+            if (task == null) {
+                logger.error("IP Address " + ip + ": Error getting task info: Task not found");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Task not found").build();
+            }
+
+            logger.info("IP Address " + ip + ": Task info retrieved successfully");
+            return Response.status(Response.Status.OK).entity(task).build();
+        } catch (Exception e) {
+            logger.error("IP Address " + ip + ": Error getting task info: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting task info: " + e.getMessage()).build();
         }
     }
 
