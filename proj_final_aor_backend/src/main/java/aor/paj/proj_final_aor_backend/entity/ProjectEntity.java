@@ -64,11 +64,29 @@ import java.util.*;
         "GROUP BY p.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
+@NamedQuery(name = "Project.searchKeywords", query = "SELECT p.keywords FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
+@NamedQuery(name = "Project.searchProjectsByNameOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%') ORDER BY p.createdAt DESC")
+@NamedQuery(name = "Project.searchProjectsByNameOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%')")
+@NamedQuery(name = "Project.searchProjectsByNameAndStateOrderedDESC", query = "SELECT p FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%') AND p.stateId = :stateId ORDER BY p.createdAt DESC")
+@NamedQuery(name = "Project.searchProjectsByNameAndStateOrderedASC", query = "SELECT p FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%') AND p.stateId = :stateId")
+@NamedQuery(name = "Project.searchProjectsByNameOrderedByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE p.name LIKE CONCAT('%', :name, '%') " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) ASC"
+)
+@NamedQuery(name = "Project.searchProjectsByNameOrderedByVacanciesDESC", query = "SELECT p FROM ProjectEntity p " +
+        "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
+        "WHERE p.name LIKE CONCAT('%', :name, '%') " +
+        "GROUP BY p.id " +
+        "ORDER BY (p.maxMembers - COUNT(up)) DESC"
+)
 
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
 @NamedQuery(name = "Project.countProjectsByState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.stateId = :stateId")
 @NamedQuery(name = "Project.countProjectsByKeyword", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
 @NamedQuery(name = "Project.countProjectsBySkill", query = "SELECT COUNT(p) FROM ProjectEntity p JOIN p.projectSkill ps JOIN ps.skill s WHERE s.name = :skillName")
+@NamedQuery(name = "Project.countSearchedProjectsByName", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%')")
 
 public class ProjectEntity implements Serializable {
 
