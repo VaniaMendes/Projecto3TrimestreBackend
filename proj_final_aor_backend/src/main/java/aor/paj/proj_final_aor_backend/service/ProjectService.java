@@ -69,6 +69,18 @@ public class ProjectService {
     }
 
     @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchProjects(@QueryParam("keyword") String keyword, @QueryParam("order") String order, @QueryParam("vacancies") Boolean vacancies, @QueryParam("state") Integer state) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to search projects from IP: " + ip);
+
+        // Get all projects
+        List<Project> projects = projectBean.searchProjects(keyword, order, vacancies, state);
+        return Response.status(Response.Status.OK).entity(projects).build();
+    }
+
+    @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectById(@PathParam("id") long projectId) {
@@ -104,6 +116,17 @@ public class ProjectService {
         logger.info("Received request to get all keywords from IP: " + ip);
 
         List<String> keywords = projectBean.getAllKeywords();
+        return Response.status(Response.Status.OK).entity(keywords).build();
+    }
+
+    @GET
+    @Path("/keywords/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchKeywords(@QueryParam("keyword") String keyword) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to search keywords from IP: " + ip);
+
+        List<String> keywords = projectBean.searchKeywords(keyword);
         return Response.status(Response.Status.OK).entity(keywords).build();
     }
 

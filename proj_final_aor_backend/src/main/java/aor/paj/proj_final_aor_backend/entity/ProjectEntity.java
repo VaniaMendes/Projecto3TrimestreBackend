@@ -64,6 +64,8 @@ import java.util.*;
         "GROUP BY p.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
+@NamedQuery(name = "Project.searchKeywords", query = "SELECT p.keywords FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
+@NamedQuery(name = "Project.searchProjectsByName", query = "SELECT p FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%')")
 
 @NamedQuery(name = "Project.countAllProjects", query = "SELECT COUNT(p) FROM ProjectEntity p")
 @NamedQuery(name = "Project.countProjectsByState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.stateId = :stateId")

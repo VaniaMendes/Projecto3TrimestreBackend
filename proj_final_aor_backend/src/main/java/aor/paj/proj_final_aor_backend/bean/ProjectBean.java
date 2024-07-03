@@ -950,6 +950,15 @@ public class ProjectBean implements Serializable {
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves projects by a specified keyword and order.
+     * This method allows fetching projects that contain a given keyword. The results can be ordered
+     * in ascending or descending order based on the creation time of the projects.
+     *
+     * @param keyword The keyword to search for in project titles, descriptions, etc.
+     * @param order Specifies the order of the results. Can be "asc" for ascending or "desc" for descending.
+     * @return A list of {@link Project} objects that match the keyword. Returns an empty list if no matches are found.
+     */
     public List<Project> getProjectsByKeyword(String keyword, String order) {
         if (order.equals("desc")) {
             return getProjectsByKeywordDESC(keyword);
@@ -959,10 +968,47 @@ public class ProjectBean implements Serializable {
         return new ArrayList<>();
     }
 
+    /**
+     * Retrieves all unique keywords used in projects.
+     * This method fetches a list of all unique keywords that have been associated with any project.
+     *
+     * @return A list of strings, each representing a unique keyword. Returns an empty list if no keywords are found.
+     */
     public List<String> getAllKeywords() {
         return projectDao.findAllUniqueKeywords();
     }
 
+    /**
+     * Searches for projects by a specified keyword.
+     * This method performs a database search for projects that contain the given keyword in their metadata.
+     * The search is case-insensitive and matches any part of the keyword.
+     *
+     * @param keyword The keyword to search for in project metadata.
+     * @return A list of strings representing the keywords found in the search. Returns an empty list if no matches are found.
+     */
+    public List<String> searchKeywords(String keyword) {
+        return projectDao.searchKeywords(keyword);
+    }
+
+    /**
+     * Searches for projects by name.
+     * This method queries the database for projects that contain the specified name or part of it.
+     * It uses the {@code projectDao} to perform the search operation based on the provided name parameter.
+     * After fetching the matching {@link ProjectEntity} objects, it clones the messages associated with each project
+     * to ensure that any modifications to the messages do not affect the original message entities.
+     * Finally, it converts the list of {@link ProjectEntity} objects into a list of {@link Project} DTOs
+     * and returns it. This conversion facilitates the separation of the entity model from the API model,
+     * allowing for more flexibility in data representation and manipulation.
+     *
+     * @param name The name or partial name of the project to search for.
+     * @return A list of {@link Project} DTOs that match the search criteria. If no projects are found,
+     *         an empty list is returned.
+     */
+    public List<Project> searchProjectsByName(String name) {
+        List<ProjectEntity> projects = projectDao.searchProjectsByName(name);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
 
     /**
      * This method is used to count the number of vacancies in a project.

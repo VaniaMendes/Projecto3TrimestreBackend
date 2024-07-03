@@ -342,6 +342,56 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
     }
 
     /**
+     * Searches for individual keywords within the projects' keywords that contain a specified piece of text.
+     * This method performs a database query to fetch projects whose keywords contain the specified search term.
+     * The keywords in the database are stored as comma-separated strings. This method splits these strings
+     * into individual keywords, filters them to include only those that contain the specified piece of text,
+     * and returns a list of unique keywords that match the criteria.
+     *
+     * @param keyword The piece of text to search for within the project keywords.
+     * @return A list of unique keywords that contain the specified piece of text. If no keywords match,
+     *         or an exception occurs (e.g., {@link NoResultException}), an empty list is returned.
+     */
+    public List<String> searchKeywords(String keyword) {
+        try {
+            // Fetch the comma-separated keywords string from the database
+            List<String> keywordStrings = em.createNamedQuery("Project.searchKeywords", String.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+
+            // Split the strings into individual keywords and filter them
+            List<String> filteredKeywords = keywordStrings.stream()
+                    .flatMap(keywords -> Arrays.stream(keywords.split(",")))
+                    .filter(k -> k.trim().toLowerCase().contains(keyword.toLowerCase()))
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            return filteredKeywords;
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Searches for projects by name.
+     * This method performs a database query to find projects whose names contain a specified search term.
+     * The search is case-insensitive and allows partial matches, as the '%' wildcard is used before and after the name parameter.
+     *
+     * @param name The name or partial name of the project to search for.
+     * @return A list of {@link ProjectEntity} objects that match the search criteria. If no projects are found,
+     *         or an exception occurs (e.g., {@link NoResultException}), an empty list is returned.
+     */
+    public List<ProjectEntity> searchProjectsByName(String name) {
+        try {
+            return em.createNamedQuery("Project.searchProjectsByName", ProjectEntity.class)
+                    .setParameter("name", "%" + name + "%")
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Counts the total number of projects in the database.
      * This method uses a named query "Project.countAllProjects" to count the projects.
      *
