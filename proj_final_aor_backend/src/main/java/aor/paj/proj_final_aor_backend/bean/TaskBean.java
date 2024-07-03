@@ -3,6 +3,7 @@ package aor.paj.proj_final_aor_backend.bean;
 import aor.paj.proj_final_aor_backend.dao.TaskDao;
 import aor.paj.proj_final_aor_backend.dao.TaskDependencyDao;
 import aor.paj.proj_final_aor_backend.dto.Task;
+import aor.paj.proj_final_aor_backend.dto.TaskInfo;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskDependencyEntity;
@@ -32,7 +33,6 @@ public class TaskBean implements Serializable {
     ProjectBean projectBean;
     @EJB
     TaskDependencyDao taskDependencyDao;
-
 
     public TaskBean() {
     }
@@ -73,6 +73,106 @@ public class TaskBean implements Serializable {
         return true;
     }
 
+
+    public boolean updateTask(long taskId, Task task, List<Long> taskIdList, long projectId) {
+        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+
+        if (projectEntity == null) {
+            logger.debug("Project with ID " + projectId + " not found");
+            return false;
+        }
+
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        if (taskEntity == null || taskEntity.isErased()) {
+            logger.debug("Task with ID " + taskId + " not found or is erased");
+            return false;
+        }
+
+        boolean updated = false;
+
+        if (task.getDescription() != null) {
+            taskEntity.setDescription(task.getDescription());
+            updated = true;
+        }
+        if (task.getTitle() != null) {
+            taskEntity.setTitle(task.getTitle());
+            updated = true;
+        }
+        if (task.getStartDate() != null) {
+            taskEntity.setStartDate(task.getStartDate());
+            updated = true;
+        }
+        if (task.getDeadline() != null) {
+            taskEntity.setDeadline(task.getDeadline());
+            updated = true;
+        }
+        if (task.getPriorityId() != 0) {
+            taskEntity.setPriorityId(task.getPriorityId());
+            updated = true;
+        }
+        if (task.getAdditionalExecutors() != null) {
+            taskEntity.setAdditionalExecutors(task.getAdditionalExecutors());
+            updated = true;
+        }
+
+        if (updated) {
+            taskDao.merge(taskEntity);
+            logger.info("Task updated successfully: " + taskEntity.getId());
+        } else {
+            logger.debug("No fields to update for task ID: " + taskId);
+        }
+
+        if (taskIdList != null) {
+            updateDependenciesTask(taskEntity.getId(), taskIdList);
+        }
+
+        return updated;
+    }
+
+    public boolean updateDependenciesTask( long taskId, List<Long> taskIdList) {
+        //Check if the principal tasks exists
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        if (taskEntity == null) {
+            return false;
+        }
+
+        // Remover todas as dependências existentes para a tarefa
+        List<TaskDependencyEntity> existingDependencies = taskDependencyDao.findTaskDependenciesEntitesByTaskId(taskId);
+        for (TaskDependencyEntity dependency : existingDependencies) {
+            dependency.setAtive(false);
+
+        }
+
+        for (Long dependentTaskId : taskIdList) {
+            // Check if the dependent task exists
+            TaskEntity dependentTaskEntity = taskDao.findTaskById(dependentTaskId);
+            if (dependentTaskEntity == null || dependentTaskEntity.getId() == taskId){
+                logger.error("Dependent task not found: " + dependentTaskId);
+                continue; // Skip to the next dependent task if not found
+            }
+
+            // Check if the dependency already exists
+            TaskDependencyEntity dependencyAlreadyExists = taskDependencyDao.dependencyExists(taskId, dependentTaskId);
+            if (dependencyAlreadyExists != null) {
+                logger.debug("Dependency already exists between tasks: " + taskId + " and " + dependentTaskId);
+                dependencyAlreadyExists.setAtive(true);
+                continue; // Skip to the next dependent task if dependency already exists
+            }
+
+            // Create the task dependency entity
+            TaskDependencyEntity taskDependencyEntity = new TaskDependencyEntity();
+            taskDependencyEntity.setTask(taskEntity);
+            taskDependencyEntity.setDependentTask(dependentTaskEntity);
+            taskDependencyEntity.setAtive(true);
+
+            // Persist the dependency
+            taskDependencyDao.createTaskDependency(taskDependencyEntity);
+            logger.debug("Dependent task added successfully: " + taskDependencyEntity.getId());
+        }
+
+        return true;
+    }
+
     public boolean updateTaskStatus(Long taskId, int newStatus) {
 
         if (newStatus != 10 && newStatus != 20 && newStatus != 30) {
@@ -80,7 +180,7 @@ public class TaskBean implements Serializable {
         }
 
         TaskEntity taskEntity = taskDao.findTaskById(taskId);
-        if (taskEntity == null) {
+        if (taskEntity == null || taskEntity.isErased()) {
             return false;
         }else {
             taskEntity.setStateId(newStatus);
@@ -95,6 +195,19 @@ public class TaskBean implements Serializable {
             return true;
         }
     }
+
+    public List<TaskInfo> getTasksFromProjectMinimalInfo(Long projectId) {
+        List<TaskEntity> taskEntities = taskDao.findTasksByProject(projectId);
+        ArrayList<TaskInfo> tasks = new ArrayList<>();
+        for (TaskEntity taskEntity : taskEntities) {
+            TaskInfo task = convertTaskMinimalInfoToDTO(taskEntity);
+
+
+            tasks.add(task);
+        }
+        return tasks;
+    }
+
 
     public List<Task> getTasksFromProject(Long projectId) {
         List<TaskEntity> taskEntities = taskDao.findTasksByProject(projectId);
@@ -145,6 +258,7 @@ public class TaskBean implements Serializable {
             TaskDependencyEntity taskDependencyEntity = new TaskDependencyEntity();
             taskDependencyEntity.setTask(taskEntity);
             taskDependencyEntity.setDependentTask(dependentTaskEntity);
+            taskDependencyEntity.setAtive(true);
 
             // Persist the dependency
             taskDependencyDao.createTaskDependency(taskDependencyEntity);
@@ -153,7 +267,32 @@ public class TaskBean implements Serializable {
         return true;
     }
 
+    public Task getTaskInfo(Long taskId) {
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        List<Task> getDependencies = getDependenciesForTask(taskEntity.getId());
+        if (taskEntity == null) {
+            return null;
+        } else {
+            Task task = convertToDTO(taskEntity);
+            if(getDependencies != null) {
+                task.setDependencies(getDependencies);
+            }
+            return task;
+        }
+    }
 
+
+    public boolean softDeleteTask(Long taskId) {
+        TaskEntity taskEntity = taskDao.findTaskById(taskId);
+        if (taskEntity == null) {
+            return false;
+        } else {
+            taskEntity.setErased(true);
+            taskDao.merge(taskEntity);
+            logger.info("Task erased: " + taskEntity.getId());
+            return true;
+        }
+    }
 
     private boolean validateTask(Task task) {
         return task.getTitle() != null
@@ -173,8 +312,6 @@ public class TaskBean implements Serializable {
         taskEntity.setAdditionalExecutors(task.getAdditionalExecutors());
         taskEntity.setErased(task.getErased());
         taskEntity.setUpdatedAt(task.getUpdatedAt());
-        
-
 
         return taskEntity;
     }
@@ -187,7 +324,13 @@ public class TaskBean implements Serializable {
         }
         return dependentTasks;
     }
+    private TaskInfo convertTaskMinimalInfoToDTO(TaskEntity taskEntity) {
+        TaskInfo task = new TaskInfo();
+        task.setId(taskEntity.getId());
+        task.setTitle(taskEntity.getTitle());
 
+        return task;
+    }
     private Task convertToDTO(TaskEntity taskEntity) {
         Task task = new Task();
         task.setId(taskEntity.getId());

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "task")
 @NamedQuery(name = "Task.findAllTasks", query = "SELECT t FROM TaskEntity t")
 @NamedQuery(name = "Task.findTaskById", query = "SELECT t FROM TaskEntity t WHERE t.id = :id")
-@NamedQuery(name = "Task.findTasksByProject", query = "SELECT t FROM TaskEntity t WHERE t.project = :project ORDER BY t.startDate ASC")
+@NamedQuery(name = "Task.findTasksByProject", query = "SELECT t FROM TaskEntity t WHERE t.project = :project AND t.erased=false ORDER BY t.priorityId, t.startDate, t.deadline ASC")
 @NamedQuery(name = "Task.findTasksByUser", query = "SELECT t FROM TaskEntity t WHERE t.responsibleUser = :responsibleUser")
 @NamedQuery(name = "Task.findTasksByState", query = "SELECT t FROM TaskEntity t WHERE t.stateId = :stateId")
 @NamedQuery(name = "Task.findTasksByPriority", query = "SELECT t FROM TaskEntity t WHERE t.priorityId = :priorityId")
