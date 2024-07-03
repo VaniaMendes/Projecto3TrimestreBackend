@@ -370,6 +370,20 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
+    /**
+     * Updates the role of a user in a project.
+     * This method updates the role (type) of a user within a specific project. It first retrieves the project and user entities
+     * based on the provided project and user IDs. If either the project or the user (author of the action) cannot be found,
+     * the method returns false, indicating failure. If both entities are found, it attempts to update the user's role in the project.
+     * If the update is successful, the project's update timestamp is refreshed, and the project entity is merged back into the database.
+     * Additionally, an activity log is registered to record the role update action.
+     *
+     * @param userId The ID of the user whose role is to be updated.
+     * @param projectId The ID of the project in which the user's role is to be updated.
+     * @param userType The new role of the user in the project.
+     * @param token The authentication token of the user performing the update action.
+     * @return true if the role update was successful, false otherwise.
+     */
     public boolean updateUserRole(Long userId, Long projectId, UserTypeInProject userType, String token) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
@@ -573,6 +587,15 @@ public class ProjectBean implements Serializable {
         return projectEntity;
     }
 
+    /**
+     * Retrieves a project DTO by its ID.
+     * This method first attempts to find a ProjectEntity using the given project ID. If the project entity is found,
+     * it clones the message entities associated with the project, converts the project entity to a DTO, and returns it.
+     * If no project entity is found with the given ID, it returns null.
+     *
+     * @param projectId The ID of the project to retrieve.
+     * @return The Project DTO corresponding to the given ID, or null if no project is found.
+     */
     public Project getProjectById(Long projectId) {
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
@@ -582,6 +605,14 @@ public class ProjectBean implements Serializable {
         return convertToDTO(projectEntity);
     }
 
+    /**
+     * Finds a ProjectEntity by its ID.
+     * This method delegates the search to the ProjectDao to find a ProjectEntity by its ID in the database.
+     * If the ProjectEntity is found, it is returned; otherwise, this method returns null.
+     *
+     * @param projectId The ID of the project to find.
+     * @return The found ProjectEntity, or null if no project with the given ID exists.
+     */
     public ProjectEntity findProjectById(Long projectId) {
         return projectDao.findProjectById(projectId);
     }
@@ -620,6 +651,15 @@ public class ProjectBean implements Serializable {
         return resourceEntity;
     }
 
+    /**
+     * Finds a user entity by its unique identifier.
+     * This method queries the database for a user with the specified ID. If the user is found,
+     * the corresponding UserEntity object is returned. If no user is found with the given ID,
+     * an error is logged, and null is returned.
+     *
+     * @param userId The unique identifier of the user to find.
+     * @return The UserEntity object corresponding to the specified ID, or null if no such user exists.
+     */
     private UserEntity findUser(Long userId) {
         UserEntity userEntity = userDao.findUserById(userId);
         if (userEntity == null) {
@@ -627,7 +667,6 @@ public class ProjectBean implements Serializable {
         }
         return userEntity;
     }
-
 
     /**
      * Checks if a state id is valid.
@@ -787,6 +826,24 @@ public class ProjectBean implements Serializable {
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves all projects associated with a specific user, with optional filters for vacancies and state, and sorted by order.
+     * This method allows for a flexible retrieval of projects based on various criteria: whether the project has vacancies,
+     * the state of the project, and the order (ascending or descending) in which the projects are returned.
+     *
+     * The method supports filtering projects that have vacancies (if vacancies is true) and projects that match a specific state.
+     * If the state parameter is null or 1, it is considered as a request to retrieve all projects regardless of their state.
+     * The order of the projects in the returned list can be specified as either ascending ("asc") or descending ("desc").
+     *
+     * Depending on the combination of the parameters provided, different private helper methods are called to perform the actual
+     * retrieval and sorting of the projects from the database.
+     *
+     * @param userId The ID of the user whose projects are to be retrieved.
+     * @param order The order in which to sort the projects. Can be "asc" for ascending or "desc" for descending.
+     * @param vacancies A Boolean indicating whether to filter projects by vacancies. True to include only projects with vacancies.
+     * @param state An Integer representing the state of the projects to be retrieved. If null or 1, all projects are considered.
+     * @return A list of {@link Project} DTOs that match the specified criteria.
+     */
     public List<Project> getAllProjectsWithUser(Long userId, String order, Boolean vacancies, Integer state) {
         List<Project> projectsDTO = new ArrayList<>();
 
@@ -990,24 +1047,41 @@ public class ProjectBean implements Serializable {
         return projectDao.searchKeywords(keyword);
     }
 
+
     /**
-     * Searches for projects by name.
-     * This method queries the database for projects that contain the specified name or part of it.
-     * It uses the {@code projectDao} to perform the search operation based on the provided name parameter.
-     * After fetching the matching {@link ProjectEntity} objects, it clones the messages associated with each project
-     * to ensure that any modifications to the messages do not affect the original message entities.
-     * Finally, it converts the list of {@link ProjectEntity} objects into a list of {@link Project} DTOs
-     * and returns it. This conversion facilitates the separation of the entity model from the API model,
-     * allowing for more flexibility in data representation and manipulation.
+     * Searches for projects based on the given criteria.
+     * This method allows for searching projects by name, state, and whether to order by vacancies.
+     * The search can be ordered in ascending or descending order.
      *
-     * @param name The name or partial name of the project to search for.
-     * @return A list of {@link Project} DTOs that match the search criteria. If no projects are found,
-     *         an empty list is returned.
+     * @param name The name or partial name of the project to search for. Uses a case-insensitive search.
+     * @param state The state ID of the projects to filter by. If null or 1, all projects are considered.
+     * @param orderByVacancies A Boolean indicating if the search results should be ordered by the number of vacancies.
+     *                          If true, projects are ordered by vacancies; otherwise, they are ordered by their names.
+     * @param order The order in which to return the search results. Can be "asc" for ascending or "desc" for descending order.
+     * @return A list of {@link Project} DTOs that match the search criteria. Returns an empty list if no projects are found.
      */
-    public List<Project> searchProjectsByName(String name) {
-        List<ProjectEntity> projects = projectDao.searchProjectsByName(name);
-        cloneMessageEntities(projects);
-        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public List<Project> searchProjects(String name, Integer state, Boolean orderByVacancies, String order) {
+        List<Project> projectsDTO = new ArrayList<>();
+
+        if (order.equals("desc")) {
+            if (orderByVacancies != null && orderByVacancies && (state == null || state == 1)) {
+                projectsDTO = projectDao.searchProjectsByNameOrderedByVacanciesDESC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+            } else if (orderByVacancies != null && !orderByVacancies && (state == null || state == 1)) {
+                projectsDTO = projectDao.searchProjectsByNameOrderedDESC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+            } else if (state != null) {
+                projectsDTO = projectDao.searchProjectsByNameAndStateOrderedDESC(name, state).stream().map(this::convertToDTO).collect(Collectors.toList());
+            }
+        } else if (order.equals("asc")) {
+            if (orderByVacancies != null && orderByVacancies && (state == null || state == 1)) {
+                projectsDTO = projectDao.searchProjectsByNameOrderedByVacanciesASC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+            } else if (orderByVacancies != null && !orderByVacancies && (state == null || state == 1)) {
+                projectsDTO = projectDao.searchProjectsByNameOrderedASC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+            } else if (state != null) {
+                projectsDTO = projectDao.searchProjectsByNameAndStateOrderedASC(name, state).stream().map(this::convertToDTO).collect(Collectors.toList());
+            }
+        }
+
+        return projectsDTO;
     }
 
     /**
@@ -1054,8 +1128,26 @@ public class ProjectBean implements Serializable {
         return count;
     }
 
+    /**
+     * Counts the number of projects that contain a specific keyword.
+     * This method queries the database to count projects where the keyword appears in any searchable project field.
+     *
+     * @param keyword The keyword to search for within project fields.
+     * @return The number of projects that contain the specified keyword.
+     */
     public Integer countProjectsByKeyword(String keyword) {
         return projectDao.countProjectsByKeyword(keyword);
+    }
+
+    /**
+     * Counts the number of projects by searching for a specific name.
+     * This method queries the database to count projects where the project name matches or contains the specified name.
+     *
+     * @param name The name or partial name of the project to search for.
+     * @return The number of projects that match the specified name.
+     */
+    public Integer countSearchProjectsByName(String name) {
+        return projectDao.countSearchProjectsByName(name);
     }
 
     /**

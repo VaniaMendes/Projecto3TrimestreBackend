@@ -63,7 +63,6 @@ public class ProjectService {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get all projects from IP: " + ip);
 
-        // Get all projects
         List<Project> projects = projectBean.getAllProjects(order, vacancies, state);
         return Response.status(Response.Status.OK).entity(projects).build();
     }
@@ -71,12 +70,14 @@ public class ProjectService {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchProjects(@QueryParam("name") String name) {
+    public Response searchProjects(@QueryParam("name") String name,
+                                   @QueryParam("state") Integer state,
+                                   @QueryParam("orderByVacancies") Boolean orderByVacancies,
+                                   @QueryParam("order") String order) {
         String ip = request.getRemoteAddr();
-        logger.info("Received request to search projects from IP: " + ip);
+        logger.info("Received request to search projects from IP: " + ip + " with parameters - Name: " + name + ", State: " + state + ", OrderByVacancies: " + orderByVacancies + ", Order: " + order);
 
-        // Get all projects
-        List<Project> projects = projectBean.searchProjectsByName(name);
+        List<Project> projects = projectBean.searchProjects(name, state, orderByVacancies, order);
         return Response.status(Response.Status.OK).entity(projects).build();
     }
 
@@ -498,14 +499,17 @@ public class ProjectService {
     @GET
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response countProjects(@QueryParam("state") Integer state, @QueryParam("keyword") String keyword) {
+    public Response countProjects(@QueryParam("state") Integer state, @QueryParam("keyword") String keyword, @QueryParam("search") String search) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to count projects from IP: " + ip);
 
         if (keyword != null) {
             logger.info("Projects counted by keyword " + keyword + " successfully");
             return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeyword(keyword)).build();
-        }else {
+        } else if (search!= null) {
+            logger.info("Projects counted by search " + search + " successfully");
+            return Response.status(Response.Status.OK).entity(projectBean.countSearchProjectsByName(search)).build();
+        } else {
             return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
         }
     }
