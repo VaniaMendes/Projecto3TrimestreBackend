@@ -71,12 +71,12 @@ public class ProjectService {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchProjects(@QueryParam("keyword") String keyword, @QueryParam("order") String order, @QueryParam("vacancies") Boolean vacancies, @QueryParam("state") Integer state) {
+    public Response searchProjects(@QueryParam("name") String name) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to search projects from IP: " + ip);
 
         // Get all projects
-        List<Project> projects = projectBean.searchProjects(keyword, order, vacancies, state);
+        List<Project> projects = projectBean.searchProjectsByName(name);
         return Response.status(Response.Status.OK).entity(projects).build();
     }
 
