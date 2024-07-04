@@ -6,7 +6,6 @@ import aor.paj.proj_final_aor_backend.dto.*;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import aor.paj.proj_final_aor_backend.entity.UserProjectEntity;
-import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -153,6 +152,19 @@ public class UserProjectBean implements Serializable {
         return true;
     }
 
+    /**
+     * Updates the type of user within a project.
+     * This method is used to change the role of a user in a specific project. It checks if the new user type is valid
+     * and not one of the restricted types (EXITED, CREATOR, CANDIDATE). It also verifies that the user exists in the project,
+     * has not exited the project, is not the creator, and is not already assigned the new user type.
+     * If any of these conditions are not met, the method returns false. Otherwise, it updates the user's type in the project
+     * and returns true.
+     *
+     * @param userId The ID of the user whose type is to be updated.
+     * @param projectId The ID of the project in which the user's type is to be updated.
+     * @param userType The new type to assign to the user within the project.
+     * @return boolean True if the user type was successfully updated, false otherwise.
+     */
     public boolean updateUserTypeInProject(Long userId, Long projectId, UserTypeInProject userType) {
         if (userType == UserTypeInProject.EXITED || userType == UserTypeInProject.CREATOR || userType == UserTypeInProject.CANDIDATE) {
             logger.warn("Cannot update user type to EXITED, CREATOR or CANDIDATE");
@@ -172,6 +184,23 @@ public class UserProjectBean implements Serializable {
         userProjectDao.merge(userProjectEntity);
         logger.info("User type updated in Project");
         return true;
+    }
+
+    /**
+     * Retrieves the type of a user within a project.
+     * This method fetches the role of a specific user in a given project. It checks if the user exists in the project.
+     * If the user does not exist, the method returns null. Otherwise, it returns the user's type within the project.
+     *
+     * @param userId The ID of the user whose project role is to be retrieved.
+     * @param projectId The ID of the project from which to retrieve the user's role.
+     * @return UserTypeInProject The role of the user within the project, or null if the user does not exist in the project.
+     */
+    public UserTypeInProject getUserTypeInProject(Long userId, Long projectId) {
+        UserProjectEntity userProjectEntity = userProjectDao.findUserInProject(projectId, userId);
+        if (userProjectEntity == null) {
+            return null;
+        }
+        return userProjectEntity.getUserType();
     }
 
     /**

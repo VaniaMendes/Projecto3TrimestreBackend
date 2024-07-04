@@ -82,4 +82,26 @@ public class SettingsService {
         }
     }
 
+    @GET
+    @Path("/max-members")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMaxMembers(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+        logger.info("Received request to get max members");
+
+        User user = userBean.getUserByToken(token);
+
+        if (user == null) {
+            logger.warn("IP Adress " + request.getRemoteAddr() + " tried to get max members with invalid token");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+
+        Integer maxMembers = settingsBean.getMaxUsersPerProject();
+        if (maxMembers != null) {
+            logger.info("IP Adress " + request.getRemoteAddr() + " got max members successfully by user with id " + user.getId());
+            return Response.status(Response.Status.OK).entity(maxMembers).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to get max members").build();
+        }
+    }
+
 }

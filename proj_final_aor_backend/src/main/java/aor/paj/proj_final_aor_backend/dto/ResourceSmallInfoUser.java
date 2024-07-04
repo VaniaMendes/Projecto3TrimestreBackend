@@ -1,5 +1,6 @@
 package aor.paj.proj_final_aor_backend.dto;
 
+import aor.paj.proj_final_aor_backend.util.enums.ResourceType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -19,7 +20,11 @@ public class ResourceSmallInfoUser {
 
     // Quantity of the resource
     @XmlElement
-    private int quantity;
+    private Integer quantity;
+
+    // Resource type
+    @XmlElement
+    private ResourceType type;
 
     public ResourceSmallInfoUser() {
     }
@@ -48,11 +53,19 @@ public class ResourceSmallInfoUser {
         this.brand = brand;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public ResourceType getType() {
+        return type;
+    }
+
+    public void setType(ResourceType type) {
+        this.type = type;
     }
 }

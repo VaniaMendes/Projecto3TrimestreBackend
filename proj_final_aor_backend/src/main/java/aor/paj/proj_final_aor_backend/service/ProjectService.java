@@ -139,7 +139,9 @@ public class ProjectService {
         String ip = request.getRemoteAddr();
         logger.info("Received request to update project from IP: " + ip);
 
-        if (projectBean.updateState(projectId, stateId, token)){
+        boolean valid=projectBean.updateState(projectId, stateId, token);
+
+        if (valid){
             logger.info("Project updated successfully");
             return Response.status(Response.Status.OK).entity("Project updated successfully").build();
         } else {
