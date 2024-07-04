@@ -8,12 +8,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  * This class represents a message, which extends a TextEvent.
  */
 @XmlRootElement
-public class Message extends TextEvent{
+public class Message extends TextEvent {
 
 
     /**
      * The content of the message.
-
      */
     @XmlElement
     private String content;
@@ -31,7 +30,6 @@ public class Message extends TextEvent{
 
     /**
      * Default constructor.
-
      */
     public Message() {
     }
@@ -39,7 +37,8 @@ public class Message extends TextEvent{
 
     /**
      * Returns the content of the message.
-     * @return  the content of the message.
+     *
+     * @return the content of the message.
      */
     public String getContent() {
         return content;
@@ -47,6 +46,7 @@ public class Message extends TextEvent{
 
     /**
      * Sets the content of the message.
+     *
      * @param content the content of the message.
      */
 
@@ -54,18 +54,40 @@ public class Message extends TextEvent{
         this.content = content;
     }
 
+
+    /**
+     * Returns the subject of the message.
+     *
+     * @return the subject of the message.
+     */
     public String getSubject() {
         return subject;
     }
 
+    /**
+     * Sets the subject of the message.
+     *
+     * @param subject the subject of the message.
+     */
     public void setSubject(String subject) {
         this.subject = subject;
     }
+
+    /**
+     * Returns the id of the project.
+     *
+     * @return the id of the project.
+     */
 
     public long getProjectId() {
         return projectId;
     }
 
+    /**
+     * Sets the id of the project.
+     *
+     * @param projectId the id of the project.
+     */
     public void setProjectId(long projectId) {
         this.projectId = projectId;
     }

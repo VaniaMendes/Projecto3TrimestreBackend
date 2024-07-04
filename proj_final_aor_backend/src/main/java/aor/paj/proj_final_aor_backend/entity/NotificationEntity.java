@@ -246,18 +246,34 @@ public class NotificationEntity implements Serializable {
     }
 
 
+    /**
+     * Getter for the users of the notification.
+     * @return users of the notification.
+     */
     public Set<UserEntity> getUsers() {
         return users;
     }
 
+    /**
+     * Setter for the users of the notification.
+     * @param users the new users of the notification.
+     */
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
     }
 
+    /**
+     * Getter for the related entity id.
+     * @return related entity id.
+     */
     public long getRelatedEntityId() {
         return relatedEntityId;
     }
 
+    /**
+     * Setter for the related entity id.
+     * @param relatedEntityId the new related entity id.
+     */
     public void setRelatedEntityId(long relatedEntityId) {
         this.relatedEntityId = relatedEntityId;
     }

@@ -14,43 +14,63 @@ import java.util.List;
 @XmlRootElement
 public class Task {
 
-    // Unique identifier for the task
+    /**
+     * The unique identifier of the task.
+     */
     @XmlElement
     private Long id;
 
-    // Title of the task
+    /**
+     * The title of the task.
+     */
     @XmlElement
     private String title;
 
-    // Description of the task
+    /**
+     * The description of the task.
+     */
     @XmlElement
     private String description;
 
-    // Date and time when the task was created
+    /**
+     * Date and time when the task was created
+     */
     @XmlElement
     private LocalDateTime createdAt;
 
-    // Date and time when the task was last updated
+    /**
+     * Date and time when the task was last updated
+     */
     @XmlElement
     private LocalDateTime updatedAt;
 
-    // Start date of the task
+    /**
+     * Start date of the task
+     */
     @XmlElement
     private LocalDateTime startDate;
 
-    // Deadline of the task
+    /**
+     * Deadline of the task
+     */
     @XmlElement
     private LocalDateTime deadline;
 
-    // Date and time when the task was concluded
+    /**
+     * Conclusion date of the task
+     */
     @XmlElement
     private LocalDateTime conclusionDate;
 
-    // Current state of the task
+    /**
+     * Current state of the task
+     */
     @XmlElement
     private Integer stateId;
 
-    // Constants representing different states of the task
+    /**
+     * Constants representing different states of the task
+     */
     @XmlElement
     public static final int PLANNED = 10;
     @XmlElement
@@ -58,11 +78,15 @@ public class Task {
     @XmlElement
     public static final int FINISHED = 30;
 
-    // Priority of the task
+    /**
+     * Priority of the task
+     */
     @XmlElement
     private Integer priorityId;
 
-    // Constants representing different priorities of the task
+    /**
+     * Constants representing different priorities of the task
+     */
     @XmlElement
     public static final int LOW = 10;
     @XmlElement
@@ -70,21 +94,32 @@ public class Task {
     @XmlElement
     public static final int HIGH = 30;
 
-    // Owner of the task
+    /**
+     * Owner of the task
+     */
     @XmlElement
     private User owner;
 
-    // Additional executors of the task
+    /**
+     * Additional executors of the task
+     */
     @XmlElement
     private String additionalExecutors;
 
-    // Project associated with the task
+    /**
+     * Project associated with the task
+     */
     @XmlElement
     private Project project;
 
-    // Flag indicating if the task is erased
+    /**
+     * Flag to indicate if the task is erased
+     */
     @XmlElement
     private Boolean erased;
+    /**
+     * Dependencies of the task
+     */
     @XmlElement
     private List<Task> dependencies;
 
@@ -98,6 +133,7 @@ public class Task {
 
     /**
      * Getter for the unique identifier of the task.
+     *
      * @return id of the task.
      */
     public Long getId() {
@@ -106,6 +142,7 @@ public class Task {
 
     /**
      * Setter for the unique identifier of the task.
+     *
      * @param id the new id of the task.
      */
     public void setId(Long id) {
@@ -114,6 +151,7 @@ public class Task {
 
     /**
      * Getter for the title of the task.
+     *
      * @return title of the task.
      */
     public String getTitle() {
@@ -122,6 +160,7 @@ public class Task {
 
     /**
      * Setter for the title of the task.
+     *
      * @param title the new title of the task.
      */
     public void setTitle(String title) {
@@ -130,6 +169,7 @@ public class Task {
 
     /**
      * Getter for the description of the task.
+     *
      * @return description of the task.
      */
     public String getDescription() {
@@ -138,6 +178,7 @@ public class Task {
 
     /**
      * Setter for the description of the task.
+     *
      * @param description the new description of the task.
      */
     public void setDescription(String description) {
@@ -146,6 +187,7 @@ public class Task {
 
     /**
      * Getter for the creation date and time of the task.
+     *
      * @return creation date and time of the task.
      */
     public LocalDateTime getCreatedAt() {
@@ -154,6 +196,7 @@ public class Task {
 
     /**
      * Setter for the creation date and time of the task.
+     *
      * @param createdAt the new creation date and time of the task.
      */
     public void setCreatedAt(LocalDateTime createdAt) {
@@ -162,6 +205,7 @@ public class Task {
 
     /**
      * Getter for the last updated date and time of the task.
+     *
      * @return last updated date and time of the task.
      */
     public LocalDateTime getUpdatedAt() {
@@ -170,6 +214,7 @@ public class Task {
 
     /**
      * Setter for the last updated date and time of the task.
+     *
      * @param updatedAt the new last updated date and time of the task.
      */
     public void setUpdatedAt(LocalDateTime updatedAt) {
@@ -178,6 +223,7 @@ public class Task {
 
     /**
      * Getter for the start date of the task.
+     *
      * @return start date of the task.
      */
     public LocalDateTime getStartDate() {
@@ -186,6 +232,7 @@ public class Task {
 
     /**
      * Setter for the start date of the task.
+     *
      * @param startDate the new start date of the task.
      */
     public void setStartDate(LocalDateTime startDate) {
@@ -194,6 +241,7 @@ public class Task {
 
     /**
      * Getter for the deadline of the task.
+     *
      * @return deadline of the task.
      */
     public LocalDateTime getDeadline() {
@@ -202,6 +250,7 @@ public class Task {
 
     /**
      * Setter for the deadline of the task.
+     *
      * @param deadline the new deadline of the task.
      */
     public void setDeadline(LocalDateTime deadline) {
@@ -210,6 +259,7 @@ public class Task {
 
     /**
      * Getter for the conclusion date of the task.
+     *
      * @return conclusion date of the task.
      */
     public LocalDateTime getConclusionDate() {
@@ -218,6 +268,7 @@ public class Task {
 
     /**
      * Setter for the conclusion date of the task.
+     *
      * @param conclusionDate the new conclusion date of the task.
      */
     public void setConclusionDate(LocalDateTime conclusionDate) {
@@ -226,6 +277,7 @@ public class Task {
 
     /**
      * Getter for the current state of the task.
+     *
      * @return current state of the task.
      */
     public Integer getStateId() {
@@ -234,6 +286,7 @@ public class Task {
 
     /**
      * Setter for the current state of the task.
+     *
      * @param stateId the new current state of the task.
      */
     public void setStateId(Integer stateId) {
@@ -242,6 +295,7 @@ public class Task {
 
     /**
      * Getter for the priority of the task.
+     *
      * @return priority of the task.
      */
     public Integer getPriorityId() {
@@ -250,6 +304,7 @@ public class Task {
 
     /**
      * Setter for the priority of the task.
+     *
      * @param priorityId the new priority of the task.
      */
     public void setPriorityId(Integer priorityId) {
@@ -258,6 +313,7 @@ public class Task {
 
     /**
      * Getter for the owner of the task.
+     *
      * @return owner of the task.
      */
     public User getOwner() {
@@ -266,6 +322,7 @@ public class Task {
 
     /**
      * Setter for the owner of the task.
+     *
      * @param owner the new owner of the task.
      */
     public void setOwner(User owner) {
@@ -274,6 +331,7 @@ public class Task {
 
     /**
      * Getter for the additional executors of the task.
+     *
      * @return additional executors of the task.
      */
     public String getAdditionalExecutors() {
@@ -282,6 +340,7 @@ public class Task {
 
     /**
      * Setter for the additional executors of the task.
+     *
      * @param additionalExecutors the new additional executors of the task.
      */
     public void setAdditionalExecutors(String additionalExecutors) {
@@ -299,6 +358,7 @@ public class Task {
 
     /**
      * Setter for the project associated with the task.
+     *
      * @param project the new project associated with the task.
      */
     public void setProject(Project project) {
@@ -307,6 +367,7 @@ public class Task {
 
     /**
      * Getter for the erased flag of the task.
+     *
      * @return erased flag of the task.
      */
     public Boolean getErased() {
@@ -315,15 +376,28 @@ public class Task {
 
     /**
      * Setter for the erased flag of the task.
+     *
      * @param erased the new erased flag of the task.
      */
     public void setErased(Boolean erased) {
         this.erased = erased;
     }
 
+    /**
+     * Getter for the dependencies of the task.
+     *
+     * @return dependencies of the task.
+     */
+
     public List<Task> getDependencies() {
         return dependencies;
     }
+
+    /**
+     * Setter for the dependencies of the task.
+     *
+     * @param dependencies the new dependencies of the task.
+     */
 
     public void setDependencies(List<Task> dependencies) {
         this.dependencies = dependencies;

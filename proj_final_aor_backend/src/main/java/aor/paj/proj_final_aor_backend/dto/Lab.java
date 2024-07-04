@@ -11,18 +11,29 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Lab {
 
-    // The unique identifier for the lab
+    /**
+     * The unique identifier for the lab.
+     */
     @XmlElement
     private Integer id;
 
-    // The name of the lab, represented as a Workplace enum
+    /**
+     * The name of the lab.
+     */
     @XmlElement
     private Workplace name;
 
-    // Default constructor
+    /**
+     * Default constructor for the Lab class.
+     */
     public Lab() {
     }
 
+
+    /**
+     * Constructor for the Lab class.
+     * @param name the name of the lab
+     */
     public Lab(String name) {
         this.name = Workplace.valueOf(name);
     }

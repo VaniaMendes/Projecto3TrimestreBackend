@@ -204,17 +204,34 @@ public class MessageEntity implements Serializable {
         this.receiver = receiver;
     }
 
+    /**
+     * Getter for the receiver group of the message.
+     * @return receiver group of the message.
+     */
     public UserProjectEntity getReceiverGroup() {
         return receiverGroup;
     }
 
+    /**
+     * Setter for the receiver group of the message.
+     * @param receiverGroup the new receiver group of the message.
+     */
     public void setReceiverGroup(UserProjectEntity receiverGroup) {
         this.receiverGroup = receiverGroup;
     }
 
+    /**
+     * Getter for the subject of the message.
+     * @return subject of the message.
+     */
     public String getSubject() {
         return subject;
     }
+
+    /**
+     * Setter for the subject of the message.
+     * @param subject the new subject of the message.
+     */
 
     public void setSubject(String subject) {
         this.subject = subject;

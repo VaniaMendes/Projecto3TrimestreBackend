@@ -60,6 +60,9 @@ public class MessageBean implements Serializable {
     @EJB
     SessionDao sessionDao;
 
+    /**
+     * Data access object for messages.
+     */
     @EJB
     UserBean userBean;
     @EJB
@@ -123,6 +126,7 @@ public class MessageBean implements Serializable {
 
 
 
+        // Send the message to the receiver
         try {
             String jsonMsg = mapper.writeValueAsString(convertMessageToDto(messageEntity));
             websocketMessage.sendMessageTOUser(jsonMsg);
@@ -222,9 +226,12 @@ public class MessageBean implements Serializable {
         messageDao.createMessage(message);
         userProjectDao.merge(userProject);
 
+        //Send notification to all users in the project
         long idPoject = project.getId();
         String type = String.valueOf(NotificationType.MESSAGE_PROJECT);
         notificationBean.sendNotificationToProjectUsers(token, project_id, type, idPoject );
+
+        //Send the message to the project
         try {
             String jsonMsg = mapper.writeValueAsString(convertMessageChatGroupToDTO(message));
             websocketMessage.sendMessageToProject(jsonMsg, project_id);
@@ -275,29 +282,49 @@ public class MessageBean implements Serializable {
         return messages;
     }
 
+    /**
+     * This method is used to get the number of messages between two users.
+     * @param token The token of the user who is requesting the messages. This is used to authenticate the user.
+     * @param id The id of the user with whom the messages are to be counted.
+     * @return Returns the number of messages between the two users.
+     */
     public int getMessageCountBetweenTwoUsers(String token, long id) {
+        // Find the users by token and id
         UserEntity user1 = sessionDao.findUserByToken(token);
         UserEntity user2 = userDao.findUserById(id);
+        // Check if the users exist
         if (user1 == null || user2 == null) {
             logger.error("User not found");
             return 0;
         }
+        // Get the number of messages between the two users
         return messageDao.findTotalMessagesBetweenTwoUsers(user1, user2);
     }
 
+    /**
+     * This method is used to get the number of messages in the chat group of a project.
+     * @param token The token of the user who is requesting the messages. This is used to authenticate the user.
+     * @return Returns the number of messages in the chat group of the project.
+     */
     public List<MessageInfoUser> getListOfUsersWithExchangeMessages(String token) {
+        // Find the user by token
         UserEntity user = sessionDao.findUserByToken(token);
+        // Check if the user exists
         if (user == null) {
             logger.debug("User not found ");
             return null;
         }
+        // If the user exists get the list of users with exchanged messages
         List<UserEntity> listOfUsers = messageDao.findUsersWithExchangedMessages(user.getId());
+
+        // Check if the list is empty
         if(listOfUsers.isEmpty()){
             logger.info("No users found with exchanged messages");
             return null;
         }
-        System.out.println(listOfUsers.size());
 
+
+        // Convert the list of users to a list of messageInfoUser DTOs
         List<MessageInfoUser> users = new ArrayList<>();
         if (listOfUsers != null && !listOfUsers.isEmpty()) {
             for (UserEntity userEntity : listOfUsers) {
@@ -309,28 +336,41 @@ public class MessageBean implements Serializable {
                 }
             }
         }
+        // Return the list of users
         return users;
     }
 
+
+    /**
+     * This method is used to mark a message as read.
+     * @param token The token of the user who is marking the message as read. This is used to authenticate the user.
+     * @param messageId The id of the message that is to be marked as read.
+     * @return Returns true if the message was successfully marked as read, false otherwise.
+     */
     public boolean markMessageAsRead(String token, long messageId) {
+        // Find the user by token
         UserEntity user = sessionDao.findUserByToken(token);
-        System.out.println(user.getFirstName());
+        // Check if the user exists
         if (user == null) {
             logger.error("User not found");
             return false;
         }
+        // Find the message by id
         MessageEntity message = messageDao.findMessageById(messageId);
-        System.out.println(messageId);
+        // Check if the message exists
         if (message == null) {
             logger.error("Message not found");
             return false;
         }
+        // Check if the user is the receiver of the message
         if (message.getReceiver().getId() != user.getId()) {
             logger.error("User not receiver of message");
             return false;
         }
+        // Mark the message as read
         message.setReadStatus(true);
         message.setReadTimestamp(LocalDateTime.now());
+        // Update the message in the database
         messageDao.updateMessage(message);
 
         return true;
@@ -374,6 +414,10 @@ public class MessageBean implements Serializable {
 
     }
 
+    /**
+     * This method is used to clone the message entities of a project.
+     * @param project The project whose message entities are to be cloned.
+     */
     public void cloneMessageEntities(ProjectEntity project) {
         Set<UserProjectEntity> userProjects = project.getUserProjects();
         for (UserProjectEntity userProject : userProjects) {

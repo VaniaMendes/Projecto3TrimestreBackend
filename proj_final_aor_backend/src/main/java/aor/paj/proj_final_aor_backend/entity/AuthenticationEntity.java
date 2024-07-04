@@ -56,61 +56,125 @@ public class AuthenticationEntity implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
+    /**
+     * Default constructor for the AuthenticationEntity class.
+     */
     public AuthenticationEntity() {
     }
 
+    /**
+     * Getter for the id field.
+     * @return the current id field.
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Setter for the id field.
+     * @param id the new value for the id field.
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
+    /**
+     * Getter for the authentication state field.
+     * @return the current authentication state field.
+     */
     public boolean isAuthState() {
         return authState;
     }
 
+    /**
+     * Setter for the authentication state field.
+     * @param authState the new value for the authentication state field.
+     */
     public void setAuthState(boolean authState) {
         this.authState = authState;
     }
 
+    /**
+     * Getter for the reset password token field.
+     * @return the current reset password token field.
+     */
     public String getResetPassToken() {
         return resetPassToken;
     }
+
+    /**
+     * Setter for the reset password token field.
+     * @param resetPassToken the new value for the reset password token field.
+     */
 
     public void setResetPassToken(String resetPassToken) {
         this.resetPassToken = resetPassToken;
     }
 
+    /**
+     * Getter for the reset password token expiricy field.
+     * @return the current reset password token expiricy field.
+     */
+
     public String getResetPassTokenExpiricy() {
         return resetPassTokenExpiricy;
     }
 
+    /**
+     * Setter for the reset password token expiricy field.
+     * @param resetPassTokenExpiricy the new value for the reset password token expiricy field.
+     */
     public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
         this.resetPassTokenExpiricy = resetPassTokenExpiricy;
     }
+
+    /**
+     * Getter for the register date field.
+     * @return the current register date field.
+     */
 
     public String getRegisterDate() {
         return registerDate;
     }
 
+    /**
+     * Setter for the register date field.
+     * @param registerDate the new value for the register date field.
+     */
+
     public void setRegisterDate(String registerDate) {
         this.registerDate = registerDate;
     }
+
+    /**
+     * Getter for the user field.
+     * @return the current user field.
+     */
 
     public UserEntity getUser() {
         return user;
     }
 
+    /**
+     * Setter for the user field.
+     * @param user the new value for the user field.
+     */
     public void setUser(UserEntity user) {
         this.user = user;
     }
 
+    /**
+     * Getter for the authentication token field.
+     * @return the current authentication token field.
+     */
     public String getAuthenticationToken() {
         return authenticationToken;
     }
 
+    /**
+     * Setter for the authentication token field.
+     * @param authenticationToken the new value for the authentication token field.
+     */
     public void setAuthenticationToken(String authenticationToken) {
         this.authenticationToken = authenticationToken;
     }

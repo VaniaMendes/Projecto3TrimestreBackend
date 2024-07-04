@@ -22,22 +22,30 @@ public class LabEntity implements Serializable {
     // Unique identifier for serialization
     private static final long serialVersionUID = 1L;
 
-    // Unique identifier for the lab
+    /**
+     * Unique identifier for the lab.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Integer id;
 
-    // Name of the lab
+    /**
+     * Name of the lab. It is unique and cannot be updated.
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private Workplace name;
 
-    // Set of projects associated with the lab
+    /**
+     * Set of projects associated with the lab.
+     */
     @OneToMany(mappedBy = "lab")
     private Set<ProjectEntity> projects;
 
-    // Set of users associated with the lab
+    /**
+     * Set of users associated with the lab.
+     */
     @OneToMany(mappedBy = "lab")
     private Set<UserEntity> users;
 

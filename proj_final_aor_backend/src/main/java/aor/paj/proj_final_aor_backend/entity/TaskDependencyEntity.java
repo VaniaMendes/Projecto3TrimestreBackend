@@ -11,28 +11,37 @@ import java.io.Serializable;
 @Entity
 @Table(name = "task_dependency")
 @NamedQuery(name = "TaskDependency.findDependency", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.dependentTask.id = :dependentTaskId AND td.ative = true")
-@NamedQuery(name= "TaskDependency.findDependenciesByTaskId", query = "SELECT td.dependentTask FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
-@NamedQuery(name= "TaskDependency.findTaskDependenciesByTaskId", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
+@NamedQuery(name = "TaskDependency.findDependenciesByTaskId", query = "SELECT td.dependentTask FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
+@NamedQuery(name = "TaskDependency.findTaskDependenciesByTaskId", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
 public class TaskDependencyEntity implements Serializable {
 
     // Unique identifier for serialization
     private static final long serialVersionUID = 1L;
 
-    // Unique identifier for the task dependency
+    /**
+     * Unique identifier for the task dependency.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
+    /**
+     * Ative status of the dependency.
+     */
     @Column(name = "ative")
     private boolean ative;
 
-    // Task associated with the dependency
+    /**
+     * Task associated with the dependency.
+     */
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private TaskEntity task;
 
-    // Dependent task associated with the dependency
+    /**
+     * Dependent task associated with the dependency.
+     */
     @ManyToOne
     @JoinColumn(name = "dependent_task_id", nullable = false)
     private TaskEntity dependentTask;
@@ -45,6 +54,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Getter for the unique identifier of the task dependency.
+     *
      * @return id of the task dependency.
      */
     public Long getId() {
@@ -53,6 +63,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Setter for the unique identifier of the task dependency.
+     *
      * @param id the new id of the task dependency.
      */
     public void setId(Long id) {
@@ -61,6 +72,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Getter for the task associated with the dependency.
+     *
      * @return task associated with the dependency.
      */
     public TaskEntity getTask() {
@@ -69,6 +81,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Setter for the task associated with the dependency.
+     *
      * @param task the new task associated with the dependency.
      */
     public void setTask(TaskEntity task) {
@@ -77,6 +90,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Getter for the dependent task associated with the dependency.
+     *
      * @return dependent task associated with the dependency.
      */
     public TaskEntity getDependentTask() {
@@ -85,6 +99,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Setter for the dependent task associated with the dependency.
+     *
      * @param dependentTask the new dependent task associated with the dependency.
      */
     public void setDependentTask(TaskEntity dependentTask) {
@@ -94,6 +109,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Getter for the ative status of the dependency.
+     *
      * @return ative status of the dependency.
      */
     public boolean isAtive() {
@@ -102,6 +118,7 @@ public class TaskDependencyEntity implements Serializable {
 
     /**
      * Setter for the ative status of the dependency.
+     *
      * @param ative the new ative status of the dependency.
      */
     public void setAtive(boolean ative) {
