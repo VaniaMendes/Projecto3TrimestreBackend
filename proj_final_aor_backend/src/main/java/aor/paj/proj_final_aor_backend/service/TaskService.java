@@ -144,7 +144,7 @@ public class TaskService {
             }
 
 
-            boolean taskStateUpdated = taskBean.updateTaskStatus(taskId, status);
+            boolean taskStateUpdated = taskBean.updateTaskStatus(taskId, status, projectId);
 
             if (!taskStateUpdated) {
                 logger.error("IP Address " + ip + ": Error updating task state");
@@ -175,7 +175,7 @@ public class TaskService {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
             }
 
-            boolean taskDeleted = taskBean.softDeleteTask(taskId);
+            boolean taskDeleted = taskBean.softDeleteTask(taskId, projectId);
 
             if (!taskDeleted) {
                 logger.error("IP Address " + ip + ": Error soft deleting task");

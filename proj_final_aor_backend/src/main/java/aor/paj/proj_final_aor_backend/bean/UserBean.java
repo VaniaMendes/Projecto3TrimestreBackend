@@ -671,6 +671,7 @@ public class UserBean implements Serializable {
         userEntity.setUserType(user.getUserType());
         userEntity.setBiography(user.getBiography());
         userEntity.setFirstName(user.getFirstName());
+        userEntity.setLab(labDao.findLabByUserId(user.getId()));
         return userEntity;
     }
 

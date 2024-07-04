@@ -8,6 +8,11 @@ import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskDependencyEntity;
 import aor.paj.proj_final_aor_backend.entity.TaskEntity;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.websocket.WebsocketTask;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +27,10 @@ import java.util.List;
 public class TaskBean implements Serializable {
 
     private static Logger logger = LogManager.getLogger(TaskBean.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @EJB
    TaskDao taskDao;
@@ -33,6 +42,8 @@ public class TaskBean implements Serializable {
     ProjectBean projectBean;
     @EJB
     TaskDependencyDao taskDependencyDao;
+    @EJB
+    WebsocketTask websocketTask;
 
     public TaskBean() {
     }
@@ -54,6 +65,7 @@ public class TaskBean implements Serializable {
             logger.debug("Project with ID " + projectId + " not found");
             return false;
         }
+
         // Criar a entidade da tarefa e associar ao projeto existente
         TaskEntity taskEntity = convertToEntity(task);
         taskEntity.setResponsibleUser(userBean.convertUserDtoToEntity(user));
@@ -70,6 +82,14 @@ public class TaskBean implements Serializable {
         }
 
         logger.info("Task registered successfully: " + taskEntity.getId());
+
+        try {
+            String jsonTask = mapper.writeValueAsString(convertToDTO(taskEntity));
+            websocketTask.sendTaskToProject(jsonTask, projectId);
+            logger.debug("Task sent to project with id: " + projectId);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing the task: " + e.getMessage());
+        }
         return true;
     }
 
@@ -126,6 +146,13 @@ public class TaskBean implements Serializable {
             updateDependenciesTask(taskEntity.getId(), taskIdList);
         }
 
+        try {
+            String jsonTask = mapper.writeValueAsString(convertToDTO(taskEntity));
+            websocketTask.sendTaskToProject(jsonTask, projectId);
+            logger.debug("Task sent to project with id: " + projectId);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing the task: " + e.getMessage());
+        }
         return updated;
     }
 
@@ -173,7 +200,7 @@ public class TaskBean implements Serializable {
         return true;
     }
 
-    public boolean updateTaskStatus(Long taskId, int newStatus) {
+    public boolean updateTaskStatus(Long taskId, int newStatus, Long projectId) {
 
         if (newStatus != 10 && newStatus != 20 && newStatus != 30) {
             return false;
@@ -192,6 +219,13 @@ public class TaskBean implements Serializable {
             }
             taskDao.merge(taskEntity);
             logger.info("Task status updated: " + taskEntity.getId());
+            try {
+                String jsonTask = mapper.writeValueAsString(convertToDTO(taskEntity));
+                websocketTask.sendTaskToProject(jsonTask, projectId);
+                logger.debug("Task sent to project with id: " + projectId);
+            } catch (JsonProcessingException e) {
+                logger.error("Error serializing the task: " + e.getMessage());
+            }
             return true;
         }
     }
@@ -282,7 +316,7 @@ public class TaskBean implements Serializable {
     }
 
 
-    public boolean softDeleteTask(Long taskId) {
+    public boolean softDeleteTask(Long taskId, Long projectId) {
         TaskEntity taskEntity = taskDao.findTaskById(taskId);
         if (taskEntity == null) {
             return false;
@@ -290,6 +324,14 @@ public class TaskBean implements Serializable {
             taskEntity.setErased(true);
             taskDao.merge(taskEntity);
             logger.info("Task erased: " + taskEntity.getId());
+
+            try {
+                String jsonTask = mapper.writeValueAsString(convertToDTO(taskEntity));
+                websocketTask.sendTaskToProject(jsonTask, projectId);
+                logger.debug("Task sent to project with id: " + projectId);
+            } catch (JsonProcessingException e) {
+                logger.error("Error serializing the task: " + e.getMessage());
+            }
             return true;
         }
     }

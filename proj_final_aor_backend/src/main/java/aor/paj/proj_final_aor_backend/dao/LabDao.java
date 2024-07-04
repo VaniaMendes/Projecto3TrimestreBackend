@@ -34,6 +34,17 @@ public class LabDao extends AbstractDao<LabEntity>{
         }
     }
 
+
+    public LabEntity findLabByUserId(Long userId) {
+        try {
+            LabEntity labEntity = (LabEntity) em.createNamedQuery("Lab.findLabByUserId").setParameter("userId", userId).getSingleResult();
+            return labEntity;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
     public LabEntity findLabByName(String name) {
         try {
             Workplace workplace = Workplace.valueOf(name.toUpperCase());
