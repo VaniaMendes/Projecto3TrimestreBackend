@@ -22,10 +22,10 @@ public class UserDao extends AbstractDao<UserEntity> {
     }
 
 
-
     /**
      * Method to find a user by their ID.
      * It uses a named query "User.findUserById" and sets the "id" parameter for the query.
+     *
      * @param id the ID of the user to find.
      * @return the user with the given ID, or null if no user is found.
      */
@@ -40,6 +40,7 @@ public class UserDao extends AbstractDao<UserEntity> {
     /**
      * Method to find a user by their email.
      * It uses a named query "User.findUserByEmail" and sets the "email" parameter for the query.
+     *
      * @param email the email of the user to find.
      * @return the user with the given email, or null if no user is found.
      */
@@ -54,20 +55,28 @@ public class UserDao extends AbstractDao<UserEntity> {
     /**
      * Method to find all active users.
      * It uses a named query "User.findAllAtiveUsers" to find all users with the activeState set to true.
+     *
      * @return a list of all active users, or null if no users are found.
      */
-    public List<UserEntity> findAllActiveUsers(){
-        try{
+    public List<UserEntity> findAllActiveUsers() {
+        try {
             return em.createNamedQuery("User.findAllAtiveUsers", UserEntity.class).getResultList();
-        }catch(NoResultException e){
+        } catch (NoResultException e) {
             return null;
         }
     }
 
-    public UserEntity findUserByNickname(String nickname){
-        try{
+    /**
+     * Method to find a user by their nickname.
+     *
+     * @param nickname the nickname of the user to find.
+     * @return the user with the given nickname, or null if no user is found.
+     */
+
+    public UserEntity findUserByNickname(String nickname) {
+        try {
             return (UserEntity) em.createNamedQuery("User.findUserByNickname").setParameter("nickname", nickname).getSingleResult();
-        }catch(NoResultException e){
+        } catch (NoResultException e) {
             return null;
         }
     }
@@ -75,6 +84,7 @@ public class UserDao extends AbstractDao<UserEntity> {
     /**
      * Method to find a user by their username.
      * It uses a named query "User.findUserByUsername" and sets the "username" parameter for the query.
+     *
      * @param prefix the firstName or the lastName of the user to find.
      * @return a list of users with the given firstName or lastName, or null if no users are found.
      */
@@ -93,6 +103,7 @@ public class UserDao extends AbstractDao<UserEntity> {
     /**
      * Method to update a user.
      * If the update is successful, it returns true. Otherwise, it returns false.
+     *
      * @param userEntity The userEntity object to update.
      * @return true if the update is successful, false otherwise.
      */

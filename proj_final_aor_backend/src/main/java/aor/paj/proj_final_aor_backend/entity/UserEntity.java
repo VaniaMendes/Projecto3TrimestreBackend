@@ -340,98 +340,198 @@ public class UserEntity implements Serializable {
         this.notifications = notifications;
     }
 
+
+    /**
+     * Getter for the messages sent.
+     * @return messages sent by the user.
+     */
     public Set<MessageEntity> getMessagesSent() {
         return messagesSent;
     }
 
+    /**
+     * Setter for the messages sent.
+     * @param messagesSent new messages sent by the user.
+     */
     public void setMessagesSent(Set<MessageEntity> messagesSent) {
         this.messagesSent = messagesSent;
     }
 
+    /**
+     * Getter for the messages received.
+     * @return messages received by the user.
+     */
     public Set<MessageEntity> getMessagesReceived() {
         return messagesReceived;
     }
 
+    /**
+     * Setter for the messages received.
+     * @param messagesReceived new messages received by the user.
+     */
     public void setMessagesReceived(Set<MessageEntity> messagesReceived) {
         this.messagesReceived = messagesReceived;
     }
 
+    /**
+     * Getter for the sessions.
+     * @return sessions of the user.
+     */
     public Set<SessionEntity> getSessions() {
         return sessions;
     }
 
+    /**
+     * Setter for the sessions.
+     * @param sessions new sessions of the user.
+     */
     public void setSessions(Set<SessionEntity> sessions) {
         this.sessions = sessions;
     }
 
+    /**
+     * Getter for the tasks.
+     * @return tasks of the user.
+     */
     public Set<TaskEntity> getTasks() {
         return tasks;
     }
 
+    /**
+     * Setter for the tasks.
+     * @param tasks new tasks of the user.
+     */
     public void setTasks(Set<TaskEntity> tasks) {
         this.tasks = tasks;
     }
 
+    /**
+     * Getter for the lab.
+     * @return lab of the user.
+     */
     public LabEntity getLab() {
         return lab;
     }
 
+    /**
+     * Setter for the lab.
+     * @param lab new lab of the user.
+     */
     public void setLab(LabEntity lab) {
         this.lab = lab;
     }
 
+    /**
+     * Getter for the projects.
+     * @return projects of the user.
+     */
     public Set<UserProjectEntity> getProjects() {
         return projects;
     }
+
+    /**
+     * Setter for the projects.
+     * @param projects new projects of the user.
+     */
 
     public void setProjects(Set<UserProjectEntity> projects) {
         this.projects = projects;
     }
 
+
+    /**
+     * Getter for the authentication.
+     * @return authentication of the user.
+     */
     public AuthenticationEntity getAuthentication() {
         return authentication;
     }
 
+
+    /**
+     * Setter for the authentication.
+     * @param authentication new authentication of the user.
+     */
     public void setAuthentication(AuthenticationEntity authentication) {
         this.authentication = authentication;
     }
 
+    /**
+     * Getter for the photo.
+     * @return photo of the user.
+     */
     public String getPhoto() {
         return photo;
     }
 
+    /**
+     * Setter for the photo.
+     * @param photo new photo of the user.
+     */
     public void setPhoto(String photo) {
         this.photo = photo;
     }
 
+    /**
+     * Getter for the nickname.
+     * @return  nickname of the user.
+     */
     public String getNickname() {
         return nickname;
     }
 
+    /**
+     * Setter for the nickname.
+     * @param nickname new nickname of the user.
+     */
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
+    /**
+     * Getter for the skills.
+     * @return skills of the user.
+     */
     public Set<UserSkillEntity> getSkills() {
         return skills;
     }
 
+    /**
+     * Setter for the skills.
+     * @param skills new skills of the user.
+     */
     public void setSkills(Set<UserSkillEntity> skills) {
         this.skills = skills;
     }
 
+    /**
+     * Getter for the interests.
+     * @return interests of the user.
+     */
     public Set<UserInterestEntity> getInterests() {
         return interests;
     }
 
+    /**
+     * Setter for the interests.
+     * @param interests new interests of the user.
+     */
     public void setInterests(Set<UserInterestEntity> interests) {
         this.interests = interests;
     }
 
+    /**
+     * Getter for the activities.
+     * @return activities of the user.
+     */
     public Set<ActivityEntity> getActivities() {
         return activities;
     }
 
+    /**
+     * Setter for the activities.
+     * @param activities new activities of the user.
+     */
     public void setActivities(Set<ActivityEntity> activities) {
         this.activities = activities;
     }

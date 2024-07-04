@@ -12,6 +12,7 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class SkillBean implements Serializable {
 
     /**
      * This method returns a list of all the skills in the database.
+     *
      * @return List of all the skills in the database.
      */
 
@@ -63,22 +65,33 @@ public class SkillBean implements Serializable {
         return skillDao.findAllSkills();
     }
 
-    public List<Skill>getSkillsByUserId(long userId){
+    /**
+     * This method returns a list of all the skills in the database.
+     *
+     * @param userId The id of the user to get the skills from.
+     * @return List of all the skills in the database.
+     */
+    public List<Skill> getSkillsByUserId(long userId) {
 
-       List<SkillEntity> userActiveSkills = userSkillDao.findAllSkillsForUser(userId);
-       if(userActiveSkills == null){
-           return null;
-       }
+        // Fetch the ative skills from the database for the user
+        List<SkillEntity> userActiveSkills = userSkillDao.findAllSkillsForUser(userId);
+        // Check if the user has no skills
+        if (userActiveSkills == null) {
+            return null;
+        }
 
-       List<Skill> userSkills = new ArrayList<>();
-       for(SkillEntity skill : userActiveSkills){
-           userSkills.add(convertToDTO(skill));
-       }
-       return userSkills;
+        // Create a list of Skill objects
+        List<Skill> userSkills = new ArrayList<>();
+        for (SkillEntity skill : userActiveSkills) {
+            userSkills.add(convertToDTO(skill));
+        }
+        // Return the list of Skill objects
+        return userSkills;
     }
 
     /**
      * This method creates a new skill in the database.
+     *
      * @param skill Skill object to be created.
      * @return True if the skill was created successfully, false otherwise.
      */
@@ -114,7 +127,8 @@ public class SkillBean implements Serializable {
     /**
      * This method associates a skill to a user.
      * It creates a new UserSkillEntity object and persists it in the database.
-     * @param userId The id of the user to associate the skill to.
+     *
+     * @param userId  The id of the user to associate the skill to.
      * @param skillId The id of the skill to associate to the user.
      * @return True if the skill was associated successfully, false otherwise.
      */
@@ -122,8 +136,6 @@ public class SkillBean implements Serializable {
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         SkillEntity skill = skillDao.find(skillId);
-        System.out.println(user.getId());
-        System.out.println(skill.getId());
 
         // Check if the user or the skill does not exist
         if (user == null || skill == null) {
@@ -131,14 +143,14 @@ public class SkillBean implements Serializable {
         }
 
         //Check if the skill is inactive
-        if(verifyskillIsInative(userId, skillId)){
+        if (verifyskillIsInative(userId, skillId)) {
             UserSkillEntity userSkill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
             userSkill.setActive(true);
             userSkillDao.updateUserSkill(userSkill);
             return true;
         }
         // Check if the user already has the skill associated
-        if(verifySkillExists(userId, skillId)){
+        if (verifySkillExists(userId, skillId)) {
             return false;
         }
 
@@ -157,7 +169,8 @@ public class SkillBean implements Serializable {
     /**
      * This method soft deletes a skill from a user.
      * It sets the active field of the UserSkillEntity object to false.
-     * @param userId The id of the user to soft delete the skill from.
+     *
+     * @param userId  The id of the user to soft delete the skill from.
      * @param skillId The id of the skill to soft delete.
      * @return True if the skill was soft deleted successfully, false otherwise.
      */
@@ -187,7 +200,12 @@ public class SkillBean implements Serializable {
     }
 
 
-
+    /**
+     * This method converts a SkillEntity object to a Skill object.
+     *
+     * @param skillEntity The SkillEntity object to convert.
+     * @return The Skill object.
+     */
     public Skill convertToDTO(SkillEntity skillEntity) {
         Skill skill = new Skill();
         skill.setId(skillEntity.getId());
@@ -198,17 +216,29 @@ public class SkillBean implements Serializable {
 
     /**
      * This method verifies if a skill already exists in the database.
+     *
      * @param skillId The id of the skill to verify.
      * @return True if the skill exists, false otherwise.
      */
-    public boolean verifySkillExists(Long userId, Long skillId){
+    public boolean verifySkillExists(Long userId, Long skillId) {
         // Fetch the skill from the database
         UserSkillEntity skill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
         return skill != null;
     }
 
-    public boolean verifyskillIsInative(Long userId, Long skillId){
+    /**
+     * This method verifies if a skill is inactive.
+     *
+     * @param userId  The id of the user to verify.
+     * @param skillId The id of the skill to verify.
+     * @return True if the skill is inactive, false otherwise.
+     */
+    public boolean verifyskillIsInative(Long userId, Long skillId) {
+        /**
+         * Fetch the skill from the database
+         */
         UserSkillEntity skill = userSkillDao.findUserSkillByUserAndSkill(userId, skillId);
+        // Check if the skill is null
         if (skill == null) {
             return false;
         }

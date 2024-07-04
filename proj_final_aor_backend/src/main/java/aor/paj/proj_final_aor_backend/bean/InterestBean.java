@@ -54,23 +54,24 @@ public class InterestBean {
 
     /**
      * This method creates a new interest in the database.
+     *
      * @param interest The interest to be created.
      * @return True if the interest was created successfully, false otherwise.
      */
 
-    public boolean createNewInterest(String token, Interest interest){
+    public boolean createNewInterest(String token, Interest interest) {
         // Check if the interest name is null or empty
-        if(interest.getName().isEmpty() ){
+        if (interest.getName().isEmpty()) {
             logger.error("Interest name is null or empty.");
             return false;
         }
 
         // Check if the interest already exists
-       if(interestAlreadyExists(interest.getName())){
-           return false;
-       }
+        if (interestAlreadyExists(interest.getName())) {
+            return false;
+        }
 
-       // Create the interest
+        // Create the interest
         InterestEntity interestEntity = new InterestEntity();
 
         String name = interest.getName();
@@ -91,11 +92,12 @@ public class InterestBean {
     /**
      * This method associates an interest to a user in the database.
      * It checks if the user and the interest exist and if the user already has the interest associated.
-     * @param userId The id of the user to associate the interest to.
+     *
+     * @param userId     The id of the user to associate the interest to.
      * @param interestId The id of the interest to associate to the user.
      * @return True if the interest was associated successfully, false otherwise.
      */
-    public boolean associateInterestToUser(long userId, long interestId){
+    public boolean associateInterestToUser(long userId, long interestId) {
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         InterestEntity interest = interestDao.find(interestId);
@@ -105,7 +107,8 @@ public class InterestBean {
             return false;
         }
 
-        if(userHasInterestInactive(userId,interestId)){
+        // Check if the user has the interest in the database but inactive
+        if (userHasInterestInactive(userId, interestId)) {
             UserInterestEntity userInterest = userInterestDao.findUserInterestByUserAndInterest(userId, interestId);
             userInterest.setActive(true);
             userInterestDao.updateUserInterest(userInterest);
@@ -113,7 +116,7 @@ public class InterestBean {
         }
 
         // Check if the user already has the interest associated
-        if(userAlreadyHasInterest(userId,interestId)){
+        if (userAlreadyHasInterest(userId, interestId)) {
             return false;
         }
 
@@ -130,10 +133,11 @@ public class InterestBean {
 
     /**
      * This method checks if an interest already exists in the database.
+     *
      * @param name The name of the interest to check.
      * @return True if the interest already exists, false otherwise.
      */
-    public boolean interestAlreadyExists(String name){
+    public boolean interestAlreadyExists(String name) {
         InterestEntity interest = interestDao.findInterestByName(name);
         return interest != null;
 
@@ -141,11 +145,13 @@ public class InterestBean {
 
     /**
      * This method checks if a user already has an interest associated.
-     * @param userId The id of the user to check.
+     *
+     * @param userId     The id of the user to check.
      * @param interestId The id of the interest to check.
      * @return True if the user already has the interest associated, false otherwise.
      */
-    public boolean userAlreadyHasInterest(long userId, long interestId){
+    public boolean userAlreadyHasInterest(long userId, long interestId) {
+        // Fetch the user and skill from the database
         UserInterestEntity interest = userInterestDao.findUserInterestByUserAndInterest(userId, interestId);
         if (interest == null) {
             return false;
@@ -153,8 +159,17 @@ public class InterestBean {
         return true;
     }
 
-    public boolean userHasInterestInactive(long userId, long interestId){
+    /**
+     * This method checks if a user has an interest associated but inactive.
+     *
+     * @param userId     The id of the user to check.
+     * @param interestId The id of the interest to check.
+     * @return True if the user has the interest associated but inactive, false otherwise.
+     */
+    public boolean userHasInterestInactive(long userId, long interestId) {
+        // Fetch the user and skill from the database
         UserInterestEntity interest = userInterestDao.findUserInterestByUserAndInterest(userId, interestId);
+        // Check if the user has the interest in the database but inactive
         if (interest == null) {
             return false;
         }
@@ -163,11 +178,12 @@ public class InterestBean {
 
     /**
      * This method puts the interest from a user in the database to inactive.
-     * @param userId The id of the user to remove the interest from.
+     *
+     * @param userId     The id of the user to remove the interest from.
      * @param interestId The id of the interest to remove from the user.
      * @return True if the interest was removed successfully, false otherwise.
      */
-    public boolean removeInterestfromUser(long userId, long interestId){
+    public boolean removeInterestfromUser(long userId, long interestId) {
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         InterestEntity interest = interestDao.find(interestId);
@@ -193,15 +209,21 @@ public class InterestBean {
 
     /**
      * This method gets all the interests from the database.
+     *
      * @return List<InterestEntity> - The list of all interests in the database.
      */
-    public List<InterestEntity> getAllInterests(){
+    public List<InterestEntity> getAllInterests() {
         return interestDao.getAllInterests();
     }
 
 
-
-    public List<InterestEntity> getAllInterestsByUser(long userId){
+    /**
+     * This method gets all the interests from a user in the database.
+     *
+     * @param userId The id of the user to get the interests from.
+     * @return List<InterestEntity> - The list of all interests from the user in the database.
+     */
+    public List<InterestEntity> getAllInterestsByUser(long userId) {
         return userInterestDao.getAllInterestsByUserId(userId);
     }
 

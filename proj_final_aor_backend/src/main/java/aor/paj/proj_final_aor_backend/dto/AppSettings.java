@@ -38,7 +38,8 @@ public class AppSettings {
 
     /**
      * Getter for the id field.
-     * @return  the current id field.
+     *
+     * @return the current id field.
      */
     public long getId() {
         return id;
@@ -46,6 +47,7 @@ public class AppSettings {
 
     /**
      * Setter for the id field.
+     *
      * @param id the new value for the id field.
      */
     public void setId(long id) {
@@ -54,6 +56,7 @@ public class AppSettings {
 
     /**
      * Getter for the sessionTimeout field.
+     *
      * @return the current sessionTimeout field.
      */
     public int getSessionTimeout() {
@@ -62,6 +65,7 @@ public class AppSettings {
 
     /**
      * Setter for the sessionTimeout field.
+     *
      * @param sessionTimeout the new value for the sessionTimeout field.
      */
     public void setSessionTimeout(int sessionTimeout) {
@@ -70,6 +74,7 @@ public class AppSettings {
 
     /**
      * Getter for the maxUsersPerProject field.
+     *
      * @return the current maxUsersPerProject field.
      */
     public int getMaxUsersPerProject() {
@@ -78,6 +83,7 @@ public class AppSettings {
 
     /**
      * Setter for the maxUsersPerProject field.
+     *
      * @param maxUsersPerProject the new value for the maxUsersPerProject field.
      */
     public void setMaxUsersPerProject(int maxUsersPerProject) {

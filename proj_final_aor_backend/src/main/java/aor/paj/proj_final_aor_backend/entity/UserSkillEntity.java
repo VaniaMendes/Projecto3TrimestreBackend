@@ -5,24 +5,32 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**
- * This class represents a UserSkillEntity in the system.
- * It contains various properties related to a user's skill and their getter and setter methods. */
+ * The UserSkillEntity class represents the relationship between a user and their skills.
+ * It is mapped to the "user_skill" table in the database.
+ * This class implements Serializable, allowing instances of this class to be serialized.
+ */
 @Entity
 @Table(name = "user_skill")
 @IdClass(UserSkillId.class)
+
+// Named query to find all users with a specific skill and active status
 @NamedQuery(name = "UserSkillEntity.findAllUsersWithSkillAndActive", query = "SELECT u FROM UserSkillEntity u WHERE u.skill = :skill AND u.active = :active")
+
+// Named query to get all skills of a user by their ID
 @NamedQuery(name= "UserSkillEntity.findAllSkillsForUser", query = "SELECT u.skill FROM UserSkillEntity u WHERE u.user.id = :id AND u.active = true")
+
+// Named query to find a user's skill by user and skill IDs
 @NamedQuery(name="UserSkillEntity.findUserSkill", query = "SELECT u FROM UserSkillEntity u WHERE u.user.id = :user AND u.skill.id = :skill")
 
 
 public class UserSkillEntity implements Serializable {
-    /**
-     * Unique identifier for serialization.
-     */
+
+    // Serial version UID for serialization and deserialization
     private static final long serialVersionUID = 1L;
 
     /**
      * User ID part of the composite key.
+     * It is a foreign key that references the id column in the user table.
      */
     @Id
     @ManyToOne
@@ -31,6 +39,7 @@ public class UserSkillEntity implements Serializable {
 
     /**
      * Skill ID part of the composite key.
+     * It is a foreign key that references the id column in the skill table.
      */
     @Id
     @ManyToOne

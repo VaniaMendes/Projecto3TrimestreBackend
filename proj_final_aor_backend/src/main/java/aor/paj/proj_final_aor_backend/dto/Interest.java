@@ -29,6 +29,7 @@ public class Interest {
 
     /**
      * Returns the ID of the interest.
+     *
      * @return the ID of the interest.
      */
     public Long getId() {
@@ -38,6 +39,7 @@ public class Interest {
 
     /**
      * Sets the ID of the interest.
+     *
      * @param id the ID of the interest.
      */
     public void setId(Long id) {
@@ -47,6 +49,7 @@ public class Interest {
 
     /**
      * Returns the name of the interest.
+     *
      * @return the name of the interest.
      */
     public String getName() {
@@ -55,9 +58,9 @@ public class Interest {
 
     /**
      * Sets the name of the interest.
+     *
      * @param name the name of the interest.
      */
-
     public void setName(String name) {
         this.name = name;
     }

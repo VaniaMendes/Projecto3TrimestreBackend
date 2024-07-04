@@ -16,29 +16,38 @@ import java.util.Set;
 @NamedQuery(name = "Lab.findAllLabs", query = " SELECT l FROM LabEntity l")
 @NamedQuery(name = "Lab.findLabById", query = " SELECT l FROM LabEntity l WHERE l.id = :id")
 @NamedQuery(name = "Lab.findLabByName", query = " SELECT l FROM LabEntity l WHERE l.name = :name")
+@NamedQuery(name = "Lab.findLabByUserId", query = " SELECT l FROM LabEntity l JOIN l.users u WHERE u.id = :userId")
 public class LabEntity implements Serializable {
 
     // Unique identifier for serialization
     private static final long serialVersionUID = 1L;
 
-    // Unique identifier for the lab
+    /**
+     * Unique identifier for the lab.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Integer id;
 
-    // Name of the lab
+    /**
+     * Name of the lab. It is unique and cannot be updated.
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private Workplace name;
 
-    // Set of projects associated with the lab
+    /**
+     * Set of projects associated with the lab.
+     */
     @OneToMany(mappedBy = "lab")
     private Set<ProjectEntity> projects;
 
-    // Set of users associated with the lab
+    /**
+     * Set of users associated with the lab.
+     */
     @OneToMany(mappedBy = "lab")
-    private Set<ProjectEntity> users;
+    private Set<UserEntity> users;
 
     /**
      * Default constructor for the LabEntity class.
@@ -98,7 +107,7 @@ public class LabEntity implements Serializable {
      * Getter for the users associated with the lab.
      * @return users associated with the lab.
      */
-    public Set<ProjectEntity> getUsers() {
+    public Set<UserEntity> getUsers() {
         return users;
     }
 
@@ -106,7 +115,7 @@ public class LabEntity implements Serializable {
      * Setter for the users associated with the lab.
      * @param users the new users associated with the lab.
      */
-    public void setUsers(Set<ProjectEntity> users) {
+    public void setUsers(Set<UserEntity> users) {
         this.users = users;
     }
 }

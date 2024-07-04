@@ -3,6 +3,11 @@ package aor.paj.proj_final_aor_backend.dto;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+
+/**
+ * This class represents a task just with the id and title.
+ * Its used to show the tasks in the front end just with the information needed.
+ */
 @XmlRootElement
 public class TaskInfo {
 

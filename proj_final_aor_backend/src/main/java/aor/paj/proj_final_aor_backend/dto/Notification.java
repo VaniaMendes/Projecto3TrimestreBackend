@@ -12,7 +12,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
-public class Notification extends TextEvent{
+public class Notification extends TextEvent {
 
     /**
      * The type of the notification.
@@ -36,6 +36,7 @@ public class Notification extends TextEvent{
 
     /**
      * Returns the type of the notification.
+     *
      * @return the type of the notification.
      */
     public NotificationType getType() {
@@ -44,16 +45,28 @@ public class Notification extends TextEvent{
 
     /**
      * Sets the type of the notification.
+     *
      * @param type the type of the notification.
      */
     public void setType(NotificationType type) {
         this.type = type;
     }
 
+    /**
+     * Returns the name of the related entity.
+     *
+     * @return the name of the related entity.
+     */
     public long getRelatedIDEntity() {
         return relatedIDEntity;
     }
 
+
+    /**
+     * Sets the name of the related entity.
+     *
+     * @param relatedIDEntity the name of the related entity.
+     */
     public void setRelatedIDEntity(long relatedIDEntity) {
         this.relatedIDEntity = relatedIDEntity;
     }
