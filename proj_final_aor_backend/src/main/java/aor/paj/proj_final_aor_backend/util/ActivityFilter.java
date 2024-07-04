@@ -33,7 +33,7 @@ public class ActivityFilter implements Filter {
 
             if (session != null) {
                 session.setAttribute("lastActivityTime", System.currentTimeMillis());
-                sessionListener.updateSessionTimeout(session, settingsBean.getSessionTimeout()*60);
+
 
                 System.out.println("ActivityFilter: Tempo de última atividade atualizado para a sessão " + session.getId());
             } else {
@@ -43,11 +43,7 @@ public class ActivityFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    @Override
-    public void destroy() {
-        // Limpeza do filtro, se necessário
-        System.out.println("ActivityFilter destroyed");
-    }
+
 
 
 }

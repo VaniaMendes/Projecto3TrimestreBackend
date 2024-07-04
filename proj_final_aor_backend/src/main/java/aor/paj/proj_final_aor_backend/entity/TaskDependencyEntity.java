@@ -10,8 +10,9 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "task_dependency")
-@NamedQuery(name = "TaskDependency.findDependency", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.dependentTask.id = :dependentTaskId")
-@NamedQuery(name= "TaskDependency.findDependenciesByTaskId", query = "SELECT td.dependentTask FROM TaskDependencyEntity td WHERE td.task.id = :taskId")
+@NamedQuery(name = "TaskDependency.findDependency", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.dependentTask.id = :dependentTaskId AND td.ative = true")
+@NamedQuery(name= "TaskDependency.findDependenciesByTaskId", query = "SELECT td.dependentTask FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
+@NamedQuery(name= "TaskDependency.findTaskDependenciesByTaskId", query = "SELECT td FROM TaskDependencyEntity td WHERE td.task.id = :taskId AND td.ative = true")
 public class TaskDependencyEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -22,6 +23,9 @@ public class TaskDependencyEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
+
+    @Column(name = "ative")
+    private boolean ative;
 
     // Task associated with the dependency
     @ManyToOne
@@ -85,5 +89,22 @@ public class TaskDependencyEntity implements Serializable {
      */
     public void setDependentTask(TaskEntity dependentTask) {
         this.dependentTask = dependentTask;
+
+    }
+
+    /**
+     * Getter for the ative status of the dependency.
+     * @return ative status of the dependency.
+     */
+    public boolean isAtive() {
+        return ative;
+    }
+
+    /**
+     * Setter for the ative status of the dependency.
+     * @param ative the new ative status of the dependency.
+     */
+    public void setAtive(boolean ative) {
+        this.ative = ative;
     }
 }

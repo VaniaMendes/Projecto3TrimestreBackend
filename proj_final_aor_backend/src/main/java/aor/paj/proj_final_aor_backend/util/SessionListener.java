@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 
-
-
     @WebListener
     public class SessionListener implements HttpSessionListener {
 
@@ -52,7 +50,9 @@ import jakarta.servlet.http.HttpSessionListener;
 
 
         public void updateSessionTimeout(HttpSession session, int timeout) {
-            session.setMaxInactiveInterval( timeout *60);
+
+            System.out.println("SessionListener: Timeout da sessão atualizado para " + timeout + " minutos");
+
         }
 
     }
