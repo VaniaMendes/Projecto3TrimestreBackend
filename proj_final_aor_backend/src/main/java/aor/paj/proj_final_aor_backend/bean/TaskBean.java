@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.TaskDao;
 import aor.paj.proj_final_aor_backend.dao.TaskDependencyDao;
+import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.dto.Task;
 import aor.paj.proj_final_aor_backend.dto.TaskInfo;
 import aor.paj.proj_final_aor_backend.dto.User;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,6 +142,35 @@ public class TaskBean implements Serializable {
             logger.error("Error serializing the task: " + e.getMessage());
         }
         return true;
+    }
+
+
+    /**
+     * This method creates a final task for a project, when this one is created.
+     * @param project The project to create the final task.
+     * @param user The user responsible for the task.
+     */
+    public void createFinalTaskOfProject (ProjectEntity project, User user) {
+
+        // Create the final task
+        Task task = new Task();
+        task.setTitle("Final Presentation");
+        task.setDescription("This is the final presentation of the project.");
+        // Set the conclusion date of the project as the conclusion date of the task
+        LocalDateTime conclusionDateTime = project.getConclusionDate();
+
+        // Set start and end times for the task
+        LocalDateTime startDateTime = conclusionDateTime.toLocalDate().atStartOfDay(); //00:00:00.000000000
+        LocalDateTime endDateTime = conclusionDateTime.toLocalDate().atTime(LocalTime.MAX); // 23:59:59.999999999
+
+        // Set the task dates
+        task.setStartDate(startDateTime);
+        task.setDeadline(endDateTime);
+        task.setPriorityId(10);
+        task.setErased(false);
+
+        // Register the task in the database
+        registerTask(task, project.getId(), user, null);
     }
 
 
