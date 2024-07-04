@@ -36,6 +36,25 @@ public class ResourceDao extends AbstractDao<ResourceEntity>{
     }
 
     /**
+     * Searches for resources based on a search string.
+     * This method performs a database query to find resources that match the given search criteria. The search criteria
+     * can be any string value that the resources might contain. If resources are found, they are returned as a list.
+     * If no resources match the search criteria, an empty list is returned. This method handles the {@link NoResultException}
+     * by returning an empty list, ensuring that the method caller receives a non-null result.
+     *
+     * @param search The search string used to query resources.
+     * @return A list of {@link ResourceEntity} that match the search criteria, or an empty list if no matches are found.
+     */
+    public List<ResourceEntity> searchResources(String search) {
+        try {
+            return em.createNamedQuery("Resource.searchResources", ResourceEntity.class).setParameter("search", search)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Retrieves all resources from the database, ordered in descending order.
      * @return a list of all resources, or an empty list if no resources are found.
      */

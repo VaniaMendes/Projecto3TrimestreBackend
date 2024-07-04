@@ -133,6 +133,22 @@ public class ResourceBean implements Serializable {
                 .collect(Collectors.toList());
     }
 
+
+    /**
+     * Searches for resources based on a partial or full search term.
+     * This method queries the database for resources that match the search criteria in their name or brand,
+     * converts each matching ResourceEntity to a ResourceSmallInfoUser DTO, and collects them into a list.
+     * The search is case-insensitive and allows partial matches due to the use of the LIKE operator in the query.
+     *
+     * @param search The search term used to find resources. It can be a partial or full name or brand of the resource.
+     * @return A list of ResourceSmallInfoUser DTOs that match the search criteria. Returns an empty list if no matches are found.
+     */
+    public List<ResourceSmallInfoUser> searchResources(String search) {
+        return resourceDao.searchResources(search).stream()
+                .map(resourceEntity -> convertToDTOInfoUser(resourceEntity, null))
+                .collect(Collectors.toList());
+    }
+
     /**
      * This method retrieves all resources from the database and converts them into a list of ResourceSmallInfo objects.
      * For each resource, it also counts the number of projects that use the resource by calling the countProjectsFromResource method from the ProjectResourceDao.
@@ -656,16 +672,38 @@ public class ResourceBean implements Serializable {
         return resource;
     }
 
-    private ResourceSmallInfoUser convertToDTOInfoUser(ResourceEntity resourceEntity, int quantity) {
+    /**
+     * Converts a ResourceEntity object into a ResourceSmallInfoUser DTO.
+     * This method is primarily used for creating a simplified data transfer object
+     * that contains essential information about a resource, including its quantity,
+     * which is not stored within the ResourceEntity itself but is provided externally.
+     *
+     * @param resourceEntity The ResourceEntity to convert.
+     * @param quantity The quantity of the resource, which may come from an external source or calculation.
+     * @return A ResourceSmallInfoUser DTO containing the resource's ID, name, brand, quantity, and type.
+     */
+    private ResourceSmallInfoUser convertToDTOInfoUser(ResourceEntity resourceEntity, Integer quantity) {
         ResourceSmallInfoUser r = new ResourceSmallInfoUser();
         r.setId(resourceEntity.getId());
         r.setName(resourceEntity.getName());
         r.setBrand(resourceEntity.getBrand());
         r.setQuantity(quantity);
+        r.setType(resourceEntity.getType());
         return r;
     }
 
-    private ResourceSmallInfo convertToDTOInfo(ResourceEntity resourceEntity, long numberProjects) {
+    /**
+     * Converts a ResourceEntity object into a ResourceSmallInfo DTO.
+     * This method is used for creating a data transfer object that encapsulates
+     * the basic information of a resource along with the number of projects it is associated with.
+     * The number of projects is not stored within the ResourceEntity but is provided externally,
+     * typically calculated based on relationships defined in the database.
+     *
+     * @param resourceEntity The ResourceEntity to convert.
+     * @param numberProjects The number of projects associated with the resource, provided externally.
+     * @return A ResourceSmallInfo DTO containing the resource's ID, name, brand, photo, type, and the number of associated projects.
+     */
+    private ResourceSmallInfo convertToDTOInfo(ResourceEntity resourceEntity, Long numberProjects) {
         ResourceSmallInfo r = new ResourceSmallInfo();
         r.setId(resourceEntity.getId());
         r.setName(resourceEntity.getName());

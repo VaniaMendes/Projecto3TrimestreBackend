@@ -26,6 +26,7 @@ import java.util.Set;
 @NamedQuery(name = "Resource.findResourcesBySupplier", query = "SELECT r FROM ResourceEntity r JOIN r.suppliers rs JOIN rs.supplier s WHERE s.id = :supplierId")
 @NamedQuery(name = "Resource.findResourcesBySourceId", query = "SELECT r FROM ResourceEntity r WHERE r.sourceId = :sourceId")
 @NamedQuery(name = "Resource.findAllBrands", query = "SELECT DISTINCT r.brand FROM ResourceEntity r ORDER BY r.brand ASC")
+@NamedQuery(name = "Resource.searchResources", query = "SELECT r FROM ResourceEntity r WHERE r.name LIKE CONCAT('%', :search, '%') OR r.brand LIKE CONCAT('%', :search, '%')")
 
 //All resources ordered
 @NamedQuery(name = "Resource.findAllResourcesOrderedByNameASC", query = "SELECT r FROM ResourceEntity r order by r.name ASC")
