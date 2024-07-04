@@ -5,6 +5,7 @@ import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
+import aor.paj.proj_final_aor_backend.util.enums.UserType;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import aor.paj.proj_final_aor_backend.websocket.Notifier;
 import jakarta.ejb.EJB;
@@ -73,6 +74,8 @@ public class ProjectBean implements Serializable {
 
     @EJB
     private NotificationBean notificationBean;
+    @EJB
+    private SettingsBean settingsBean;
     @EJB
     Notifier notifier;
 
@@ -162,33 +165,66 @@ public class ProjectBean implements Serializable {
             return true;
         }
 
+        if (project.getMaxMembers() <= 0 || project.getMaxMembers() > settingsBean.getMaxUsersPerProject()){
+            logger.error("Project max members is invalid.");
+            return true;
+        }
+
         return false;
     }
 
+
     /**
-     * Updates the state of a project.
-     * @param id The id of the project to be updated.
-     * @param stateId The new state id to be set.
-     * @param token The token of the user updating the project.
-     * @return true if the update was successful, false otherwise.
+     * Updates the state of a project based on specified conditions and rules.
+     * This method first validates the project's existence and the validity of the new state ID.
+     * It then checks if the user attempting the update is not the project's creator and if the state transition is valid.
+     * For ADMIN users, special handling is applied when moving a project from READY to APPROVED state by setting the project's initial date to now.
+     * Finally, the project's state is updated, and a notification is sent to all project users.
+     *
+     * @param id The ID of the project to update.
+     * @param stateId The new state ID to set for the project.
+     * @param token The token of the user attempting to update the project's state.
+     * @return true if the project state was successfully updated, false otherwise.
      */
     public boolean updateState(long id, int stateId, String token) {
         ProjectEntity projectEntity = findProject(id);
+
+        System.out.println(1);
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
         cloneMessageEntities(projectEntity);
 
+        System.out.println(2);
+
         UserEntity author = sessionDao.findUserByToken(token);
-        if (author == null) {
+        if (author == null || (!(author.getUserType() == UserType.ADMIN) && !userProjectBean.userProjectExists(author.getId(), id))) {
             return false;
         }
+
+        System.out.println(3);
+
+        int currentStateId = projectEntity.getStateId();
+        boolean isAdmin = author.getUserType() == UserType.ADMIN;
+
+        // Check for valid state transitions
+        if (!isValidTransition(currentStateId, stateId, isAdmin)) {
+            return false;
+        }
+
+        System.out.println(4);
+
+        // Special handling for ADMIN moving from READY to APPROVED
+        if (isAdmin && currentStateId == Project.READY && stateId == Project.APPROVED) {
+            projectEntity.setInitialDate(LocalDateTime.now());
+        }
+
+        System.out.println(5);
 
         projectEntity.setStateId(stateId);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
         String newState = getStateNameFromId(stateId);
-
         activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_STATE, author, newState);
 
         projectDao.merge(projectEntity);
@@ -197,6 +233,32 @@ public class ProjectBean implements Serializable {
 
         logger.info("Project state updated to: " + stateId + " for project: " + projectEntity.getName() + " by user with id: " + author.getId());
         return true;
+    }
+
+    /**
+     * Validates if a transition between two project states is valid based on the current state, the desired new state, and the user's admin status.
+     * This method allows transitions from PLANNING to READY, READY to APPROVED (admin only), APPROVED to IN_PROGRESS, and IN_PROGRESS to FINISHED.
+     * Projects can be CANCELLED from any state. Admins have the exclusive ability to move projects from READY to APPROVED.
+     *
+     * @param currentState The current state ID of the project.
+     * @param newState The desired new state ID for the project.
+     * @param isAdmin A boolean indicating if the user is an admin.
+     * @return true if the transition is valid, false otherwise.
+     */
+    private boolean isValidTransition(int currentState, int newState, boolean isAdmin) {
+        if (newState == Project.CANCELLED) return true; // Can be cancelled at any time
+        switch (currentState) {
+            case Project.PLANNING:
+                return newState == Project.READY;
+            case Project.READY:
+                return (newState == Project.APPROVED && isAdmin) || (!isAdmin && newState == Project.CANCELLED);
+            case Project.APPROVED:
+                return newState == Project.IN_PROGRESS;
+            case Project.IN_PROGRESS:
+                return newState == Project.FINISHED;
+            default:
+                return false;
+        }
     }
 
     /**
@@ -1217,6 +1279,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setLab(labBean.convertToEntity(project.getLab()));
         projectEntity.setNeeds(project.getNeeds());
         projectEntity.setMaxMembers(project.getMaxMembers());
+        projectEntity.setConclusionDate(project.getConclusionDate());
 
         return projectEntity;
     }

@@ -140,6 +140,16 @@ public class ResourceService {
     }
 
     @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchResources(@QueryParam("search") String search) {
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to search resources from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(resourceBean.searchResources(search)).build();
+    }
+
+    @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getResourceById(@PathParam("id") long id, @HeaderParam("token") String token) {

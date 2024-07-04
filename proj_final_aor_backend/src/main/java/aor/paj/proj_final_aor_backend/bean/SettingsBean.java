@@ -62,4 +62,8 @@ public class SettingsBean implements Serializable {
         }
         return appSettingsEntity.getSessionTimeout();
     }
+
+    public Integer getMaxUsersPerProject() {
+        return appSettingsDao.findCurrentMaxUsers();
+    }
 }

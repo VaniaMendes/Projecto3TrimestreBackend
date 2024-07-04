@@ -8,10 +8,10 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "settings")
+@NamedQuery(name = "AppSettingsEntity.findCurrentMaxUsers", query = "SELECT s.maxUsersPerProject FROM AppSettingsEntity s WHERE s.id = 1")
 public class AppSettingsEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

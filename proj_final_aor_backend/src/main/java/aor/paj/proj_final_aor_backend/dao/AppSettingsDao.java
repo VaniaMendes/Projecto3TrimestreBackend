@@ -1,9 +1,7 @@
 package aor.paj.proj_final_aor_backend.dao;
 
-import aor.paj.proj_final_aor_backend.dto.AppSettings;
 import aor.paj.proj_final_aor_backend.entity.ActivityEntity;
 import aor.paj.proj_final_aor_backend.entity.AppSettingsEntity;
-import aor.paj.proj_final_aor_backend.entity.InterestEntity;
 import jakarta.ejb.Stateless;
 
 @Stateless
@@ -19,6 +17,14 @@ public class AppSettingsDao extends AbstractDao<ActivityEntity>{
     }
     public void createSettings(AppSettingsEntity settings) {
         em.merge(settings);
+    }
+
+    public Integer findCurrentMaxUsers() {
+        try {
+            return em.createNamedQuery("AppSettingsEntity.findCurrentMaxUsers", Integer.class).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
    public void updateSettings (AppSettingsEntity settings) {
