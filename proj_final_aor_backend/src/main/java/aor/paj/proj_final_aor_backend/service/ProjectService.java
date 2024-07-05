@@ -84,9 +84,15 @@ public class ProjectService {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectById(@PathParam("id") long projectId) {
+    public Response getProjectById(@PathParam("id") long projectId, @HeaderParam("token") String token) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get project by id from IP: " + ip);
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
 
         Project project = projectBean.getProjectById(projectId);
         if (project == null) {
@@ -496,6 +502,27 @@ public class ProjectService {
             logger.info("Activities from Project with id '" + projectId + "' retrieved successfully");
             return Response.status(Response.Status.OK).entity(activityBean.getActivitiesFromProject(projectId)).build();
         }
+    }
+
+    @GET
+    @Path("/{id}/activity/last/{maxResults}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLastXActivitiesFromProject(@PathParam("id") long projectId, @PathParam("maxResults") int maxResults, @HeaderParam("token") String token) {
+        String ip = request.getRemoteAddr();
+
+        User user = userBean.getUserByToken(token);
+        if(user == null){
+            logger.error("User not found or unauthorized");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("User not found or unauthorized").build();
+        }
+
+        if (projectBean.findProject(projectId) == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Project not found").build();
+        }
+
+        logger.info("Received request to get last activities from project from IP: " + ip);
+
+        return Response.status(Response.Status.OK).entity(activityBean.getLastXActivitiesFromProject(projectId, maxResults)).build();
     }
 
     @GET
