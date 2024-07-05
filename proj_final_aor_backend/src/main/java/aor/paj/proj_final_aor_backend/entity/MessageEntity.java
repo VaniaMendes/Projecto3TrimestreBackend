@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NamedQuery(name = "Message.findMessagesBetweenUsers", query = "SELECT m FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1) ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name = "Message.findSentMessagesUsers", query = "SELECT m.receiver FROM MessageEntity m WHERE m.sender.id =:id ORDER BY m.sendTimestamp DESC")
 @NamedQuery(name = "Message.findReceivedMessagesUsers", query = "SELECT m.sender FROM MessageEntity m WHERE m.receiver.id =:id ORDER BY m.sendTimestamp DESC")
-@NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp DESC")
+@NamedQuery(name= "Message.findMessagesByProject", query = "SELECT m FROM MessageEntity m WHERE m.receiverGroup.project.id = :projectId ORDER BY m.sendTimestamp ASC")
 
 @NamedQuery(name="Message.findTotalMessagesBetweenTwoUsers",  query = "SELECT COUNT(m) FROM MessageEntity m WHERE (m.sender.id = :user1 AND m.receiver.id = :user2) OR (m.sender.id = :user2 AND m.receiver.id = :user1)")
 
@@ -37,7 +37,6 @@ public class MessageEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private long id;
-
 
     /**
      * Read status of the message
@@ -89,12 +88,16 @@ public class MessageEntity implements Serializable {
     })
     private UserProjectEntity receiverGroup;
 
-
     /**
      * Default constructor for the MessageEntity class.
      */
     public MessageEntity() {}
 
+
+    /**
+     *  Getter for the unique identifier of the message.
+     * @return id of the message.
+     */
     public long getId() {
         return id;
     }
