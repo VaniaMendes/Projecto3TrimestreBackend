@@ -39,4 +39,30 @@ public class ActivityDao extends AbstractDao<ActivityEntity>{
             return new ArrayList<>();
         }
     }
+
+
+    /**
+     * Retrieves a specified number of the most recent activities associated with a given project.
+     * This method queries the database for activities linked to the specified project ID,
+     * limiting the results to the number defined by the maxResults parameter. It utilizes
+     * a named query defined in the ActivityEntity class to fetch the data. In case of any
+     * exceptions (e.g., database connection issues), an empty list is returned, ensuring
+     * the method's resilience.
+     *
+     * @param projectId The ID of the project for which activities are being queried.
+     * @param maxResults The maximum number of activity records to retrieve.
+     * @return A list of ActivityEntity objects representing the most recent activities
+     *         associated with the given project, limited by maxResults. Returns an empty
+     *         list if the query fails or if there are no activities for the project.
+     */
+    public List<ActivityEntity> getLastXActivitiesFromProject(Long projectId, Integer maxResults) {
+        try{
+            return em.createNamedQuery("ActivityEntity.findAllFromProject", ActivityEntity.class)
+                    .setParameter("projectId", projectId)
+                    .setMaxResults(maxResults)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
 }

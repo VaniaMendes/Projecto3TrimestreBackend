@@ -31,13 +31,29 @@ public class ActivityBean implements Serializable {
     @EJB
     private ProjectBean projectBean;
 
+    /**
+     * Default constructor.
+     */
     public ActivityBean() {
     }
 
+    /**
+     * Constructs an ActivityBean with a specific ActivityDao.
+     *
+     * @param activityDao The ActivityDao to be used by this bean.
+     */
     public ActivityBean(ActivityDao activityDao) {
         this.activityDao = activityDao;
     }
 
+    /**
+     * Registers a new activity for a given project.
+     *
+     * @param projectEntity The project entity to which the activity belongs.
+     * @param type The type of the activity.
+     * @param author The user entity who authored the activity.
+     * @param observation Additional observations about the activity.
+     */
     public void registerActivity(ProjectEntity projectEntity, ProjectActivityType type, UserEntity author, String observation) {
         ActivityEntity activityEntity = new ActivityEntity();
 
@@ -49,6 +65,12 @@ public class ActivityBean implements Serializable {
         activityDao.persist(activityEntity);
     }
 
+    /**
+     * Retrieves all activities associated with a given project.
+     *
+     * @param projectId The ID of the project for which activities are being retrieved.
+     * @return A list of Activity DTOs representing all activities for the specified project.
+     */
     public List<Activity> getActivitiesFromProject(Long projectId) {
         List<ActivityEntity> activityEntities = activityDao.findAllFromProject(projectId);
         List<Activity> activities = new ArrayList<>();
@@ -58,6 +80,28 @@ public class ActivityBean implements Serializable {
         return activities;
     }
 
+    /**
+     * Retrieves the last specified number of activities for a given project.
+     *
+     * @param projectId The ID of the project for which to retrieve the activities.
+     * @param maxResults The maximum number of activities to retrieve.
+     * @return A list of {@link Activity} DTOs representing the last activities for the specified project, up to the specified maxResults.
+     */
+    public List<Activity> getLastXActivitiesFromProject(Long projectId, Integer maxResults) {
+        List<ActivityEntity> activityEntities = activityDao.getLastXActivitiesFromProject(projectId, maxResults);
+        List<Activity> activities = new ArrayList<>();
+        for (ActivityEntity activityEntity : activityEntities) {
+            activities.add(convertToDTO(activityEntity));
+        }
+        return activities;
+    }
+
+    /**
+     * Converts an {@link Activity} DTO to an {@link ActivityEntity}.
+     *
+     * @param activity The Activity DTO to convert.
+     * @return An ActivityEntity that represents the same data as the provided Activity DTO.
+     */
     private ActivityEntity convertToEntity(Activity activity) {
         ActivityEntity activityEntity = new ActivityEntity();
         activityEntity.setId(activity.getId());
@@ -67,6 +111,12 @@ public class ActivityBean implements Serializable {
         return activityEntity;
     }
 
+    /**
+     * Converts an {@link ActivityEntity} to an {@link Activity} DTO.
+     *
+     * @param activityEntity The ActivityEntity to convert.
+     * @return An Activity DTO that represents the same data as the provided ActivityEntity.
+     */
     private Activity convertToDTO(ActivityEntity activityEntity) {
         Activity activity = new Activity();
         activity.setId(activityEntity.getId());
@@ -78,6 +128,14 @@ public class ActivityBean implements Serializable {
         return activity;
     }
 
+    /**
+     * Converts a {@link ProjectEntity} to an {@link IdAndNameDTO}.
+     * This method is used to extract and encapsulate the ID and name information
+     * from a ProjectEntity into a more simplified DTO form for easier data handling and transfer.
+     *
+     * @param projectEntity The ProjectEntity to convert.
+     * @return An {@link IdAndNameDTO} containing the ID and name of the project.
+     */
     private IdAndNameDTO convertToDTOProjectInfo(ProjectEntity projectEntity) {
         IdAndNameDTO project = new IdAndNameDTO();
         project.setId(projectEntity.getId());
@@ -85,6 +143,14 @@ public class ActivityBean implements Serializable {
         return project;
     }
 
+    /**
+     * Converts a {@link UserEntity} to an {@link IdAndNameDTO}.
+     * This method is utilized to compile and encapsulate the ID and full name (first and last name)
+     * from a UserEntity into a simplified DTO format, facilitating easier data management and transfer.
+     *
+     * @param userEntity The UserEntity to convert.
+     * @return An {@link IdAndNameDTO} containing the ID and full name of the user.
+     */
     private IdAndNameDTO convertToDTOAuthorInfo(UserEntity userEntity) {
         IdAndNameDTO user = new IdAndNameDTO();
         user.setId(userEntity.getId());
