@@ -2,6 +2,7 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
@@ -79,6 +80,11 @@ public class ProjectBean implements Serializable {
     @EJB
     Notifier notifier;
 
+    @EJB
+    TaskBean taskBean;
+    @EJB
+    UserBean userBean;
+
     // Default constructor
     public ProjectBean() {
     }
@@ -127,6 +133,9 @@ public class ProjectBean implements Serializable {
         notificationBean.sendNotificationToAllUsers(token, NotificationType.NEW_PROJECT, projectEntity.getId());
 
         projectDao.persist(projectEntity);
+
+
+        taskBean.createFinalTaskOfProject(projectEntity, userBean.convertUserEntityToDto(creator) );
 
         return true;
     }
