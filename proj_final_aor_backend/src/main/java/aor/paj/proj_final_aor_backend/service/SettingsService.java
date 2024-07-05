@@ -52,6 +52,28 @@ public class SettingsService {
         }
     }
 
+    @GET
+    @Path("/session-timeout")
+    @Produces(MediaType.APPLICATION_JSON)
+public Response getSessionTimeout(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+        logger.info("Received request to get session timeout");
+
+        User user = userBean.getUserByToken(token);
+
+        if (user == null) {
+            logger.warn("IP Adress " + request.getRemoteAddr() + " tried to get session timeout with invalid token");
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid token").build();
+        }
+
+        Integer sessionTimeout = settingsBean.getSessionTimeout();
+        if (sessionTimeout != null) {
+            logger.info("IP Adress " + request.getRemoteAddr() + " got session timeout successfully by user with id " + user.getId());
+            return Response.status(Response.Status.OK).entity(sessionTimeout).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to get session timeout").build();
+        }
+    }
+
     @PUT
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)

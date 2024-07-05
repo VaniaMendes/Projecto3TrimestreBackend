@@ -134,7 +134,7 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
      */
     public List<UserEntity> findAvailableUsersForProject(Long projectId) {
         try {
-            return em.createNamedQuery("UserProject.findAvailableUsersForProject", UserEntity.class).setParameter("projectId", projectId).getResultList();
+            return em.createNamedQuery("UserProject.findAvailableUsersForProjectExcludingAdmin", UserEntity.class).setParameter("projectId", projectId).getResultList();
         } catch (Exception e) {
             return new ArrayList<>();
         }
