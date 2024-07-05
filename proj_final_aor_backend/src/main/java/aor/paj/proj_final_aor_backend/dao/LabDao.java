@@ -6,15 +6,31 @@ import jakarta.ejb.Stateless;
 
 import java.util.List;
 
+/**
+ * The LabDao class provides data access operations for the LabEntity.
+ * It extends the AbstractDao class, inheriting common data access operations.
+ * This class is marked as Stateless, meaning it does not hold any conversational state.
+ */
 @Stateless
-public class LabDao extends AbstractDao<LabEntity>{
+public class LabDao extends AbstractDao<LabEntity> {
 
+    // Default serial version UID for serialization.
     private static final long serialVersionUID = 1L;
 
+
+    /**
+     * Default constructor.
+     * Initializes the superclass with LabEntity class type
+     */
     public LabDao() {
         super(LabEntity.class);
     }
 
+    /**
+     * Retrieves all LabEntity instances from the database.
+     *
+     * @return A list of all LabEntity instances, or null if an error occurs.
+     */
     public List<LabEntity> findAllLabs() {
         try {
             List<LabEntity> labEntities = em.createNamedQuery("Lab.findAllLabs").getResultList();
@@ -25,15 +41,28 @@ public class LabDao extends AbstractDao<LabEntity>{
     }
 
 
-    public LabEntity findLabById(Integer id) {
+    /**
+     * Finds a LabEntity by its associated user's ID.
+     *
+     * @param userId The ID of the user associated with the LabEntity to find.
+     * @return The found LabEntity, or null if no entity associated with the given user ID exists.
+     */
+    public LabEntity findLabByUserId(Long userId) {
         try {
-            LabEntity labEntity = (LabEntity) em.createNamedQuery("Lab.findLabById").setParameter("id", id).getSingleResult();
+            LabEntity labEntity = (LabEntity) em.createNamedQuery("Lab.findLabByUserId").setParameter("userId", userId).getSingleResult();
             return labEntity;
         } catch (Exception e) {
             return null;
         }
     }
 
+
+    /**
+     * Finds a LabEntity by its name.
+     *
+     * @param name The name of the LabEntity to find.
+     * @return The found LabEntity, or null if no entity with the given name exists.
+     */
     public LabEntity findLabByName(String name) {
         try {
             Workplace workplace = Workplace.valueOf(name.toUpperCase());
@@ -50,16 +79,4 @@ public class LabDao extends AbstractDao<LabEntity>{
     }
 
 
-
-    public void createLab(LabEntity lab) {
-        em.persist(lab);
-    }
-
-    public void updateLab(LabEntity lab) {
-        em.merge(lab);
-    }
-
-    public void deleteLab(LabEntity lab) {
-        em.remove(em.contains(lab) ? lab : em.merge(lab));
-    }
 }

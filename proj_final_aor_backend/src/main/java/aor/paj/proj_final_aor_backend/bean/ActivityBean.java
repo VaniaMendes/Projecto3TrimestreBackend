@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Stateless
 public class ActivityBean implements Serializable {
 
@@ -33,7 +34,7 @@ public class ActivityBean implements Serializable {
     public ActivityBean() {
     }
 
-    public ActivityBean (ActivityDao activityDao) {
+    public ActivityBean(ActivityDao activityDao) {
         this.activityDao = activityDao;
     }
 

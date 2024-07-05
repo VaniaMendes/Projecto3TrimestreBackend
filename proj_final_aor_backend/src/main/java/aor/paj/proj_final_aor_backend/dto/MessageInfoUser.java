@@ -32,11 +32,13 @@ public class MessageInfoUser {
 
     @XmlElement
     private String photo;
+
     public MessageInfoUser() {
     }
 
     /**
      * Getter for the 'id' field.
+     *
      * @return long - The id of the MessageInfoUser.
      */
     public long getId() {
@@ -45,6 +47,7 @@ public class MessageInfoUser {
 
     /**
      * Setter for the 'id' field.
+     *
      * @param id - The new id of the MessageInfoUser.
      */
     public void setId(long id) {
@@ -53,6 +56,7 @@ public class MessageInfoUser {
 
     /**
      * Getter for the 'firstName' field.
+     *
      * @return String - The first name of the MessageInfoUser.
      */
     public String getFirstName() {
@@ -61,6 +65,7 @@ public class MessageInfoUser {
 
     /**
      * Setter for the 'firstName' field.
+     *
      * @param firstName - The new first name of the MessageInfoUser.
      */
     public void setFirstName(String firstName) {
@@ -69,6 +74,7 @@ public class MessageInfoUser {
 
     /**
      * Getter for the 'lastName' field.
+     *
      * @return String - The last name of the MessageInfoUser.
      */
 
@@ -78,6 +84,7 @@ public class MessageInfoUser {
 
     /**
      * Setter for the 'lastName' field.
+     *
      * @param lastName - The new last name of the MessageInfoUser.
      */
     public void setLastName(String lastName) {
@@ -86,6 +93,7 @@ public class MessageInfoUser {
 
     /**
      * Getter for the 'photo' field.
+     *
      * @return String - The photo of the MessageInfoUser.
      */
     public String getPhoto() {
@@ -94,6 +102,7 @@ public class MessageInfoUser {
 
     /**
      * Setter for the 'photo' field.
+     *
      * @param photo - The new photo of the MessageInfoUser.
      */
     public void setPhoto(String photo) {

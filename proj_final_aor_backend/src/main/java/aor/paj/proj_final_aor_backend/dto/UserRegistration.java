@@ -12,10 +12,19 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class UserRegistration {
 
+    /**
+     * The email of the user.
+     */
     @XmlElement
     private String email;
+    /**
+     * The password of the user.
+     */
     @XmlElement
     private String password;
+    /**
+     * The confirmation of the password of the user.
+     */
     @XmlElement
     private String confirmPassword;
 

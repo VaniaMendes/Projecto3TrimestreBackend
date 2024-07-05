@@ -45,6 +45,7 @@ public class LabBean implements Serializable {
 
     /**
      * Constructor with LabDao parameter
+     *
      * @param labDao Lab Data Access Object
      */
     public LabBean(LabDao labDao) {
@@ -73,6 +74,7 @@ public class LabBean implements Serializable {
 
     /**
      * This method creates a new LabEntity from a Lab DTO and persists it using the LabDao.
+     *
      * @param lab Lab DTO
      * @return The created LabEntity
      */
@@ -104,6 +106,7 @@ public class LabBean implements Serializable {
 
     /**
      * This method converts a Lab DTO to a LabEntity.
+     *
      * @param lab Lab DTO
      * @return The converted LabEntity
      */
@@ -117,6 +120,7 @@ public class LabBean implements Serializable {
 
     /**
      * This method converts a LabEntity to a Lab DTO.
+     *
      * @param labEntity LabEntity
      * @return The converted Lab DTO
      */
