@@ -2,7 +2,6 @@ package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Project;
-import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;
@@ -748,16 +747,20 @@ public class ProjectBean implements Serializable {
         return stateId == 100 || stateId == 200 || stateId == 300 || stateId == 400 || stateId == 500 || stateId == 600;
     }
 
+
     /**
-     * Retrieves all projects from the database based on the specified order, vacancies, and state.
-     * If the order is "desc", it retrieves projects in descending order. If the order is "asc", it retrieves projects in ascending order.
-     * If vacancies is true, it retrieves projects that have vacancies. If vacancies is false, it retrieves all projects.
-     * If state is 1 or null, it retrieves all projects. Otherwise, it retrieves projects with the specified state.
+     * Retrieves a list of all projects, optionally filtered by order, vacancies, and state.
+     * This method allows for a flexible retrieval of projects based on various criteria:
+     * - Order: Determines the sorting order of the projects, either ascending ("asc") or descending ("desc").
+     * - Vacancies: A boolean value indicating whether to filter projects by those that have vacancies.
+     * - State: An optional filter for the state of the projects. A null value or 1 indicates no specific state filter.
      *
-     * @param order The order in which to retrieve the projects. Can be "ASC" for ascending order or "DESC" for descending order.
-     * @param vacancies Whether to retrieve only projects that have vacancies.
-     * @param state The state of the projects to be retrieved. If state is 1 or null, all projects are retrieved.
-     * @return A list of Project DTOs that match the specified order, vacancies, and state.
+     * The method delegates to more specific private methods based on the combination of input parameters to fetch the projects.
+     *
+     * @param order The order in which to sort the projects. Can be "asc" for ascending or "desc" for descending.
+     * @param vacancies A Boolean indicating whether to filter projects by those that have vacancies. True to filter by vacancies, false otherwise.
+     * @param state An Integer representing the state of the projects to filter by. A null value or 1 indicates no specific state filter.
+     * @return A List of Project DTOs that match the specified criteria.
      */
     public List<Project> getAllProjects(String order, Boolean vacancies, Integer state) {
         List<Project> projectsDTO = new ArrayList<>();
@@ -767,6 +770,8 @@ public class ProjectBean implements Serializable {
                 projectsDTO = getProjectsByVacanciesDESC();
             } else if (!vacancies && (state == null || state == 1)) {
                 projectsDTO = getAllProjectsLatestToOldest();
+            } else if (vacancies && state != null) {
+                projectsDTO = getProjectsByStateAndVacanciesDESC(state);
             } else if (state != null) {
                 projectsDTO = getProjectsByStateDESC(state);
             }
@@ -775,6 +780,8 @@ public class ProjectBean implements Serializable {
                 projectsDTO = getProjectsByVacanciesASC();
             } else if (!vacancies && (state == null || state == 1)) {
                 projectsDTO = getAllProjectsOldestToLatest();
+            } else if (vacancies && state != null) {
+                projectsDTO = getProjectsByStateAndVacanciesASC(state);
             } else if (state != null) {
                 projectsDTO = getProjectsByStateASC(state);
             }
@@ -894,6 +901,36 @@ public class ProjectBean implements Serializable {
             }
         }
 
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that have vacancies and match a specific state, ordered in descending order of their creation time.
+     * This method first queries the database for projects that have vacancies and match the given state, ordered in descending order.
+     * It then clones the messages received by each user project and sets them back to the user project.
+     * Finally, it converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs with the specified state and vacancies, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByStateAndVacanciesDESC(int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByVacanciesAndStateOrderedDESC(state);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that have vacancies and match a specific state, ordered in ascending order of their creation time.
+     * Similar to the descending order method, this method queries the database for projects that have vacancies and match the given state, but orders them in ascending order.
+     * It clones the messages received by each user project and sets them back to the user project.
+     * Finally, it converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs with the specified state and vacancies, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByStateAndVacanciesASC(int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByVacanciesAndStateOrderedASC(state);
+        cloneMessageEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1058,8 +1095,8 @@ public class ProjectBean implements Serializable {
      * @param keyword The keyword to be used for retrieving the projects.
      * @return A list of Project DTOs that contain the specified keyword, ordered from oldest to newest.
      */
-    private List<Project> getProjectsByKeywordASC(String keyword) {
-        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrderedASC(keyword);
+    private List<Project> getProjectsByKeywordOrSkillASC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedASC(keyword);
         cloneMessageEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
@@ -1072,8 +1109,70 @@ public class ProjectBean implements Serializable {
      * @param keyword The keyword to be used for retrieving the projects.
      * @return A list of Project DTOs that contain the specified keyword, ordered from newest to oldest.
      */
-    private List<Project> getProjectsByKeywordDESC(String keyword) {
-        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrderedDESC(keyword);
+    private List<Project> getProjectsByKeywordOrSkillDESC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedDESC(keyword);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that contain a specific keyword and match a given state, ordered in ascending order of their creation time.
+     * This method first queries the database for projects matching the specified keyword and state using a predefined query.
+     * After retrieving the projects, it clones the messages received by each user project and sets them back to the user project.
+     * Finally, it converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs that contain the specified keyword and match the given state, ordered from oldest to newest.
+     */
+    private List<Project> getProjectsByKeywordOrSkillAndStateASC(String keyword, int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillAndStateOrderedASC(keyword, state);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that contain a specific keyword and match a given state, ordered in descending order of their creation time.
+     * Similar to the ascending order method, this method queries the database for projects matching the specified keyword and state.
+     * It then clones the messages received by each user project and sets them back to the user project.
+     * Finally, it converts each ProjectEntity to a Project DTO and collects them into a list, but in this case, the order is from newest to oldest.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @param state The state of the projects to be retrieved.
+     * @return A list of Project DTOs that contain the specified keyword and match the given state, ordered from newest to oldest.
+     */
+    private List<Project> getProjectsByKeywordOrSkillAndStateDESC(String keyword, int state) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillAndStateOrderedDESC(keyword, state);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that contain a specific keyword and are ordered by the number of vacancies in descending order.
+     * This method first queries the database for projects matching the specified keyword. The projects are then ordered by the number of vacancies
+     * from highest to lowest. For each project, it clones the messages received by each user project and sets them back to the user project.
+     * Finally, it converts each ProjectEntity to a Project DTO and collects them into a list.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @return A list of Project DTOs that contain the specified keyword, ordered by the number of vacancies from highest to lowest.
+     */
+    private List<Project> getProjectsByKeywordOrSkillOrderedByVacanciesDESC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedByVacanciesDESC(keyword);
+        cloneMessageEntities(projects);
+        return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all projects from the database that contain a specific keyword and are ordered by the number of vacancies in ascending order.
+     * Similar to the descending order method, this method queries the database for projects matching the specified keyword. However, the projects
+     * are ordered by the number of vacancies from lowest to highest. It clones the messages received by each user project and sets them back to the user project.
+     * Each ProjectEntity is then converted to a Project DTO and collected into a list.
+     *
+     * @param keyword The keyword to be used for retrieving the projects.
+     * @return A list of Project DTOs that contain the specified keyword, ordered by the number of vacancies from lowest to highest.
+     */
+    private List<Project> getProjectsByKeywordOrSkillOrderedByVacanciesASC(String keyword) {
+        List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedByVacanciesASC(keyword);
         cloneMessageEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
@@ -1087,14 +1186,30 @@ public class ProjectBean implements Serializable {
      * @param order Specifies the order of the results. Can be "asc" for ascending or "desc" for descending.
      * @return A list of {@link Project} objects that match the keyword. Returns an empty list if no matches are found.
      */
-    public List<Project> getProjectsByKeyword(String keyword, String order) {
+    public List<Project> getProjectsByKeywordOrSkill(String keyword, String order, Boolean vacancies, Integer state) {
+        List<Project> projectsDTO = new ArrayList<>();
+
         if (order.equals("desc")) {
-            return getProjectsByKeywordDESC(keyword);
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByKeywordOrSkillOrderedByVacanciesDESC(keyword);
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByKeywordOrSkillDESC(keyword);
+            } else if (state != null) {
+                projectsDTO = getProjectsByKeywordOrSkillAndStateDESC(keyword, state);
+            }
         } else if (order.equals("asc")) {
-            return getProjectsByKeywordASC(keyword);
+            if (vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByKeywordOrSkillOrderedByVacanciesASC(keyword);
+            } else if (!vacancies && (state == null || state == 1)) {
+                projectsDTO = getProjectsByKeywordOrSkillASC(keyword);
+            } else if (state != null) {
+                projectsDTO = getProjectsByKeywordOrSkillAndStateASC(keyword, state);
+            }
         }
-        return new ArrayList<>();
+
+        return projectsDTO;
     }
+
 
     /**
      * Retrieves all unique keywords used in projects.
@@ -1200,17 +1315,33 @@ public class ProjectBean implements Serializable {
     }
 
     /**
-     * Counts the number of projects that contain a specific keyword.
-     * This method queries the database to count projects where the keyword appears in any searchable project field.
+     * Counts the number of projects that match a given keyword and optionally filters by state.
+     * This method delegates to different DAO methods based on the state parameter. If the state is 1,
+     * it counts projects by keyword regardless of their state. Otherwise, it counts projects by both keyword and state.
      *
      * @param keyword The keyword to search for within project fields.
-     * @return The number of projects that contain the specified keyword.
+     * @param state The state of the projects to be counted. If state is 1, all projects are counted regardless of state.
+     * @return The number of projects matching the criteria.
      */
-    public Integer countProjectsByKeyword(String keyword) {
-        return projectDao.countProjectsByKeyword(keyword);
+    public Integer countProjectsByKeywordOrSkill(String keyword, Integer state) {
+        if (state == 1) {
+            return projectDao.countProjectsByKeywordOrSkill(keyword);
+        } else {
+            return projectDao.countProjectsByKeywordOrSkillAndState(keyword, state);
+        }
     }
 
 
+
+    /**
+     * Counts the number of projects that match a given name and optionally filters by state.
+     * This method delegates to different DAO methods based on the state parameter. If the state is 1,
+     * it counts projects by name regardless of their state. Otherwise, it counts projects by both name and state.
+     *
+     * @param name The name or partial name of the project to search for. The search is case-sensitive.
+     * @param state The state of the projects to be counted. If state is 1, all projects are counted regardless of state.
+     * @return The number of projects matching the criteria.
+     */
     public Integer countSearchProjectsByName(String name, Integer state) {
         if (state == 1) {
             return projectDao.countSearchProjectsByName(name);
@@ -1296,7 +1427,7 @@ public class ProjectBean implements Serializable {
      * @param projectEntity The project entity to be converted.
      * @return The converted project DTO.
      */
-    private Project convertToDTO(ProjectEntity projectEntity) {
+    public Project convertToDTO(ProjectEntity projectEntity) {
         Project project = new Project();
         project.setId(projectEntity.getId());
         project.setName(projectEntity.getName());

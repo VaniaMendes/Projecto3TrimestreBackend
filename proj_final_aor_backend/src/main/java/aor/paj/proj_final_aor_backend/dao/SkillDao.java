@@ -81,6 +81,22 @@ public class SkillDao extends AbstractDao<SkillEntity> {
         }
     }
 
+    /**
+     * Retrieves a list of all SkillEntity instances that are associated with projects from the database.
+     * This method executes a named query "Skill.findSkillsWithProjects" to fetch skills that have at least one associated project.
+     *
+     * @return A list of SkillEntity instances each representing a skill associated with one or more projects.
+     *         Returns null if an exception occurs during the query execution, indicating an issue with database access or query execution.
+     */
+    public List<SkillEntity> findAllSkillsWithProjects() {
+        try {
+            return em.createNamedQuery("Skill.findSkillsWithProjects", SkillEntity.class)
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     /**
      * Finds SkillEntity instances by the associated user's ID.
@@ -98,5 +114,24 @@ public class SkillDao extends AbstractDao<SkillEntity> {
         }
     }
 
+    /**
+     * Searches for SkillEntity objects that are associated with at least one project and whose name matches the specified pattern.
+     * This method performs a database query using a named query "Skill.searchSkillsWithProjects".
+     * The query is designed to find skills where the skill name contains the specified name parameter,
+     * allowing for partial matches by using the '%' wildcard before and after the name parameter.
+     *
+     * @param name The name or partial name of the skill to search for. The search is case-sensitive.
+     * @return A list of SkillEntity instances that match the search criteria and are associated with at least one project.
+     *         Returns null if an exception occurs during the query execution, indicating an issue with database access or query execution.
+     */
+    public List<SkillEntity> searchSkillsWithProjects(String name) {
+        try {
+            return em.createNamedQuery("Skill.searchSkillsWithProjects", SkillEntity.class)
+                    .setParameter("name", "%" + name + "%")
+                    .getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }
