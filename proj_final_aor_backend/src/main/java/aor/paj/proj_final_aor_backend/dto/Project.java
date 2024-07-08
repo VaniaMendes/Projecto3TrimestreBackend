@@ -61,6 +61,9 @@ public class Project {
     private Integer vacancyNumber;
 
     @XmlElement
+    private String observations;
+
+    @XmlElement
     private List<UserInfoInProject> usersInfo;
 
     @XmlElement
@@ -339,5 +342,23 @@ public class Project {
      */
     public void setSkills(List<Skill> skills) {
         this.skills = skills;
+    }
+
+    /**
+     * Gets the observations related to the project.
+     *
+     * @return A string representing the observations related to the project.
+     */
+    public String getObservations() {
+        return observations;
+    }
+
+    /**
+     * Sets the observations related to the project.
+     *
+     * @param observations A string representing the observations to be set for the project.
+     */
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 }
