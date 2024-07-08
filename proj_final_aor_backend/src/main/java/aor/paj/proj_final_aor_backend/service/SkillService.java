@@ -43,12 +43,12 @@ public class SkillService {
             return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
         }
         // Create the skill
-        boolean created = skillBean.createNewSkill(token,skill);
+        Skill skillCreated = skillBean.createNewSkill(token,skill);
 
         // Check if the skill was created successfully
-        if (created) {
-            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + skill.getName() + " by user with ");
-            return Response.status(Response.Status.CREATED).entity("Skill created successfully").build();
+        if (skillCreated!=null) {
+            logger.info("IPAdress: " + request.getRemoteAddr() + " Skill created successfully: " + skill.getName() + " by user with id: " + user.getId());
+            return Response.status(Response.Status.CREATED).entity(skillCreated).build();
         } else {
             logger.error("Failed to create skill: " + skill.getName());
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to create skill").build();

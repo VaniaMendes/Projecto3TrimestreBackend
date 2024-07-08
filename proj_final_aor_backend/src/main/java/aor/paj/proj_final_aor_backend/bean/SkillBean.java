@@ -95,16 +95,16 @@ public class SkillBean implements Serializable {
      * @param skill Skill object to be created.
      * @return True if the skill was created successfully, false otherwise.
      */
-    public boolean createNewSkill(String token, Skill skill) {
+    public Skill createNewSkill(String token, Skill skill) {
         // Check if the skill name is null or empty
         if (skill.getName().isEmpty()) {
             logger.error("Skill name is null or empty.");
-            return false;
+            return null;
         }
         // Check if the skill already exists
         if (skillDao.findSkillByName(skill.getName()) != null) {
             logger.error("Skill already exists.");
-            return false;
+            return null;
         }
         // Create the skill
         SkillEntity skillEntity = new SkillEntity();
@@ -120,8 +120,14 @@ public class SkillBean implements Serializable {
         skillEntity.setType(skill.getType());
         // Persist the skill in the database
         skillDao.createSkill(skillEntity);
-        associateSkillToUser(userBean.getUserByToken(token).getId(), skillEntity.getId());
-        return true;
+        boolean associated = associateSkillToUser(userBean.getUserByToken(token).getId(), skillEntity.getId());
+        if (!associated) {
+            logger.error("Failed to associate skill to user.");
+            return null;
+        }
+        // Convert SkillEntity back to Skill
+        Skill createdSkill = convertToDTO(skillEntity);
+        return createdSkill;
     }
 
     /**

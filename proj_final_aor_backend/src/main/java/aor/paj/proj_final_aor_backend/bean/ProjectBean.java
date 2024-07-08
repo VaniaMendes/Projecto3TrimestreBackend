@@ -1210,15 +1210,13 @@ public class ProjectBean implements Serializable {
         return projectDao.countProjectsByKeyword(keyword);
     }
 
-    /**
-     * Counts the number of projects by searching for a specific name.
-     * This method queries the database to count projects where the project name matches or contains the specified name.
-     *
-     * @param name The name or partial name of the project to search for.
-     * @return The number of projects that match the specified name.
-     */
-    public Integer countSearchProjectsByName(String name) {
-        return projectDao.countSearchProjectsByName(name);
+
+    public Integer countSearchProjectsByName(String name, Integer state) {
+        if (state == 1) {
+            return projectDao.countSearchProjectsByName(name);
+        } else {
+            return projectDao.countSearchProjectsByNameAndState(name, state);
+        }
     }
 
     /**

@@ -8,5 +8,6 @@ public enum ProjectActivityType {
     EDIT_PROJECT_STATE,
     ADDED_CANDIDATE,
     UPDATED_MEMBER_ROLE,
-    ADDED_RESOURCE
+    ADDED_RESOURCE,
+    MEMBER_COMMENT
 }
