@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.bean;
 
 import aor.paj.proj_final_aor_backend.dao.ProjectSkillDao;
+import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.dto.Skill;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectSkillEntity;
@@ -24,6 +25,9 @@ public class ProjectSkillBean implements Serializable {
 
     @EJB
     private SkillBean skillBean;
+
+    @EJB
+    private ProjectBean projectBean;
 
     public ProjectSkillBean() {
     }
@@ -121,4 +125,66 @@ public class ProjectSkillBean implements Serializable {
         }
         return skills;
     }
+
+    private List<Project> getProjectsOfSkillOrderedDESC(Long skillId) {
+        List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllProjectsFromSkillOrderedDESC(skillId);
+        ArrayList<Project> projects = new ArrayList<>();
+        for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
+            ProjectEntity projectEntity = projectSkillEntity.getProject();
+            projects.add(projectBean.convertToDTO(projectEntity));
+        }
+        return projects;
+    }
+
+    private List<Project> getProjectsOfSkillOrderedASC(Long skillId) {
+        List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllProjectsFromSkillOrderedASC(skillId);
+        ArrayList<Project> projects = new ArrayList<>();
+        for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
+            ProjectEntity projectEntity = projectSkillEntity.getProject();
+            projects.add(projectBean.convertToDTO(projectEntity));
+        }
+        return projects;
+    }
+
+    private List<Project> getProjectsOfSkillByStateOrderedDESC(Long skillId, Integer state) {
+        List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllProjectsFromSkillByStateOrderedDESC(skillId, state);
+        ArrayList<Project> projects = new ArrayList<>();
+        for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
+            ProjectEntity projectEntity = projectSkillEntity.getProject();
+            projects.add(projectBean.convertToDTO(projectEntity));
+        }
+        return projects;
+    }
+
+    private List<Project> getProjectsOfSkillByStateOrderedASC(Long skillId, Integer state) {
+        List<ProjectSkillEntity> projectSkillEntities = projectSkillDao.findAllProjectsFromSkillByStateOrderedASC(skillId, state);
+        ArrayList<Project> projects = new ArrayList<>();
+        for (ProjectSkillEntity projectSkillEntity : projectSkillEntities) {
+            ProjectEntity projectEntity = projectSkillEntity.getProject();
+            projects.add(projectBean.convertToDTO(projectEntity));
+        }
+        return projects;
+    }
+
+    public List<Project> getProjectsBySkill(Long skillId, String order, Integer state) {
+        List<Project> projectsDTO = new ArrayList<>();
+
+        if (order.equals("desc")) {
+            if (state == null || state == 1) {
+                projectsDTO = getProjectsOfSkillOrderedDESC(skillId);
+            } else if (state != null) {
+                projectsDTO = getProjectsOfSkillByStateOrderedDESC(skillId, state);
+            }
+        } else if (order.equals("asc")) {
+            if (state == null || state == 1) {
+                projectsDTO = getProjectsOfSkillOrderedASC(skillId);
+            } else if (state != null) {
+                projectsDTO = getProjectsOfSkillByStateOrderedASC(skillId, state);
+            }
+        }
+
+        return projectsDTO;
+    }
+
+
 }

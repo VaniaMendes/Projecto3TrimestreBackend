@@ -157,30 +157,6 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
 
 
     /**
-     * Retrieves all projects associated with a given skill.
-     *
-     * This method uses a named query "Project.findProjectsBySkill" defined in the ProjectEntity class.
-     * The query is expected to select projects from the database where the skill name matches the provided parameter.
-     * The skill name is set as a parameter in the query using the setParameter method.
-     *
-     * If the query returns results, a list of ProjectEntity objects is returned.
-     * If the query does not return any results (i.e., there are no projects associated with the given skill),
-     * a NoResultException is caught and an empty list is returned.
-     *
-     * @param skill the name of the skill to retrieve projects for.
-     * @return a list of projects associated with the given skill, or an empty list if no such projects are found.
-     */
-    public List<ProjectEntity> findProjectsBySkill(String skill) {
-        try {
-            return em.createNamedQuery("Project.findProjectsBySkill", ProjectEntity.class)
-                    .setParameter("skillName", skill)
-                    .getResultList();
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * Retrieves all projects from the database ordered by vacancies in ascending order.
      * This method uses a named query "Project.orderByVacanciesASC" to retrieve the projects.
      *
@@ -282,9 +258,9 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
      * @param keyword the keyword to search for in project keywords.
      * @return a list of projects that contain the given keyword in ascending order, or an empty list if no such projects are found.
      */
-    public List<ProjectEntity> findProjectsByKeywordOrderedASC(String keyword) {
+    public List<ProjectEntity> findProjectsByKeywordOrSkillOrderedASC(String keyword) {
         try {
-            return em.createNamedQuery("Project.findProjectsByKeywordOrderedASC", ProjectEntity.class)
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillOrderedASC", ProjectEntity.class)
                     .setParameter("keyword", "%" + keyword + "%")
                     .getResultList();
         } catch (NoResultException e) {
@@ -306,9 +282,96 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
      * @param keyword the keyword to search for in project keywords.
      * @return a list of projects that contain the given keyword in descending order, or an empty list if no such projects are found.
      */
-    public List<ProjectEntity> findProjectsByKeywordOrderedDESC(String keyword) {
+    public List<ProjectEntity> findProjectsByKeywordOrSkillOrderedDESC(String keyword) {
         try {
-            return em.createNamedQuery("Project.findProjectsByKeywordOrderedDESC", ProjectEntity.class)
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillOrderedDESC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Finds and returns a list of ProjectEntity objects that match a given keyword and state, ordered in ascending order.
+     * This method performs a database query using a named query "Project.findProjectsByKeywordAndStateOrderedASC".
+     * The query selects projects that contain the specified keyword in any part of their details and match the given state.
+     * The '%' wildcard is used around the keyword to allow for partial matches.
+     *
+     * @param keyword The keyword to search for within project details.
+     * @param state The state that the projects must match.
+     * @return A list of ProjectEntity objects that match the criteria, ordered in ascending order.
+     *         Returns an empty list if no matching projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrSkillAndStateOrderedASC(String keyword, int state) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillAndStateOrderedASC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .setParameter("stateId", state)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Finds and returns a list of ProjectEntity objects that match a given keyword and state, ordered in descending order.
+     * This method performs a database query using a named query "Project.findProjectsByKeywordAndStateOrderedDESC".
+     * Similar to the ascending order method, this query selects projects that contain the specified keyword in any part
+     * of their details and match the given state, but the results are ordered in descending order.
+     * The '%' wildcard is used around the keyword to allow for partial matches.
+     *
+     * @param keyword The keyword to search for within project details.
+     * @param state The state that the projects must match.
+     * @return A list of ProjectEntity objects that match the criteria, ordered in descending order.
+     *         Returns an empty list if no matching projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrSkillAndStateOrderedDESC(String keyword, int state) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillAndStateOrderedDESC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .setParameter("stateId", state)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves a list of projects filtered by a keyword and ordered by vacancies in ascending order.
+     * This method performs a database query using a named query "Project.findProjectsByKeywordOrderedByVacanciesASC".
+     * The query is designed to find projects where the project's details contain the specified keyword,
+     * and the results are ordered by the number of vacancies in ascending order. The '%' wildcard is used
+     * around the keyword parameter to allow for partial matches.
+     *
+     * @param keyword The keyword to search for within project details.
+     * @return A list of {@link ProjectEntity} instances that match the search criteria, ordered by vacancies in ascending order.
+     *         Returns an empty list if no matching projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrSkillOrderedByVacanciesASC(String keyword) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillOrderedByVacanciesASC", ProjectEntity.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Retrieves a list of projects filtered by a keyword and ordered by vacancies in descending order.
+     * This method performs a database query using a named query "Project.findProjectsByKeywordOrderedByVacanciesDESC".
+     * The query is designed to find projects where the project's details contain the specified keyword,
+     * and the results are ordered by the number of vacancies in descending order. The '%' wildcard is used
+     * around the keyword parameter to allow for partial matches.
+     *
+     * @param keyword The keyword to search for within project details.
+     * @return A list of {@link ProjectEntity} instances that match the search criteria, ordered by vacancies in descending order.
+     *         Returns an empty list if no matching projects are found.
+     */
+    public List<ProjectEntity> findProjectsByKeywordOrSkillOrderedByVacanciesDESC(String keyword) {
+        try {
+            return em.createNamedQuery("Project.findProjectsByKeywordOrSkillOrderedByVacanciesDESC", ProjectEntity.class)
                     .setParameter("keyword", "%" + keyword + "%")
                     .getResultList();
         } catch (NoResultException e) {
@@ -537,20 +600,6 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
-    /**
-     * Counts the number of projects in the database that require a specific skill.
-     * This method uses a named query "Project.countProjectsBySkill" to count the projects.
-     *
-     * @param skill The skill required by the projects to be counted.
-     * @return The number of projects that require the specified skill. Returns null if an exception occurs.
-     */
-    public Integer countProjectsBySkill(String skill) {
-        try {
-            return ((Number) em.createNamedQuery("Project.countProjectsBySkill").setParameter("skillName", skill).getSingleResult()).intValue();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     /**
      * Counts the number of projects in the database that contain a specific keyword in their name.
@@ -559,9 +608,31 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
      * @param keyword The keyword to be found in the names of the projects to be counted.
      * @return The number of projects that contain the specified keyword in their name. Returns null if an exception occurs.
      */
-    public Integer countProjectsByKeyword(String keyword) {
+    public Integer countProjectsByKeywordOrSkill(String keyword) {
         try {
-            return ((Number) em.createNamedQuery("Project.countProjectsByKeyword").setParameter("keyword", "%" + keyword + "%").getSingleResult()).intValue();
+            return ((Number) em.createNamedQuery("Project.countProjectsByKeywordOrSkill").setParameter("keyword", "%" + keyword + "%").getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Counts the number of projects in the database that match both a specified keyword and state.
+     * This method performs a database query using a named query "Project.countProjectsByKeywordAndState".
+     * The query is designed to count projects where the project's details contain the specified keyword
+     * and match the specified state. The '%' wildcard is used before and after the keyword parameter
+     * to allow for partial matches. The state is matched exactly.
+     *
+     * @param keyword The keyword to be found in the projects' details.
+     * @param state The state of the projects to be counted.
+     * @return The number of projects that match both the specified keyword and state. Returns null if an exception occurs.
+     */
+    public Integer countProjectsByKeywordOrSkillAndState(String keyword, int state) {
+        try {
+            return ((Number) em.createNamedQuery("Project.countProjectsByKeywordOrSkillAndState")
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .setParameter("stateId", state)
+                    .getSingleResult()).intValue();
         } catch (Exception e) {
             return null;
         }
@@ -584,9 +655,22 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
         }
     }
 
-    public Integer countSearchProjectsByNameAndState (String name, int state) {
+    /**
+     * Counts the number of projects in the database that match both a specified name (or part of it) and state.
+     * This method performs a database query using a named query "Project.countSearchedProjectsByNameAndState".
+     * The query is designed to count projects where the project name contains the specified name parameter,
+     * allowing for partial matches by using the '%' wildcard before and after the name parameter. The state is matched exactly.
+     *
+     * @param name The name or partial name of the project to search for.
+     * @param state The state of the projects to be counted.
+     * @return The total number of projects matching the search criteria. Returns null if an exception occurs during query execution.
+     */
+    public Integer countSearchProjectsByNameAndState(String name, int state) {
         try {
-            return ((Number) em.createNamedQuery("Project.countSearchedProjectsByNameAndState").setParameter("name", "%" + name + "%").setParameter("stateId", state).getSingleResult()).intValue();
+            return ((Number) em.createNamedQuery("Project.countSearchedProjectsByNameAndState")
+                    .setParameter("name", "%" + name + "%")
+                    .setParameter("stateId", state)
+                    .getSingleResult()).intValue();
         } catch (Exception e) {
             return null;
         }

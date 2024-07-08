@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.entity;
 
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 
 import java.io.Serializable;
 
@@ -9,9 +10,12 @@ import java.io.Serializable;
 @IdClass(ProjectSkillId.class)
 
 @NamedQuery(name = "ProjectSkill.findAllSkillsFromProject", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId AND ps.activeStatus = true")
-@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkill", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true")
 @NamedQuery(name = "ProjectSkill.findAllSkillsNotInProject", query = "SELECT s FROM SkillEntity s WHERE s.id NOT IN (SELECT ps.skill.id FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId AND ps.activeStatus = true)")
 @NamedQuery(name = "ProjectSkill.findSkillFromProject", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.project.id = :projectId AND ps.skill.id = :skillId")
+@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkillOrderedDESC", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true ORDER BY ps.project.createdAt DESC")
+@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkillOrderedASC", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true ORDER BY ps.project.createdAt ASC")
+@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkillByStateOrderedDESC", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true AND ps.project.stateId = :state ORDER BY ps.project.createdAt DESC")
+@NamedQuery(name = "ProjectSkill.findAllProjectsFromSkillByStateOrderedASC", query = "SELECT ps FROM ProjectSkillEntity ps WHERE ps.skill.id = :skillId AND ps.activeStatus = true AND ps.project.stateId = :state ORDER BY ps.project.createdAt ASC")
 public class ProjectSkillEntity implements Serializable {
 
     @Id
