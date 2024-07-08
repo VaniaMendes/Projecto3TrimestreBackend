@@ -1,7 +1,9 @@
 package aor.paj.proj_final_aor_backend.bean;
 
+import aor.paj.proj_final_aor_backend.dao.AuthenticationDao;
 import aor.paj.proj_final_aor_backend.dao.UserDao;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
+import aor.paj.proj_final_aor_backend.util.EmailServiceHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,6 +23,10 @@ class UserBeanTest {
 
     @Mock
     UserDao userDao;
+    @Mock
+    AuthenticationDao authenticationDao;
+    @Mock
+    EmailServiceHelper emailServiceHelper;
 
 
     @BeforeEach

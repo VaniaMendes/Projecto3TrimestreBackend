@@ -396,6 +396,8 @@ public class MessageBean implements Serializable {
     }
 
 
+
+
     /**
      * This method is used to convert a message entity to a message DTO for a chat group.
      * @param messageEntity The message entity that is to be converted.

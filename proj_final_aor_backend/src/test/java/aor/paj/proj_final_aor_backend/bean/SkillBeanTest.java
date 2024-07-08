@@ -58,6 +58,12 @@ class SkillBeanTest {
         userEntity.setId(1L);
         User user = userBean.convertUserEntityToDto(userEntity);
         when(userBean.getUserByToken("token")).thenReturn(user);
-        assertTrue(skillBean.createNewSkill("token", skill));
+
+        // Check if user is not null before calling createNewSkill
+        if (user != null) {
+            assertTrue(skillBean.createNewSkill("token", skill));
+        } else {
+            fail("User is null");
+        }
     }
 }

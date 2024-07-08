@@ -2,13 +2,10 @@ package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.NotificationBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
-import aor.paj.proj_final_aor_backend.dao.SessionDao;
 import aor.paj.proj_final_aor_backend.dto.Notification;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -16,7 +13,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Path("/notifications")
@@ -53,7 +49,6 @@ public class NotificationService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error retrieving notifications: " + e.getMessage()).build();
         }
     }
-
 
     @PUT
     @Path("/{notificationId}")
@@ -125,6 +120,27 @@ public class NotificationService {
         }
     }
 
+    @GET
+    @Path("/unread/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getUnreadNotificationsByUserId(@HeaderParam("token") String token,
+                                                   @PathParam("userId") long userId){
+        logger.info("Received request to get unread notifications for user with id: " + userId);
+        try {
+            List<Notification> notifications = notificationBean.getUnreadNotificationList(token);
 
+            if(notifications != null) {
+                logger.info("Unread notifications retrieved successfully for user with id: " + userId);
+                return Response.status(Response.Status.OK).entity(notifications).build();
+            } else {
+                logger.error("Theres is no unread notifications for user with id: " + userId);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving unread notifications").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving unread notifications for user with id: " + userId + ": " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
 }
 

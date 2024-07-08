@@ -28,6 +28,9 @@ public class Notification extends TextEvent {
     private long relatedIDEntity;
 
 
+
+    @XmlElement
+    private boolean open;
     /**
      * Default constructor.
      */

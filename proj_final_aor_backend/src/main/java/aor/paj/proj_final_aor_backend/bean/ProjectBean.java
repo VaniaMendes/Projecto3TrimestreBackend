@@ -88,6 +88,8 @@ public class ProjectBean implements Serializable {
     TaskBean taskBean;
     @EJB
     UserBean userBean;
+    @EJB
+    MessageDao messageDao;
 
     // Default constructor
     public ProjectBean() {
@@ -356,9 +358,7 @@ public class ProjectBean implements Serializable {
 
         notificationBean.sendNotificationToProjectUsers(token, projectId, String.valueOf(NotificationType.NEW_MEMBER), projectEntity.getId());
 
-
-
-        messageBean.sendMessage(token, createWelcomeMessage(token, userId, projectEntity));
+        createWelcomeMessage(token, userId, projectEntity);
         logger.info("User with id: " + userEntity.getId() + " added to project: " + projectEntity.getName() + " by user with id: " + author.getId());
 
         return true;
@@ -372,7 +372,6 @@ public class ProjectBean implements Serializable {
      * @param project  the project to which the user has been added
      * @return         the created welcome message
      * **/
-
     public Message createWelcomeMessage (String token, Long userId, ProjectEntity project){
         //Get the sender by token
         User sender = userBean.getUserByToken(token);
@@ -388,10 +387,15 @@ public class ProjectBean implements Serializable {
 
         //Define the sender, receiver, subject and content
         message.setSender(sender1);
+        message.setSendTimestamp(LocalDateTime.now());
         message.setReceiver(receiver1);
         message.setSubject("Bem vindo ");
         message.setContent(" Foi adicionado ao projeto " + project.getName() + ". Bom trabalho");
 
+
+        //Persist de message in messageEntity
+
+        messageBean.sendMessage(token, message);
         //Return message
         return message;
     }

@@ -84,6 +84,39 @@ import java.util.Set;
 @NamedQuery(name = "Notification.countUnreadNotifications", query = "SELECT COUNT(n) FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.readStatus=false AND (n.type != 'MESSAGE_RECEIVED' AND n.type != 'MESSAGE_PROJECT')")
 
 
+@NamedQuery(
+        name = "Notification.countUnreadForTypeMessageAndTime",
+        query =  "SELECT COUNT(n) FROM NotificationEntity n " +
+                "WHERE n.id IN (" +
+                "   SELECT MAX(n2.id) " +
+                "   FROM NotificationEntity n2 " +
+                "   JOIN n2.users u " +
+                "   WHERE u.id = :userId AND n2.type = 'MESSAGE_RECEIVED' " +
+                "   AND n2.readStatus = false " +
+                "   AND n2.sendTimestamp > :timestamp " +
+                "   GROUP BY n2.sender_id" +
+                ")"
+)
+
+@NamedQuery(
+        name = "Notification.countUnreadForTypeMessageProjectandtime",
+        query =  "SELECT COUNT(n) FROM NotificationEntity n " +
+                "WHERE n.id IN (" +
+                "   SELECT MAX(n2.id) " +
+                "   FROM NotificationEntity n2 " +
+                "   JOIN n2.users u " +
+                "   WHERE u.id = :userId AND n2.type = 'MESSAGE_PROJECT' " +
+                "   AND n2.readStatus = false " +
+                "   AND n2.sendTimestamp > :timestamp " +
+                "   GROUP BY n2.sender_id" +
+                ")"
+)
+@NamedQuery(
+        name = "Notification.countUnreadNotificationsAndTime",
+        query = "SELECT COUNT(n) FROM NotificationEntity n WHERE n.id = :userId AND n.type NOT IN ('MESSAGE_RECEIVED', 'MESSAGE_PROJECT') AND n.sendTimestamp > :timestamp AND n.readStatus = false"
+)
+
+
 public class NotificationEntity implements Serializable {
 
     /**
