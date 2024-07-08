@@ -94,6 +94,13 @@ import java.util.*;
 @NamedQuery(name = "Project.countSearchedProjectsByName", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%')")
 @NamedQuery(name = "Project.countSearchedProjectsByNameAndState", query = "SELECT COUNT(p) FROM ProjectEntity p WHERE p.name LIKE CONCAT('%', :name, '%') AND p.stateId = :stateId")
 
+//Stats
+@NamedQuery(name = "Project.countProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p GROUP BY p.lab.id")
+@NamedQuery(name = "Project.averageNumberOfActiveMembers", query = "SELECT AVG(COUNT(up)) FROM ProjectEntity p JOIN p.userProjects up WHERE up.approved = true AND up.exited = false GROUP BY p")
+@NamedQuery(name = "Project.countApprovedProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 300 GROUP BY p.lab.id")
+@NamedQuery(name = "Project.countFinishedProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 500 GROUP BY p.lab.id")
+@NamedQuery(name = "Project.countCancelledProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 600 GROUP BY p.lab.id")
+@NamedQuery(name = "Project.averageExecutionTime", query = "SELECT AVG(DATEDIFF(p.conclusionDate, p.initialDate)) FROM ProjectEntity p")
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
@@ -144,6 +151,9 @@ public class ProjectEntity implements Serializable {
     // Needs of the project
     @Column(name = "needs")
     private String needs;
+
+    @Column(name = "observations")
+    private String observations;
 
     // Set of activities associated with the project
     @OneToMany(mappedBy = "project", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -625,5 +635,27 @@ public class ProjectEntity implements Serializable {
      */
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    /**
+     * Gets the observations about the project.
+     * This method returns a string containing observations or remarks about the project,
+     * which may include any special notes or comments relevant to the project's status, progress, or any other aspect.
+     *
+     * @return A string representing the observations about the project.
+     */
+    public String getObservations() {
+        return observations;
+    }
+
+    /**
+     * Sets the observations for the project.
+     * This method allows setting or updating the observations or remarks about the project.
+     * The input is a string that may contain any notes, comments, or special information relevant to the project.
+     *
+     * @param observations A string containing the observations or remarks to be associated with the project.
+     */
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 }

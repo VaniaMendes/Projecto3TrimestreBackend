@@ -197,20 +197,15 @@ public class ProjectBean implements Serializable {
     public boolean updateState(long id, int stateId, String token) {
         ProjectEntity projectEntity = findProject(id);
 
-        System.out.println(1);
         if (projectEntity == null || !isValidStateId(stateId)) {
             return false;
         }
-        cloneMessageEntities(projectEntity);
-
-        System.out.println(2);
+        cloneMessagesEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null || (!(author.getUserType() == UserType.ADMIN) && !userProjectBean.userProjectExists(author.getId(), id))) {
             return false;
         }
-
-        System.out.println(3);
 
         int currentStateId = projectEntity.getStateId();
         boolean isAdmin = author.getUserType() == UserType.ADMIN;
@@ -219,8 +214,6 @@ public class ProjectBean implements Serializable {
         if (!isValidTransition(currentStateId, stateId, isAdmin)) {
             return false;
         }
-
-        System.out.println(4);
 
         // Special handling for ADMIN moving from READY to APPROVED
         if (isAdmin && currentStateId == Project.READY && stateId == Project.APPROVED) {
@@ -243,30 +236,48 @@ public class ProjectBean implements Serializable {
         return true;
     }
 
+
     /**
-     * Validates if a transition between two project states is valid based on the current state, the desired new state, and the user's admin status.
-     * This method allows transitions from PLANNING to READY, READY to APPROVED (admin only), APPROVED to IN_PROGRESS, and IN_PROGRESS to FINISHED.
-     * Projects can be CANCELLED from any state. Admins have the exclusive ability to move projects from READY to APPROVED.
+     * Checks if a transition between project states is valid based on the current state, the desired new state, and the user's admin status.
+     * This method enforces the project state transition rules, ensuring that transitions are only made between specific states
+     * and under certain conditions (e.g., admin privileges).
      *
      * @param currentState The current state ID of the project.
      * @param newState The desired new state ID for the project.
-     * @param isAdmin A boolean indicating if the user is an admin.
-     * @return true if the transition is valid, false otherwise.
+     * @param isAdmin A boolean indicating if the user attempting the transition is an admin.
+     * @return true if the transition is valid according to the rules; false otherwise.
      */
     private boolean isValidTransition(int currentState, int newState, boolean isAdmin) {
         if (newState == Project.CANCELLED) return true; // Can be cancelled at any time
-        switch (currentState) {
-            case Project.PLANNING:
-                return newState == Project.READY;
-            case Project.READY:
-                return (newState == Project.APPROVED && isAdmin) || (!isAdmin && newState == Project.CANCELLED);
-            case Project.APPROVED:
-                return newState == Project.IN_PROGRESS;
-            case Project.IN_PROGRESS:
-                return newState == Project.FINISHED;
-            default:
-                return false;
+        if (currentState == Project.PLANNING && newState == Project.READY) return true;
+        if (currentState == Project.READY && (newState == Project.PLANNING || newState == Project.APPROVED) && isAdmin) return true;
+        if (currentState == Project.READY && newState == Project.CANCELLED) return true;
+        if (currentState == Project.APPROVED && newState == Project.IN_PROGRESS) return true;
+        if (currentState == Project.IN_PROGRESS && newState == Project.FINISHED) return true;
+        return false;
+    }
+
+    public boolean updateObservations(long id, String observations, String token) {
+        ProjectEntity projectEntity = findProject(id);
+        if (projectEntity == null || observations == null || observations.isEmpty()) {
+            return false;
         }
+        cloneMessagesEntities(projectEntity);
+
+        UserEntity author = sessionDao.findUserByToken(token);
+        if (author == null || author.getUserType() != UserType.ADMIN) {
+            return false;
+        }
+
+        projectEntity.setObservations(observations);
+        projectEntity.setUpdatedAt(LocalDateTime.now());
+
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author, "Observations updated");
+
+        projectDao.merge(projectEntity);
+
+        logger.info("Project observations updated for project: " + projectEntity.getName() + " by user with id: " + author.getId());
+        return true;
     }
 
     /**
@@ -294,7 +305,7 @@ public class ProjectBean implements Serializable {
         projectEntity.setDescription(description);
         projectEntity.setUpdatedAt(LocalDateTime.now());
 
-        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author, null);
+        activityBean.registerActivity(projectEntity, ProjectActivityType.EDIT_PROJECT_DATA, author, "Description updated");
 
         projectDao.merge(projectEntity);
 
@@ -336,7 +347,7 @@ public class ProjectBean implements Serializable {
         }
 
         userProjectBean.addUserToProject(userEntity, projectEntity, userType);
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
 
         if (userType != UserTypeInProject.CANDIDATE) {
             projectEntity.setUpdatedAt(LocalDateTime.now());
@@ -375,7 +386,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -418,7 +429,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -459,7 +470,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -490,7 +501,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return false;
         }
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
 
         UserEntity author = sessionDao.findUserByToken(token);
         if (author == null) {
@@ -671,7 +682,7 @@ public class ProjectBean implements Serializable {
         if (projectEntity == null) {
             return null;
         }
-        cloneMessageEntities(projectEntity);
+        cloneMessagesEntities(projectEntity);
         return convertToDTO(projectEntity);
     }
 
@@ -800,7 +811,7 @@ public class ProjectBean implements Serializable {
         // Retrieve all projects from the database in descending order
         List<ProjectEntity> projects = projectDao.findAllProjectsOrderedDESC();
 
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -817,7 +828,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getAllProjectsOldestToLatest() {
         List<ProjectEntity> projects = projectDao.findAllProjects();
 
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -835,7 +846,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getProjectsByStateDESC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedDESC(state);
 
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -853,7 +864,7 @@ public class ProjectBean implements Serializable {
     private List<Project> getProjectsByStateASC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByStateOrderedASC(state);
 
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
 
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
@@ -915,7 +926,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByStateAndVacanciesDESC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByVacanciesAndStateOrderedDESC(state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -930,7 +941,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByStateAndVacanciesASC(int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByVacanciesAndStateOrderedASC(state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -986,7 +997,7 @@ public class ProjectBean implements Serializable {
      */
     public List<Project> getProjectsWithUserLatestToOldest(Long userId) {
         List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdOrderedDESC(userId);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1000,7 +1011,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsWithUserOldestToLatest(Long userId) {
         List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdOrderedASC(userId);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1015,7 +1026,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsWithUserByStateDESC(Long userId, int state) {
         List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdAndStateOrderedDESC(userId, state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -1034,7 +1045,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsWithUserByStateASC(Long userId, int state) {
         List<ProjectEntity> projects = projectDao.findActiveProjectsByUserIdAndStateOrderedASC(userId, state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         List<Project> projectsDTO = projects.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -1097,7 +1108,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillASC(String keyword) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedASC(keyword);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1111,7 +1122,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillDESC(String keyword) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedDESC(keyword);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1127,7 +1138,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillAndStateASC(String keyword, int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillAndStateOrderedASC(keyword, state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1143,7 +1154,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillAndStateDESC(String keyword, int state) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillAndStateOrderedDESC(keyword, state);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1158,7 +1169,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillOrderedByVacanciesDESC(String keyword) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedByVacanciesDESC(keyword);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1173,7 +1184,7 @@ public class ProjectBean implements Serializable {
      */
     private List<Project> getProjectsByKeywordOrSkillOrderedByVacanciesASC(String keyword) {
         List<ProjectEntity> projects = projectDao.findProjectsByKeywordOrSkillOrderedByVacanciesASC(keyword);
-        cloneMessageEntities(projects);
+        cloneMessagesEntities(projects);
         return projects.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
@@ -1437,6 +1448,7 @@ public class ProjectBean implements Serializable {
         project.setLab(labBean.convertToDTO(projectEntity.getLab()));
         project.setMaxMembers(projectEntity.getMaxMembers());
         project.setNeeds(projectEntity.getNeeds());
+        project.setObservations(projectEntity.getObservations());
         project.setCreatedAt(projectEntity.getCreatedAt());
         project.setUpdatedAt(projectEntity.getUpdatedAt());
         project.setConclusionDate(projectEntity.getConclusionDate());
@@ -1458,7 +1470,7 @@ public class ProjectBean implements Serializable {
      *
      * @param projects A list of ProjectEntity objects for which to clone the MessageEntity set.
      */
-    private void cloneMessageEntities(List<ProjectEntity> projects) {
+    private void cloneMessagesEntities(List<ProjectEntity> projects) {
         for (ProjectEntity project : projects) {
             Set<UserProjectEntity> userProjects = project.getUserProjects();
             for (UserProjectEntity userProject : userProjects) {
@@ -1469,7 +1481,7 @@ public class ProjectBean implements Serializable {
         }
     }
 
-    public void cloneMessageEntities(ProjectEntity project) {
+    public void cloneMessagesEntities(ProjectEntity project) {
         Set<UserProjectEntity> userProjects = project.getUserProjects();
         for (UserProjectEntity userProject : userProjects) {
             Set<MessageEntity> originalMessages = userProject.getMessagesReceived();

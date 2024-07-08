@@ -1,6 +1,7 @@
 package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.*;
+import aor.paj.proj_final_aor_backend.dto.ObservationRequest;
 import aor.paj.proj_final_aor_backend.dto.Project;
 import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
@@ -176,6 +177,25 @@ public class ProjectService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update project description").build();
         }
 
+    }
+
+    @PUT
+    @Path("/{id}/observation")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateObservation(@PathParam("id") long projectId,
+                                      ObservationRequest observationRequest,
+                                      @HeaderParam("token") String token){
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to update project observation from IP: " + ip);
+
+        if (projectBean.updateObservations(projectId, observationRequest.getObservation(), token)){
+            logger.info("Project observation updated successfully");
+            return Response.status(Response.Status.OK).entity("Project observation updated successfully").build();
+        } else {
+            logger.error("Failed to update project observation");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update project observation").build();
+        }
     }
 
     @POST
