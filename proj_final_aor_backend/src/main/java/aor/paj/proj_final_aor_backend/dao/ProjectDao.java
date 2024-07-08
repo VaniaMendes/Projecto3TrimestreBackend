@@ -583,4 +583,12 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
             return null;
         }
     }
+
+    public Integer countSearchProjectsByNameAndState (String name, int state) {
+        try {
+            return ((Number) em.createNamedQuery("Project.countSearchedProjectsByNameAndState").setParameter("name", "%" + name + "%").setParameter("stateId", state).getSingleResult()).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

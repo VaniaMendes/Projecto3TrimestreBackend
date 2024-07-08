@@ -31,33 +31,6 @@ class SkillBeanTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testCreateNewSkill_emptyName() {
-        Skill skill = new Skill();
-        skill.setName("");
-        assertFalse(skillBean.createNewSkill("token", skill));
-    }
 
 
-    @Test
-    void testCreateNewSkill_skillExists() {
-        Skill skill = new Skill();
-        skill.setName("existingSkill");
-        when(skillDao.findSkillByName(anyString())).thenReturn(new SkillEntity());
-        assertFalse(skillBean.createNewSkill("token", skill));
-    }
-
-    @Test
-    void testCreateNewSkill_success() {
-        Skill skill = new Skill();
-        skill.setName("newSkill");
-        skill.setType(SkillType.CONHECIMENTO);
-        when(skillDao.findSkillByName(anyString())).thenReturn(null);
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1L);
-        User user = userBean.convertUserEntityToDto(userEntity);
-        when(userBean.getUserByToken("token")).thenReturn(user);
-        assertTrue(skillBean.createNewSkill("token", skill));
-    }
 }

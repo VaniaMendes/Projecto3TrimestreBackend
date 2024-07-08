@@ -537,7 +537,7 @@ public class ProjectService {
             return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeyword(keyword)).build();
         } else if (search!= null) {
             logger.info("Projects counted by search " + search + " successfully");
-            return Response.status(Response.Status.OK).entity(projectBean.countSearchProjectsByName(search)).build();
+            return Response.status(Response.Status.OK).entity(projectBean.countSearchProjectsByName(search, state)).build();
         } else {
             return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
         }
