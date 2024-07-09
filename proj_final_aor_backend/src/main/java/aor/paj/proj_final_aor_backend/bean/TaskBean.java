@@ -111,10 +111,19 @@ public class TaskBean implements Serializable {
             logger.debug("Project with ID " + projectId + " not found");
             return false;
         }
+        // If task owner is not specified, set the current user as owner
+        if (task.getOwner() == null || task.getOwner().getId() == 0) {
+            task.setOwner(user); // Set the current user as the owner of the task
+        } else {
+            // Ensure the owner entity is properly set in the task
+            UserEntity userEntity = userBean.convertUserDtoToEntity(task.getOwner());
+            task.setOwner(userBean.convertUserEntityToDto(userEntity));
+        }
+
 
         // Create the task entity
         TaskEntity taskEntity = convertToEntity(task);
-        taskEntity.setResponsibleUser(userBean.convertUserDtoToEntity(user));
+        taskEntity.setResponsibleUser(userBean.convertUserDtoToEntity(task.getOwner()));
         taskEntity.setErased(false);
         taskEntity.setUpdatedAt(LocalDateTime.now());
         taskEntity.setCreatedAt(LocalDateTime.now());
@@ -187,6 +196,7 @@ public class TaskBean implements Serializable {
         //Check if the project exists
         ProjectEntity projectEntity = projectBean.findProjectById(projectId);
 
+
         if (projectEntity == null) {
             logger.debug("Project with ID " + projectId + " not found");
             return false;
@@ -220,6 +230,11 @@ public class TaskBean implements Serializable {
         }
         if (task.getPriorityId() != 0) {
             taskEntity.setPriorityId(task.getPriorityId());
+            updated = true;
+        }
+        if(task.getOwner().getId() != 0){
+            User userEntity = userBean.getUserById(task.getOwner().getId());
+            taskEntity.setResponsibleUser(userBean.convertUserDtoToEntity(userEntity));
             updated = true;
         }
 
@@ -308,6 +323,7 @@ public class TaskBean implements Serializable {
     }
 
 
+
     /**
      * This method updates the status of a task in the database.
      *
@@ -380,6 +396,32 @@ public class TaskBean implements Serializable {
     public List<Task> getTasksFromProject(Long projectId) {
         //Fetch the tasks from the database
         List<TaskEntity> taskEntities = taskDao.findTasksByProject(projectId);
+        ArrayList<Task> tasks = new ArrayList<>();
+        for (TaskEntity taskEntity : taskEntities) {
+            //Get the dependencies for the task
+            List<Task> getDependencies = getDependenciesForTask(taskEntity.getId());
+            //Convert the task entity to a task DTO
+            Task task = convertToDTO(taskEntity);
+            if (getDependencies != null) {
+                //Set the dependencies for the task
+                task.setDependencies(getDependencies);
+            }
+
+            tasks.add(task);
+        }
+        //Return the list of tasks
+        return tasks;
+    }
+
+    /**
+     * This method gets all the tasks from a project.
+     *
+     * @param projectId The id of the project to get the tasks from.
+     * @return List of all the tasks from the project.
+     */
+    public List<Task> getTasksFromProjectOrderByDate(Long projectId) {
+        //Fetch the tasks from the database
+        List<TaskEntity> taskEntities = taskDao.findTasksByProjectOrdered(projectId);
         ArrayList<Task> tasks = new ArrayList<>();
         for (TaskEntity taskEntity : taskEntities) {
             //Get the dependencies for the task

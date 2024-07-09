@@ -5,6 +5,7 @@ import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NamedQuery;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,31 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
         return em.find(NotificationEntity.class, id);
     }
 
+
+
+    public long findUnOpenNotificationsByUserID(long userId){
+        try {
+            // Count all notifications of type  MESSAGE_RECEIVED
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countUnOpenForTypeMessage", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Count all notifications of MESSAGE_PROJECT
+            Long countNonMessageReceivedProject = em.createNamedQuery("Notification.countUnOpenForTypeMessageProject", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Count all notifications except MESSAGE_RECEIVED and MESSAGE_PROJECT
+            Long countAllNotificationsExceptMessage = em.createNamedQuery("Notification.countUnOpenNotifications", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Sum the results and return the total count
+            return countNonMessageReceived.intValue() + countNonMessageReceivedProject.intValue() + countAllNotificationsExceptMessage.intValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting notifications", e);
+        }
+    }
     /**
      * Finds the total number of unread notifications for a user by their ID.
      *
@@ -76,6 +102,52 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
         } catch (Exception e) {
             throw new RuntimeException("Error counting notifications", e);
         }
+    }
+
+
+    public List<NotificationEntity> fianAllNotificationsOfUSer(Long userId) {
+        return em.createNamedQuery("Notification.findAllNotificationsOfUser", NotificationEntity.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+
+    public List<NotificationEntity> findNotificationsListForUser(long userId) {
+        // Initialize an empty list to hold the notifications to be returned
+        List<NotificationEntity> notifications = new ArrayList<>();
+
+        try {
+            // Initialize a list to combine all notifications before pagination
+            List<NotificationEntity> allNotifications = new ArrayList<>();
+
+            // Get notifications of type MESSAGE_RECEIVED
+            allNotifications.addAll(em.createNamedQuery("Notification.findLatestMessageReceivedByUserID", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList());
+
+            // Get notifications of type MESSAGE_PROJECT
+            allNotifications.addAll(em.createNamedQuery("Notification.findLatestMessageReceivedByProject", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList());
+
+            // Get notifications of all types except MESSAGE_RECEIVED and MESSAGE_PROJECT
+            allNotifications.addAll(em.createNamedQuery("Notification.findAllNotificationsExceptMessageReceived", NotificationEntity.class)
+                    .setParameter("userId", userId)
+                    .getResultList());
+
+            // Sort the notifications by their send timestamp in descending order
+            allNotifications.sort((n1, n2) -> n2.getSendTimestamp().compareTo(n1.getSendTimestamp()));
+            // Assign allNotifications to notifications to be returned
+            notifications = allNotifications;
+
+
+        } catch (Exception e) {
+            // handle exception
+            e.printStackTrace();
+        }
+
+        // Return the list of notifications
+        return notifications;
     }
 
 
@@ -159,6 +231,7 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
             throw new RuntimeException("Error counting notifications", e);
         }
     }
+
 
     /**
      * Finds notifications for a user by their ID and notification type.
