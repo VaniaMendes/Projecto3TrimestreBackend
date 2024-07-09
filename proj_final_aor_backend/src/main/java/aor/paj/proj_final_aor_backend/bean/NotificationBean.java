@@ -101,6 +101,7 @@ public class NotificationBean implements Serializable {
         notification.setSender(userBean.convertUserToDTOForMessage(sender));
         notification.setType(NotificationType.valueOf(type.toString()));
         notification.setReceiver(userBean.convertUserToDTOForMessage(user));
+        notification.setOpen(false);
 
         NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
         //Persist the notification in the database
@@ -176,6 +177,7 @@ public class NotificationBean implements Serializable {
                     notification.setType(type);
                     notification.setReceiver(userBean.convertUserToDTOForMessage(user));
                     notification.setRelatedIDEntity(projectId);
+                    notification.setOpen(false);
 
                     //Create the notification
                     NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
@@ -306,6 +308,53 @@ public class NotificationBean implements Serializable {
     }
 
 
+   public List<Notification> getUnreadNotificationList(String token){
+        // Find the user
+        UserEntity user = sessionDao.findUserByToken(token);
+
+        // Check if the user exists
+        if (user == null) {
+            logger.error("No user found with token: " + token);
+            return null;
+        }
+
+        // Find the notifications for the user
+        List<NotificationEntity> notifications = notificationDao.findNotificationsListForUser(user.getId());
+
+        // Check if there are notifications
+        if (notifications == null || notifications.isEmpty()) {
+            logger.error("No notifications found for user with id: " + user.getId());
+            return null;
+        }
+
+        // Convert the notifications to DTOs
+        List<Notification> notificationList = new ArrayList<>();
+
+        for (NotificationEntity notificationEntity : notifications) {
+
+            Notification notification = new Notification();
+            notification.setId(notificationEntity.getId());
+            notification.setReadStatus(notificationEntity.isReadStatus());
+            notification.setSendTimestamp(notificationEntity.getSendTimestamp());
+            notification.setType(NotificationType.valueOf(notificationEntity.getType().toString()));
+            notification.setRelatedIDEntity(notificationEntity.getRelatedEntityId());
+            UserEntity senderEntity = new UserEntity();
+            senderEntity.setId(notificationEntity.getSender_id());
+            senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
+            senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
+            senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
+            notification.setOpen(notificationEntity.isOpen());
+
+            MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
+
+            notification.setSender(senderDto);
+            notificationList.add(notification);
+        }
+
+        return notificationList;
+   }
+
+
     /**
      * Method to get the notifications for a user.
      *
@@ -350,6 +399,7 @@ public class NotificationBean implements Serializable {
             senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
             senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
             senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
+            notification.setOpen(notificationEntity.isOpen());
 
             MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
 
@@ -395,10 +445,20 @@ public class NotificationBean implements Serializable {
         // Check if the notification is a message to mark all messages as read
         String typeOfNotification = NotificationType.MESSAGE_RECEIVED.toString();
         String typeOfNotification2 = NotificationType.MESSAGE_PROJECT.toString();
-        if (notification.getType().equals(typeOfNotification) || notification.getType().equals(typeOfNotification2)) {
-            List<NotificationEntity> notificationEntityList = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification);
 
-            for (NotificationEntity notificationEntity : notificationEntityList) {
+        if (notification.getType().equals(typeOfNotification) || notification.getType().equals(typeOfNotification2)) {
+            // Fetch all notifications of both types
+            List<NotificationEntity> notificationEntityList1 = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification);
+            List<NotificationEntity> notificationEntityList2 = notificationDao.findNotificationsByUserIDandType(user.getId(), typeOfNotification2);
+
+            // Mark all notifications of both types as read
+            for (NotificationEntity notificationEntity : notificationEntityList1) {
+                notificationEntity.setReadStatus(true);
+                notificationEntity.setReadTimestamp(LocalDateTime.now());
+                notificationDao.merge(notificationEntity);
+            }
+
+            for (NotificationEntity notificationEntity : notificationEntityList2) {
                 notificationEntity.setReadStatus(true);
                 notificationEntity.setReadTimestamp(LocalDateTime.now());
                 notificationDao.merge(notificationEntity);
@@ -407,6 +467,57 @@ public class NotificationBean implements Serializable {
         return true;
     }
 
+
+    public boolean markAllNotificationsAsOpen(String token){
+        // Find the user
+        UserEntity user = sessionDao.findUserByToken(token);
+
+        // Check if the user exists
+        if (user == null) {
+            logger.error("No user found with token: " + token);
+            return false;
+        }
+
+        // Find the notifications for the user
+        List<NotificationEntity> notifications = notificationDao.fianAllNotificationsOfUSer(user.getId());
+
+        // Check if there are notifications
+        if (notifications == null || notifications.isEmpty()) {
+            logger.error("No notifications found for user with id: " + user.getId());
+            return false;
+        }
+
+        // Mark the notification as read
+        for (NotificationEntity notification : notifications) {
+            notification.setOpen(true);
+            notificationDao.merge(notification);
+        }
+
+        return true;
+    }
+
+    public long getOpenNotifications (String token){
+        // Find the user
+        UserEntity user = sessionDao.findUserByToken(token);
+
+        // Check if the user exists
+        if (user == null) {
+            logger.error("No user found with token: " + token);
+            return 0;
+        }
+
+        // Find the number of unread notifications for the user
+        long notifications = notificationDao.findUnOpenNotificationsByUserID(user.getId());
+
+        // Check if there are unread notifications
+        if (notifications == 0) {
+            logger.error("No unread notifications found for user with id: " + user.getId());
+            return 0;
+        }
+
+        // Return the number of unread notifications
+        return notifications;
+    }
 
     /**
      * Method to get the number of notifications for a user.
@@ -434,6 +545,7 @@ public class NotificationBean implements Serializable {
         notificationEntity.setType(notification.getType().toString());
         notificationEntity.setRelatedEntityId(notification.getRelatedIDEntity());
         notificationEntity.setSender_id(userBean.convertUserToDTOForMessage(sender).getId());
+        notificationEntity.setOpen(notification.isOpen());
         return notificationEntity;
     }
 
