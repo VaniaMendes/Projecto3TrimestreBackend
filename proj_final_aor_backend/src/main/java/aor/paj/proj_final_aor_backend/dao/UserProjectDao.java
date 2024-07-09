@@ -200,4 +200,12 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
         }
     }
 
+    public Double countAverageActiveUsers() {
+        try {
+            return em.createNamedQuery("UserProject.countAverageActiveUsers", Double.class).getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
