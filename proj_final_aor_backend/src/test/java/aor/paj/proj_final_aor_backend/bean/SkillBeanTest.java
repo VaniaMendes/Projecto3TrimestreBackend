@@ -31,12 +31,6 @@ class SkillBeanTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testCreateNewSkill_emptyName() {
-        Skill skill = new Skill();
-        skill.setName("");
-        assertFalse(skillBean.createNewSkill("token", skill));
-    }
 
 
     @Test

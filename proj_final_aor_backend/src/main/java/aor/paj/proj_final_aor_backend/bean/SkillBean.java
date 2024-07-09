@@ -66,6 +66,32 @@ public class SkillBean implements Serializable {
     }
 
     /**
+     * Retrieves a list of SkillEntity objects that are associated with at least one project.
+     * This method calls the {@code findAllSkillsWithProjects} method from the {@code SkillDao} class,
+     * which is expected to perform a database query to find all skills linked to projects.
+     *
+     * @return A list of {@link SkillEntity} instances, each representing a skill associated with one or more projects.
+     *         If there are no skills associated with projects or in case of a query execution issue, an empty list or null may be returned.
+     */
+    public List<SkillEntity> getSkillsWithProjects() {
+        return skillDao.findAllSkillsWithProjects();
+    }
+
+    /**
+     * Searches for skills associated with at least one project and whose names match the specified pattern.
+     * This method leverages the {@code SkillDao} to perform a database query, specifically using the
+     * "searchSkillsWithProjects" named query. The search is conducted based on the name parameter, allowing
+     * for partial matches by incorporating the '%' wildcard before and after the name parameter in the query.
+     *
+     * @param name The name or partial name of the skill to search for. The search is case-sensitive.
+     * @return A list of {@link SkillEntity} objects that match the search criteria and are associated with at least one project.
+     *         If an exception occurs during the query execution, this method returns null, indicating an issue with database access or query execution.
+     */
+    public List<SkillEntity> searchSkillsWithProjects(String name) {
+        return skillDao.searchSkillsWithProjects(name);
+    }
+
+    /**
      * This method returns a list of all the skills in the database.
      *
      * @param userId The id of the user to get the skills from.
@@ -95,16 +121,16 @@ public class SkillBean implements Serializable {
      * @param skill Skill object to be created.
      * @return True if the skill was created successfully, false otherwise.
      */
-    public boolean createNewSkill(String token, Skill skill) {
+    public Skill createNewSkill(String token, Skill skill) {
         // Check if the skill name is null or empty
         if (skill.getName().isEmpty()) {
             logger.error("Skill name is null or empty.");
-            return false;
+            return null;
         }
         // Check if the skill already exists
         if (skillDao.findSkillByName(skill.getName()) != null) {
             logger.error("Skill already exists.");
-            return false;
+            return null;
         }
         // Create the skill
         SkillEntity skillEntity = new SkillEntity();
@@ -120,8 +146,14 @@ public class SkillBean implements Serializable {
         skillEntity.setType(skill.getType());
         // Persist the skill in the database
         skillDao.createSkill(skillEntity);
-        associateSkillToUser(userBean.getUserByToken(token).getId(), skillEntity.getId());
-        return true;
+        boolean associated = associateSkillToUser(userBean.getUserByToken(token).getId(), skillEntity.getId());
+        if (!associated) {
+            logger.error("Failed to associate skill to user.");
+            return null;
+        }
+        // Convert SkillEntity back to Skill
+        Skill createdSkill = convertToDTO(skillEntity);
+        return createdSkill;
     }
 
     /**

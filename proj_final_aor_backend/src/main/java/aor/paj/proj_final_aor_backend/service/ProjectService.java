@@ -1,10 +1,9 @@
 package aor.paj.proj_final_aor_backend.service;
 
 import aor.paj.proj_final_aor_backend.bean.*;
+import aor.paj.proj_final_aor_backend.dto.ObservationRequest;
 import aor.paj.proj_final_aor_backend.dto.Project;
-import aor.paj.proj_final_aor_backend.dto.Resource;
 import aor.paj.proj_final_aor_backend.dto.User;
-import aor.paj.proj_final_aor_backend.entity.ResourceEntity;
 import aor.paj.proj_final_aor_backend.util.enums.UserTypeInProject;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
@@ -107,11 +106,14 @@ public class ProjectService {
     @GET
     @Path("/keyword/{keyword}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByKeyword(@PathParam("keyword") String keyword, @QueryParam("order") String order) {
+    public Response getProjectsByKeyword(@PathParam("keyword") String keyword,
+                                         @QueryParam("order") String order,
+                                         @QueryParam("vacancies") Boolean vacancies,
+                                         @QueryParam("state") Integer state) {
         String ip = request.getRemoteAddr();
         logger.info("Received request to get projects by keyword from IP: " + ip);
 
-        List<Project> projects = projectBean.getProjectsByKeyword(keyword, order);
+        List<Project> projects = projectBean.getProjectsByKeywordOrSkill(keyword, order, vacancies, state);
         return Response.status(Response.Status.OK).entity(projects).build();
     }
 
@@ -175,6 +177,25 @@ public class ProjectService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update project description").build();
         }
 
+    }
+
+    @PUT
+    @Path("/{id}/observation")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateObservation(@PathParam("id") long projectId,
+                                      ObservationRequest observationRequest,
+                                      @HeaderParam("token") String token){
+        String ip = request.getRemoteAddr();
+        logger.info("Received request to update project observation from IP: " + ip);
+
+        if (projectBean.updateObservations(projectId, observationRequest.getObservation(), token)){
+            logger.info("Project observation updated successfully");
+            return Response.status(Response.Status.OK).entity("Project observation updated successfully").build();
+        } else {
+            logger.error("Failed to update project observation");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Failed to update project observation").build();
+        }
     }
 
     @POST
@@ -534,10 +555,10 @@ public class ProjectService {
 
         if (keyword != null) {
             logger.info("Projects counted by keyword " + keyword + " successfully");
-            return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeyword(keyword)).build();
+            return Response.status(Response.Status.OK).entity(projectBean.countProjectsByKeywordOrSkill(keyword, state)).build();
         } else if (search!= null) {
             logger.info("Projects counted by search " + search + " successfully");
-            return Response.status(Response.Status.OK).entity(projectBean.countSearchProjectsByName(search)).build();
+            return Response.status(Response.Status.OK).entity(projectBean.countSearchProjectsByName(search, state)).build();
         } else {
             return Response.status(Response.Status.OK).entity(projectBean.countProjects(state)).build();
         }

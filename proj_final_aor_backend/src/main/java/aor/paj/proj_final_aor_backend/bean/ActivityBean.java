@@ -3,6 +3,7 @@ package aor.paj.proj_final_aor_backend.bean;
 import aor.paj.proj_final_aor_backend.dao.ActivityDao;
 import aor.paj.proj_final_aor_backend.dto.Activity;
 import aor.paj.proj_final_aor_backend.dto.IdAndNameDTO;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.ActivityEntity;
 import aor.paj.proj_final_aor_backend.entity.ProjectEntity;
 import aor.paj.proj_final_aor_backend.entity.UserEntity;
@@ -63,6 +64,34 @@ public class ActivityBean implements Serializable {
         activityEntity.setObservation(observation);
 
         activityDao.persist(activityEntity);
+    }
+
+    /**
+     * Registers a new activity of type MEMBER_COMMENT for a specific project.
+     * This method first retrieves the project entity by its ID. If the project is found,
+     * it proceeds to register a new activity with the MEMBER_COMMENT type, associating it
+     * with the provided author and observation. If the project is not found, it logs an error.
+     *
+     * @param projectId The ID of the project for which the comment activity is to be registered.
+     * @param author The user entity who authored the comment.
+     * @param observation The content or observation of the comment.
+     */
+    public void registerActivityTypeMemberComment(Long projectId, User author, String observation) {
+        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+
+        if (projectEntity == null) {
+            logger.error("Project not found");
+            return;
+        }
+
+        UserEntity userEntity = userBean.findUserById(author.getId());
+
+        if (userEntity == null) {
+            logger.error("User not found");
+            return;
+        }
+
+        registerActivity(projectEntity, ProjectActivityType.MEMBER_COMMENT, userEntity, observation);
     }
 
     /**
