@@ -73,4 +73,12 @@ public class Notification extends TextEvent {
     public void setRelatedIDEntity(long relatedIDEntity) {
         this.relatedIDEntity = relatedIDEntity;
     }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
 }

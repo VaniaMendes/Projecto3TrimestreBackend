@@ -49,6 +49,31 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
         return em.find(NotificationEntity.class, id);
     }
 
+
+
+    public long findUnOpenNotificationsByUserID(long userId){
+        try {
+            // Count all notifications of type  MESSAGE_RECEIVED
+            Long countNonMessageReceived = em.createNamedQuery("Notification.countUnOpenForTypeMessage", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Count all notifications of MESSAGE_PROJECT
+            Long countNonMessageReceivedProject = em.createNamedQuery("Notification.countUnOpenForTypeMessageProject", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Count all notifications except MESSAGE_RECEIVED and MESSAGE_PROJECT
+            Long countAllNotificationsExceptMessage = em.createNamedQuery("Notification.countUnOpenNotifications", Long.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+
+            // Sum the results and return the total count
+            return countNonMessageReceived.intValue() + countNonMessageReceivedProject.intValue() + countAllNotificationsExceptMessage.intValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Error counting notifications", e);
+        }
+    }
     /**
      * Finds the total number of unread notifications for a user by their ID.
      *
@@ -77,6 +102,13 @@ public class NotificationDao extends AbstractDao<NotificationEntity> {
         } catch (Exception e) {
             throw new RuntimeException("Error counting notifications", e);
         }
+    }
+
+
+    public List<NotificationEntity> fianAllNotificationsOfUSer(Long userId) {
+        return em.createNamedQuery("Notification.findAllNotificationsOfUser", NotificationEntity.class)
+                .setParameter("userId", userId)
+                .getResultList();
     }
 
 

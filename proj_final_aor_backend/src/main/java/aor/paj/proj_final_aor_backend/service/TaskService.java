@@ -56,6 +56,30 @@ public class TaskService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting tasks: " + e.getMessage()).build();
         }
     }
+
+    @GET
+    @Path("/{projectId}/tasks/order")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Response getTasksOrderByDate(@HeaderParam("token") String token, @PathParam("projectId") long projectId, @Context HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        logger.debug("Received request to get tasks");
+        User user = userBean.getUserByToken(token);
+
+        try {
+            if (user == null) {
+                logger.error("IP Address " + ip + ": Error getting tasks: User not found");
+                return Response.status(Response.Status.UNAUTHORIZED).entity("User not found").build();
+            }
+
+            logger.info("IP Address " + ip + ": Tasks retrieved successfully");
+            return Response.status(Response.Status.OK).entity(taskBean.getTasksFromProjectOrderByDate(projectId)).build();
+        } catch (Exception e) {
+            logger.error("IP Address " + ip + ": Error getting tasks: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting tasks: " + e.getMessage()).build();
+        }
+    }
     @GET
     @Path("/{projectId}/tasks-info")
     @Produces(MediaType.APPLICATION_JSON)

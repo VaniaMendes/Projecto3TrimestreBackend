@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.bean.NotificationBean;
 import aor.paj.proj_final_aor_backend.bean.UserBean;
 import aor.paj.proj_final_aor_backend.dto.Notification;
 import aor.paj.proj_final_aor_backend.dto.User;
+import aor.paj.proj_final_aor_backend.entity.UserEntity;
 import jakarta.ejb.EJB;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -142,5 +143,60 @@ public class NotificationService {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
+
+    @PUT
+    @Path("/markAllAsOpen")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response markAllNotificationsAsOpen(@HeaderParam("token") String token){
+        logger.info("Received request to mark all notifications as open");
+        try {
+            boolean updated = notificationBean.markAllNotificationsAsOpen(token);
+
+            if(updated) {
+                logger.info("All notifications marked as open successfully");
+                return Response.status(Response.Status.OK).entity("All notifications marked as open successfully").build();
+            } else {
+                logger.error("Error marking all notifications as open");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error marking all notifications as open").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error marking all notifications as open: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/open")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getOpenNotifications(@HeaderParam("token") String token){
+        logger.info("Received request to get open notifications");
+        try {
+            // Find the user
+            User user = userBean.getUserByToken(token);
+
+            // Check if the user exists
+            if (user == null) {
+                logger.error("No user found with token: " + token);
+                return Response.status(Response.Status.BAD_REQUEST).entity("No user found with token").build();
+            }
+
+            // Find the number of open notifications for the user
+            long openNotifications = notificationBean.getOpenNotifications(token);
+
+            if (openNotifications > 0) {
+                logger.info("Open notifications retrieved successfully");
+                return Response.status(Response.Status.OK).entity(openNotifications).build();
+            } else {
+                logger.info("No open notifications found for user with id: " + user.getId());
+                return Response.status(Response.Status.OK).entity(openNotifications).build();
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving open notifications: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error retrieving open notifications").build();
+        }
+    }
+
 }
 

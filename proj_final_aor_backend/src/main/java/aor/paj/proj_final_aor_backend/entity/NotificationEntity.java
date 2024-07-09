@@ -116,6 +116,34 @@ import java.util.Set;
         query = "SELECT COUNT(n) FROM NotificationEntity n WHERE n.id = :userId AND n.type NOT IN ('MESSAGE_RECEIVED', 'MESSAGE_PROJECT') AND n.sendTimestamp > :timestamp AND n.readStatus = false"
 )
 
+@NamedQuery(name = "Notification.findAllNotificationsOfUser", query = "SELECT n FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.isOpen = false")
+
+
+
+@NamedQuery(name = "Notification.countUnOpenForTypeMessage", query =
+        "SELECT COUNT(n) FROM NotificationEntity n " +
+                "WHERE n.id IN (" +
+                "   SELECT MAX(n2.id) " +
+                "   FROM NotificationEntity n2 " +
+                "   JOIN n2.users u " +
+                "   WHERE u.id = :userId AND n2.type = 'MESSAGE_RECEIVED' " +
+                "AND n2.isOpen = false" +
+                "   GROUP BY n2.sender_id" +
+                ")")
+
+@NamedQuery(name = "Notification.countUnOpenForTypeMessageProject", query =
+        "SELECT COUNT(n) FROM NotificationEntity n " +
+                "WHERE n.id IN (" +
+                "   SELECT MAX(n2.id) " +
+                "   FROM NotificationEntity n2 " +
+                "   JOIN n2.users u " +
+                "   WHERE u.id = :userId AND n2.type = 'MESSAGE_PROJECT' " +
+                "AND n2.isOpen = false" +
+                "   GROUP BY n2.sender_id" +
+                ")")
+
+
+@NamedQuery(name = "Notification.countUnOpenNotifications", query = "SELECT COUNT(n) FROM NotificationEntity n JOIN n.users u WHERE u.id = :userId AND n.isOpen=false AND (n.type != 'MESSAGE_RECEIVED' AND n.type != 'MESSAGE_PROJECT')")
 
 public class NotificationEntity implements Serializable {
 
@@ -165,6 +193,9 @@ public class NotificationEntity implements Serializable {
 
     @Column(name = "type", nullable = false, unique = false, updatable = true)
     private String type;
+
+    @Column (name = "isOpen")
+    private boolean isOpen;
 
     /**
      * Many to many relationship with the UserEntity class
@@ -309,5 +340,13 @@ public class NotificationEntity implements Serializable {
      */
     public void setRelatedEntityId(long relatedEntityId) {
         this.relatedEntityId = relatedEntityId;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
     }
 }
