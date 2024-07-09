@@ -38,6 +38,7 @@ import java.util.Set;
 @NamedQuery(name = "UserProject.countActiveUsersByProjectId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
+@NamedQuery(name = "UserProject.countAverageActiveUsers", query = "SELECT AVG(CAST((SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = p.id AND up.approved = true AND up.exited = false) AS DOUBLE)) FROM ProjectEntity p")
 
 @NamedQuery(name = "UserProject.isUserInAProject", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :userId AND up.project.id = :projectId AND up.approved = true AND up.exited = false")
 public class UserProjectEntity implements Serializable {

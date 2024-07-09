@@ -675,4 +675,88 @@ public class ProjectDao extends AbstractDao<ProjectEntity> {
             return null;
         }
     }
+
+    /**
+     * Counts the number of projects for each lab.
+     * This method executes a named query "Project.countProjectsByLab" which is expected to
+     * group projects by lab and count them. The result is a list of Object arrays where each
+     * Object array contains two elements: the lab ID and the count of projects for that lab.
+     *
+     * @return A list of Object arrays, each containing the lab ID (index 0) and the count of projects (index 1).
+     *         Returns an empty list if an exception occurs during query execution.
+     */
+    public List<Object[]> countProjectsByLab() {
+        try {
+            return em.createNamedQuery("Project.countProjectsByLab").getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Counts the number of approved projects for each lab.
+     * Approved projects are identified by the stateId of 300.
+     * The result is grouped by lab ID.
+     *
+     * @return A list of Object arrays, where each Object array contains two elements:
+     *         [0] - the lab ID (Long),
+     *         [1] - the count of approved projects for that lab (Long).
+     */
+    public List<Object[]> countApprovedProjectsByLab() {
+        try {
+            return em.createNamedQuery("Project.countApprovedProjectsByLab").getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Counts the number of finished projects for each lab.
+     * Finished projects are identified by a specific stateId (not provided in the method).
+     * The result is grouped by lab ID.
+     *
+     * @return A list of Object arrays, where each Object array contains two elements:
+     *         [0] - the lab ID (Long),
+     *         [1] - the count of finished projects for that lab (Long).
+     *         Returns an empty list if an exception occurs during query execution.
+     */
+    public List<Object[]> countFinishedProjectsByLab() {
+        try {
+            return em.createNamedQuery("Project.countFinishedProjectsByLab").getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Counts the number of cancelled projects for each lab.
+     * Cancelled projects are identified by a specific stateId (not provided in the method).
+     * The result is grouped by lab ID.
+     *
+     * @return A list of Object arrays, where each Object array contains two elements:
+     *         [0] - the lab ID (Long),
+     *         [1] - the count of cancelled projects for that lab (Long).
+     *         Returns an empty list if an exception occurs during query execution.
+     */
+    public List<Object[]> countCancelledProjectsByLab() {
+        try {
+            return em.createNamedQuery("Project.countCancelledProjectsByLab").getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public Long countTotalProjectsByLab(Integer labId) {
+        try {
+            Object[] result = (Object[]) em.createNamedQuery("Project.countTotalProjectsByLab")
+                    .setParameter("labId", labId)
+                    .getSingleResult();
+
+            return (Long) result[1];
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
 }
