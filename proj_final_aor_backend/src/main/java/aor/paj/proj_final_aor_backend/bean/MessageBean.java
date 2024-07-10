@@ -70,6 +70,8 @@ public class MessageBean implements Serializable {
     @EJB
     UserProjectDao userProjectDao;
     @EJB
+    ProjectBean projectBean;
+    @EJB
     NotificationBean notificationBean;
     @EJB
     Notifier notifier;
@@ -201,6 +203,8 @@ public class MessageBean implements Serializable {
             return false;
         }
 
+        projectBean.cloneMessagesEntities(project);
+
         //Check if the user is in the project
         UserProjectEntity userProject = userProjectDao.findUserInProject(project_id, sender.getId());
         if (userProject == null) {
@@ -261,6 +265,7 @@ public class MessageBean implements Serializable {
             logger.debug("Project not found");
             return null;
         }
+        projectBean.cloneMessagesEntities(project);
 
         //Check if the user is in the project
         UserProjectEntity userProject = userProjectDao.findUserInProject(project_id, user.getId());
