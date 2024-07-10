@@ -39,7 +39,8 @@ public class ProjectInfoUser {
     @XmlElement
     private Lab lab;
 
-
+    @XmlElement
+    private String stateId;
 
 
     /**
@@ -128,5 +129,22 @@ public class ProjectInfoUser {
      */
     public void setLab(Lab lab) {
         this.lab = lab;
+    }
+
+    /**
+     * Getter for the 'stateId' field.
+     * @return String - The stateId of the ProjectInfoUser.
+     */
+
+    public String getStateId() {
+        return stateId;
+    }
+
+    /**
+     * Setter for the 'stateId' field.
+     * @param stateId - The new stateId of the ProjectInfoUser.
+     */
+    public void setStateId(String stateId) {
+        this.stateId = stateId;
     }
 }

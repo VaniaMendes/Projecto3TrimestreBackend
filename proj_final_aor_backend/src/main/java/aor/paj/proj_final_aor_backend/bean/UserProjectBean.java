@@ -337,8 +337,8 @@ public class UserProjectBean implements Serializable {
      * @param userId The ID of the user.
      * @return List of active UserProject objects associated with the user.
      */
-    public List<ProjectInfoUser> getActiveProjectsOfAUser(Long userId){
-        List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveProjectsFromAUserByUserId(userId);
+    public List<ProjectInfoUser> getActiveProjectsOfAUser(Long userId, String order){
+        List<UserProjectEntity> userProjectEntities = userProjectDao.findActiveProjectsFromAUserByUserId(userId, order);
         List<ProjectInfoUser> userProjects = new ArrayList<>();
         for (UserProjectEntity userProjectEntity : userProjectEntities) {
             userProjects.add(convertUserProjecttoProjectDTO(userProjectEntity));
@@ -385,6 +385,7 @@ public class UserProjectBean implements Serializable {
         project.setName(userProjectEntity.getProject().getName());
         project.setJoinedAt(userProjectEntity.getJoinedAt());
         project.setLeftAt(userProjectEntity.getLeftAt());
+        project.setStateId(String.valueOf(userProjectEntity.getProject().getStateId()));
         Lab lab = new Lab();
         lab.setId(userProjectEntity.getProject().getLab().getId());
         lab.setName(userProjectEntity.getProject().getLab().getName());
