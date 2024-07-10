@@ -40,6 +40,8 @@ public class ProjectInfoUser {
     private Lab lab;
 
 
+
+
     /**
      * Default constructor for ProjectInfoUser.
      */
