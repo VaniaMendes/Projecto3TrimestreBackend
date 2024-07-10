@@ -36,37 +36,37 @@ import java.util.*;
 @NamedQuery(name = "Project.findAllKeywords", query = "SELECT p.keywords FROM ProjectEntity p")
 @NamedQuery(name = "Project.orderByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
                 "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
-                "GROUP BY p.id " +
+                "GROUP BY up.project.id " +
                 "ORDER BY (p.maxMembers - COUNT(up)) ASC"
 )
 @NamedQuery(name = "Project.orderByVacanciesDESC",
         query = "SELECT p FROM ProjectEntity p " +
                 "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
-                "GROUP BY p.id " +
+                "GROUP BY up.project.id " +
                 "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
 @NamedQuery(name = "Project.orderByVacanciesAndStateASC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE p.stateId = :stateId " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) ASC"
 )
 @NamedQuery(name = "Project.orderByUserByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE up.user.id = :userId " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) ASC"
 )
 @NamedQuery(name = "Project.orderByUserByVacanciesDESC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE up.user.id = :userId " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
 @NamedQuery(name = "Project.orderByVacanciesAndStateDESC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE p.stateId = :stateId " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
 @NamedQuery(name = "Project.searchKeywords", query = "SELECT p.keywords FROM ProjectEntity p WHERE CONCAT(',', p.keywords, ',') LIKE CONCAT('%,', :keyword, ',%')")
@@ -77,13 +77,13 @@ import java.util.*;
 @NamedQuery(name = "Project.searchProjectsByNameOrderedByVacanciesASC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE p.name LIKE CONCAT('%', :name, '%') " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) ASC"
 )
 @NamedQuery(name = "Project.searchProjectsByNameOrderedByVacanciesDESC", query = "SELECT p FROM ProjectEntity p " +
         "LEFT JOIN UserProjectEntity up ON p.id = up.project.id AND up.approved = true AND up.exited = false " +
         "WHERE p.name LIKE CONCAT('%', :name, '%') " +
-        "GROUP BY p.id " +
+        "GROUP BY up.project.id " +
         "ORDER BY (p.maxMembers - COUNT(up)) DESC"
 )
 

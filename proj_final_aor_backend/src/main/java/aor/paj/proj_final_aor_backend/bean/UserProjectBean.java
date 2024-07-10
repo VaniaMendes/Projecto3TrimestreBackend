@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Stateless EJB bean for managing user-project associations.
@@ -265,23 +266,28 @@ public class UserProjectBean implements Serializable {
         }
         return users;
     }
+
     /**
-     * Retrieves a list of users who are available for a specific project.
+     * Retrieves a list of users for a specific project, optionally filtered by a search query.
+     * This method can be used to find all available users for a project or to perform a search among these users
+     * based on a provided search string. If the search string is null, all available users for the project are returned.
+     * Otherwise, the search is performed based on the provided string, which could be a part of the user's name or other attributes.
+     * Each user entity found is then converted to a UserInfoInProject DTO before being returned.
      *
-     * This method first retrieves a list of UserEntity objects who are available for the provided project ID.
-     * It then iterates over each UserEntity, converts it to a User DTO object, and adds it to a list.
-     * The list of User DTO objects is then returned.
-     *
-     * @param projectId The ID of the project for which to retrieve the available users.
-     * @return A list of User DTO objects representing the available users for the specified project.
+     * @param projectId The ID of the project for which users are being searched.
+     * @param search The search query used to filter users. If null, all available users for the project are returned.
+     * @return A list of UserInfoInProject DTOs representing the users found. If no users are found, an empty list is returned.
      */
-    public List<UserInfoInProject> getAllUsersAvailableForProject(Long projectId) {
-        List<UserEntity> userEntities = userProjectDao.findAvailableUsersForProject(projectId);
-        List<UserInfoInProject> users = new ArrayList<>();
-        for (UserEntity userEntity : userEntities) {
-            users.add(userBean.convertToDTO(userEntity));
+    public List<UserInfoInProject> getUsersAvailableForProject(Long projectId, String search) {
+        List<UserEntity> userEntities;
+        if (search == null) {
+            userEntities = userProjectDao.findAvailableUsersForProject(projectId);
+        } else {
+            userEntities = userProjectDao.searchAvailableUsersForProject(projectId, search);
         }
-        return users;
+        return userEntities.stream()
+                .map(userBean::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -613,7 +613,8 @@ public class ProjectService {
     @Path("/{projectId}/users/available")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAvailableUsersForProject(@PathParam("projectId") Long projectId,
-                                                @HeaderParam("token") String token){
+                                                @HeaderParam("token") String token,
+                                                @QueryParam("name") String name){
         String ip = request.getRemoteAddr();
 
         User user = userBean.getUserByToken(token);
@@ -627,7 +628,7 @@ public class ProjectService {
         }
         logger.info("Received request to get available users for project from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(userProjectBean.getAllUsersAvailableForProject(projectId)).build();
+        return Response.status(Response.Status.OK).entity(userProjectBean.getUsersAvailableForProject(projectId, name)).build();
     }
 
     @GET
