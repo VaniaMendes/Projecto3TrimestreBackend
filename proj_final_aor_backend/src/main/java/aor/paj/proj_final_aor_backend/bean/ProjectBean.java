@@ -4,6 +4,7 @@ import aor.paj.proj_final_aor_backend.dao.*;
 import aor.paj.proj_final_aor_backend.dto.Message;
 import aor.paj.proj_final_aor_backend.dto.MessageInfoUser;
 import aor.paj.proj_final_aor_backend.dto.Project;
+import aor.paj.proj_final_aor_backend.dto.User;
 import aor.paj.proj_final_aor_backend.entity.*;
 import aor.paj.proj_final_aor_backend.util.enums.NotificationType;
 import aor.paj.proj_final_aor_backend.util.enums.ProjectActivityType;

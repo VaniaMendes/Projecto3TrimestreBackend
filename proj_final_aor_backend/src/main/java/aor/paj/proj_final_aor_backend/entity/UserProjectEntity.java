@@ -40,6 +40,7 @@ import java.util.Set;
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
 
 @NamedQuery(name = "UserProject.isUserInAProject", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :userId AND up.project.id = :projectId AND up.approved = true AND up.exited = false")
+@NamedQuery(name = "UserProject.findUserProjectsByUserID", query = "SELECT up FROM UserProjectEntity up WHERE up.user.id = :id")
 public class UserProjectEntity implements Serializable {
 
     // Represents the project associated with this UserProjectEntity

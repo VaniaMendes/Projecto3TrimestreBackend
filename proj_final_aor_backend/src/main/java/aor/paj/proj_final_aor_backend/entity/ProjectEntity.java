@@ -100,7 +100,7 @@ import java.util.*;
 @NamedQuery(name = "Project.countApprovedProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 300 GROUP BY p.lab.id")
 @NamedQuery(name = "Project.countFinishedProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 500 GROUP BY p.lab.id")
 @NamedQuery(name = "Project.countCancelledProjectsByLab", query = "SELECT p.lab.id, COUNT(p) FROM ProjectEntity p WHERE p.stateId = 600 GROUP BY p.lab.id")
-@NamedQuery(name = "Project.averageExecutionTime", query = "SELECT AVG(DATEDIFF(p.conclusionDate, p.initialDate)) FROM ProjectEntity p")
+
 public class ProjectEntity implements Serializable {
 
     // Unique identifier for serialization
