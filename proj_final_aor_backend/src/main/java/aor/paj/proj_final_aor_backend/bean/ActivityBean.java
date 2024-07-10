@@ -77,12 +77,14 @@ public class ActivityBean implements Serializable {
      * @param observation The content or observation of the comment.
      */
     public void registerActivityTypeMemberComment(Long projectId, User author, String observation) {
-        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+        ProjectEntity projectEntity = projectBean.findProject(projectId);
 
         if (projectEntity == null) {
             logger.error("Project not found");
             return;
         }
+
+        projectBean.cloneMessagesEntities(projectEntity);
 
         UserEntity userEntity = userBean.findUserById(author.getId());
 
