@@ -33,6 +33,18 @@ public class TaskService {
     TaskBean taskBean;
 
 
+    /**
+     * This method is used to retrieve all skills that are not associated with a specific project.
+     * It first logs the request to get skills not associated with the project.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves all skills not associated with the provided project id from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills not associated with the project.
+     *
+     * @param token The token of the user trying to retrieve the skills.
+     * @param projectId The id of the project for which the skills not associated are to be retrieved.
+     * @return Response The response of the operation, containing the list of skills not associated with the project.
+     */
     @GET
     @Path("/{projectId}/tasks")
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,6 +69,20 @@ public class TaskService {
         }
     }
 
+    /**
+     * This method is used to retrieve all tasks associated with a specific project, ordered by date.
+     * It first logs the request to get tasks.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to retrieve all tasks associated with the provided project id, ordered by date.
+     * If the operation is successful and the tasks are found, it logs the success and returns a response with status OK and the list of tasks.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve tasks.
+     * @param projectId The id of the project whose tasks are to be retrieved.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of tasks or an error message.
+     */
     @GET
     @Path("/{projectId}/tasks/order")
     @Produces(MediaType.APPLICATION_JSON)
@@ -80,6 +106,21 @@ public class TaskService {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error getting tasks: " + e.getMessage()).build();
         }
     }
+
+    /**
+     * This method is used to retrieve minimal information about all tasks associated with a specific project.
+     * It first logs the request to get tasks.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to retrieve all tasks associated with the provided project id with minimal information.
+     * If the operation is successful and the tasks are found, it logs the success and returns a response with status OK and the list of tasks.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve tasks.
+     * @param projectId The id of the project whose tasks are to be retrieved.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of tasks or an error message.
+     */
     @GET
     @Path("/{projectId}/tasks-info")
     @Produces(MediaType.APPLICATION_JSON)
@@ -105,6 +146,21 @@ public class TaskService {
     }
 
 
+    /**
+     * This method is used to register a new task for a specific project.
+     * It first logs the request to register a new task.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to register the task in the database.
+     * If the operation is successful and the task is registered, it logs the success and returns a response with status CREATED and a success message.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to register the task.
+     * @param projectId The id of the project for which the task is to be registered.
+     * @param requestBody The request body, containing the task to be registered and a list of task ids.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @POST
     @Path("/{projectId}/add-task")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -150,6 +206,22 @@ public class TaskService {
         }
     }
 
+    /**
+     * This method is used to update the status of a task for a specific project.
+     * It first logs the request to update the task status.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to update the task status in the database.
+     * If the operation is successful and the task status is updated, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the task status.
+     * @param projectId The id of the project for which the task status is to be updated.
+     * @param taskId The id of the task whose status is to be updated.
+     * @param status The new status of the task.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{projectId}/{taskId}/update-status")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -183,6 +255,21 @@ public class TaskService {
         }
     }
 
+    /**
+     * This method is used to soft delete a task for a specific project.
+     * It first logs the request to soft delete the task.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to soft delete the task in the database.
+     * If the operation is successful and the task is soft deleted, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to soft delete the task.
+     * @param projectId The id of the project for which the task is to be soft deleted.
+     * @param taskId The id of the task to be soft deleted.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{projectId}/{taskId}/soft-delete")
     @Produces(MediaType.APPLICATION_JSON)
@@ -215,13 +302,20 @@ public class TaskService {
     }
 
     /**
-     * Method to update a task
-     * @param token - user token
-     * @param projectId - project id
-     * @param taskId - task id
-     * @param requestBody - request body
-     * @param request - http request
-     * @return
+     * This method is used to update a task for a specific project.
+     * It first logs the request to update the task.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to update the task in the database.
+     * If the operation is successful and the task is updated, it logs the success and returns a response with status CREATED and a success message.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the task.
+     * @param projectId The id of the project for which the task is to be updated.
+     * @param taskId The id of the task to be updated.
+     * @param requestBody The request body, containing the task to be updated and a list of task ids.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
      */
     @PUT
     @Path("/{projectId}/{taskId}/")
@@ -270,13 +364,21 @@ public class TaskService {
         }
     }
 
+
     /**
-     * Method to get the task info for fill the update task modal
-     * @param token - user token
-     * @param projectId - project id
-     * @param taskId - task id
-     * @param request - http request
-     * @return - task info
+     * This method is used to retrieve information about a specific task.
+     * It first logs the request to get task info.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to retrieve the task information from the database.
+     * If the operation is successful and the task is found, it logs the success and returns a response with status OK and the task information.
+     * If the operation fails, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve the task information.
+     * @param projectId The id of the project to which the task belongs.
+     * @param taskId The id of the task whose information is to be retrieved.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the task information or an error message.
      */
     @GET
     @Path("/{projectId}/tasks/{taskId}")
