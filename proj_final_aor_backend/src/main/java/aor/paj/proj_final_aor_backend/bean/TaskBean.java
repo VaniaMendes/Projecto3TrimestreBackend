@@ -105,7 +105,7 @@ public class TaskBean implements Serializable {
             return false;
         }
         //Check if the project exists
-        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
+        ProjectEntity projectEntity = projectBean.findProject(projectId);
 
         if (projectEntity == null) {
             logger.debug("Project with ID " + projectId + " not found");
@@ -194,13 +194,14 @@ public class TaskBean implements Serializable {
      */
     public boolean updateTask(long taskId, Task task, List<Long> taskIdList, long projectId) {
         //Check if the project exists
-        ProjectEntity projectEntity = projectBean.findProjectById(projectId);
-
+        ProjectEntity projectEntity = projectBean.findProject(projectId);
 
         if (projectEntity == null) {
             logger.debug("Project with ID " + projectId + " not found");
             return false;
         }
+
+        projectBean.cloneMessagesEntities(projectEntity);
 
         //Check if the task exists
         TaskEntity taskEntity = taskDao.findTaskById(taskId);

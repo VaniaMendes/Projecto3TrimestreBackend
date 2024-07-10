@@ -731,18 +731,6 @@ public class ProjectBean implements Serializable {
     }
 
     /**
-     * Finds a ProjectEntity by its ID.
-     * This method delegates the search to the ProjectDao to find a ProjectEntity by its ID in the database.
-     * If the ProjectEntity is found, it is returned; otherwise, this method returns null.
-     *
-     * @param projectId The ID of the project to find.
-     * @return The found ProjectEntity, or null if no project with the given ID exists.
-     */
-    public ProjectEntity findProjectById(Long projectId) {
-        return projectDao.findProjectById(projectId);
-    }
-
-    /**
      * Finds a SkillEntity by its id.
      *
      * This method uses the SkillDao to find a SkillEntity in the database with the given id.
