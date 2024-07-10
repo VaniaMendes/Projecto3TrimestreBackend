@@ -149,6 +149,27 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
     }
 
     /**
+     * Searches for available users for a specific project excluding administrators.
+     * This method utilizes a named query "UserProject.searchAvailableUsersForProjectExcludingAdmin" to perform the search.
+     * Available users are those who are not currently associated with the project in any role and have not been marked as exited.
+     *
+     * @param projectId The ID of the project for which available users are being searched.
+     * @param name The name or partial name to filter the users by. This can be used to perform a search based on user names.
+     * @return A list of {@link UserEntity} instances representing the users available for the project and matching the name criteria.
+     *         Returns an empty list if no matching users are found or if an exception occurs during the query execution.
+     */
+    public List<UserEntity> searchAvailableUsersForProject(Long projectId, String name) {
+        try {
+            return em.createNamedQuery("UserProject.searchAvailableUsersForProjectExcludingAdmin", UserEntity.class)
+                    .setParameter("projectId", projectId)
+                    .setParameter("name", name)
+                    .getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Counts the number of active users by the given project ID.
      * This method uses a named query "UserProject.countActiveUsersByProjectId" to count the active users.
      *
