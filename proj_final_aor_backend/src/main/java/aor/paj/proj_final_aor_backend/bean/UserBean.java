@@ -544,6 +544,9 @@ public class UserBean implements Serializable {
      * @return A string value representing the encrypted password.
      */
     public String encryptPassword(String password) {
+        if(password == null){
+            throw new NullPointerException("Password cannot be null");
+        }
         // Generate a salt with a log2 value of 12
         String salt = BCrypt.gensalt(12);
         String hashedPassword = BCrypt.hashpw(password, salt);
@@ -626,11 +629,14 @@ public class UserBean implements Serializable {
      * @return A boolean value indicating whether the update was successful. Returns false if the user does not exist. Returns true if the user visibility was successfully updated.
      */
     public boolean updateVisibility(long userId, boolean visibility) {
+        if(userId == 0){
+            throw new IllegalArgumentException("User ID cannot be 0");
+        }
         //Retrieve the user from the database
         UserEntity userEntity = userDao.findUserById(userId);
         //Check if the user exists
         if (userEntity == null) {
-            logger.warn("User not found with ID: " + userEntity.getId());
+            logger.warn("User not found with ID: " + userId);
             return false;
         }
         //Update the visibility state of the user
@@ -638,10 +644,10 @@ public class UserBean implements Serializable {
         try {
             //Update the user in the database
             userDao.updateUser(userEntity);
-            logger.debug("User visibility updated successfully: " + userEntity.getId());
+            logger.debug("User visibility updated successfully: " + userId);
             return true;
         } catch (Exception e) {
-            logger.debug("Failed to update user visibility: " + userEntity.getId(), e);
+            logger.debug("Failed to update user visibility: " + userId, e);
             return false;
         }
     }
@@ -660,9 +666,12 @@ public class UserBean implements Serializable {
         //Retrieve the user from the database
         UserEntity userEntity = userDao.findUserById(userId);
 
+        if(userId == 0){
+            throw new IllegalArgumentException("User ID cannot be 0");
+        }
         //Check if the user exists
         if (userEntity == null) {
-            logger.warn("User not found with ID: " + userEntity.getId());
+            logger.warn("User not found with ID: " + userId);
             return false;
         }
         //Check if the biography is not null
@@ -677,7 +686,7 @@ public class UserBean implements Serializable {
             logger.info("User updated successfully: " + userEntity.getId());
             return true;
         } catch (Exception e) {
-            logger.error("Failed to update user: " + userEntity.getId(), e);
+            logger.error("Failed to update user: " + userId, e);
             return false;
         }
     }

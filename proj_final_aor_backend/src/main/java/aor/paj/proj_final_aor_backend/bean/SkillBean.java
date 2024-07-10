@@ -165,6 +165,10 @@ public class SkillBean implements Serializable {
      * @return True if the skill was associated successfully, false otherwise.
      */
     public boolean associateSkillToUser(long userId, long skillId) {
+
+        if(userId== 0 || skillId == 0){
+            return false;
+        }
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         SkillEntity skill = skillDao.find(skillId);
@@ -207,6 +211,10 @@ public class SkillBean implements Serializable {
      * @return True if the skill was soft deleted successfully, false otherwise.
      */
     public boolean softDeleteSkill(long userId, long skillId) {
+
+        if(userId== 0 || skillId == 0){
+            return false;
+        }
         // Fetch the user and skill from the database
         UserEntity user = userDao.findUserById(userId);
         SkillEntity skill = skillDao.find(skillId);
@@ -226,9 +234,14 @@ public class SkillBean implements Serializable {
         }
         // Soft delete the skill
         userSkill.setActive(false);
-        // Update the userSkill in the database
-        userSkillDao.updateUserSkill(userSkill);
-        return true;
+        try {
+            // Update the userSkill in the database
+            userSkillDao.updateUserSkill(userSkill);
+            return true;
+        }catch (Exception e) {
+            logger.error("Error updating userSkill: " + e.getMessage());
+            return false;
+        }
     }
 
 
