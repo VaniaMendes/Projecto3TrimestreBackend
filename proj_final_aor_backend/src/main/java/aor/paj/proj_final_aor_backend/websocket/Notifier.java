@@ -71,7 +71,7 @@ public class Notifier {
 
 
                         // Verificar se o ID do usuário coincide com o ID do receptor da notificação
-                        if (user != null && user.getId()==(notification.getReceiver().getId())) {
+                        if (user != null && user.getId()!=notification.getSender().getId()) {
                             session.getBasicRemote().sendText(jsonNotification);
                             logger.info("Notification sent to session: " + session.getId());
                         }

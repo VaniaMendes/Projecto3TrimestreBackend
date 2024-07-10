@@ -17,8 +17,5 @@ public enum UserType {
      */
     LOGGED_IN,
 
-    /**
-     * Represents a user who has not authenticated.
-     */
-    GUEST
+
 }
