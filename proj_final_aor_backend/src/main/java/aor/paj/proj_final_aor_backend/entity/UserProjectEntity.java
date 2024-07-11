@@ -35,6 +35,7 @@ import java.util.Set;
 @NamedQuery(name = "UserProject.findUserInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.user.id = :userId")
 @NamedQuery(name = "UserProject.findUsersNotApprovedInProject", query = "SELECT up FROM UserProjectEntity up WHERE up.project.id = :projectId AND up.approved = false")
 @NamedQuery(name = "UserProject.findAvailableUsersForProjectExcludingAdmin", query = "SELECT u FROM UserEntity u WHERE u.id NOT IN (SELECT up.user.id FROM UserProjectEntity up WHERE up.project.id = :projectId) AND u.activeState = true AND u.userType <> aor.paj.proj_final_aor_backend.util.enums.UserType.ADMIN")
+@NamedQuery(name = "UserProject.searchAvailableUsersForProjectExcludingAdmin", query = "SELECT u FROM UserEntity u WHERE u.id NOT IN (SELECT up.user.id FROM UserProjectEntity up WHERE up.project.id = :projectId) AND u.activeState = true AND u.userType <> aor.paj.proj_final_aor_backend.util.enums.UserType.ADMIN AND (u.firstName LIKE CONCAT('%', :name, '%') OR u.lastName LIKE CONCAT('%', :name, '%'))")
 @NamedQuery(name = "UserProject.countActiveUsersByProjectId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.project.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserId", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false")
 @NamedQuery(name = "UserProject.countProjectsByUserIdAndState", query = "SELECT COUNT(up) FROM UserProjectEntity up WHERE up.user.id = :id AND up.approved = true AND up.exited = false AND up.project.stateId = :stateId")
@@ -89,6 +90,7 @@ public class UserProjectEntity implements Serializable {
 
     // Default constructor
     public UserProjectEntity() {
+        this.messagesReceived = new HashSet<>();
     }
 
     public void addMessageReceived(MessageEntity message) {
