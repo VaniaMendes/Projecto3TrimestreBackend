@@ -1291,24 +1291,31 @@ public class ProjectBean implements Serializable {
      */
     public List<Project> searchProjects(String name, Integer state, Boolean orderByVacancies, String order) {
         List<Project> projectsDTO = new ArrayList<>();
+        List<ProjectEntity> projects = new ArrayList<>();
 
         if (order.equals("desc")) {
             if (orderByVacancies != null && orderByVacancies && (state == null || state == 1)) {
-                projectsDTO = projectDao.searchProjectsByNameOrderedByVacanciesDESC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameOrderedByVacanciesDESC(name);
             } else if (orderByVacancies != null && !orderByVacancies && (state == null || state == 1)) {
-                projectsDTO = projectDao.searchProjectsByNameOrderedDESC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameOrderedDESC(name);
             } else if (state != null) {
-                projectsDTO = projectDao.searchProjectsByNameAndStateOrderedDESC(name, state).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameAndStateOrderedDESC(name, state);
             }
         } else if (order.equals("asc")) {
             if (orderByVacancies != null && orderByVacancies && (state == null || state == 1)) {
-                projectsDTO = projectDao.searchProjectsByNameOrderedByVacanciesASC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameOrderedByVacanciesASC(name);
             } else if (orderByVacancies != null && !orderByVacancies && (state == null || state == 1)) {
-                projectsDTO = projectDao.searchProjectsByNameOrderedASC(name).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameOrderedASC(name);
             } else if (state != null) {
-                projectsDTO = projectDao.searchProjectsByNameAndStateOrderedASC(name, state).stream().map(this::convertToDTO).collect(Collectors.toList());
+                projects = projectDao.searchProjectsByNameAndStateOrderedASC(name, state);
             }
         }
+
+        // Clone messages for each project entity before converting to DTO
+        cloneMessagesEntities(projects);
+
+        // Convert to DTOs
+        projectsDTO = projects.stream().map(this::convertToDTO).collect(Collectors.toList());
 
         return projectsDTO;
     }
