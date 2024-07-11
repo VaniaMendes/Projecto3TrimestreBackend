@@ -32,6 +32,9 @@ public class UserInfoInProject {
     @XmlElement
     private UserTypeInProject userType;
 
+    @XmlElement
+    private boolean visibility;
+
     // Default constructor
     public UserInfoInProject() {
     }
@@ -114,5 +117,21 @@ public class UserInfoInProject {
      */
     public void setUserType(UserTypeInProject userType) {
         this.userType = userType;
+    }
+
+    /**
+     * Checks if the user's information is visible.
+     * @return the visibility status of the user's information.
+     */
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    /**
+     * Sets the visibility status of the user's information.
+     * @param visibility the visibility status to set.
+     */
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
     }
 }

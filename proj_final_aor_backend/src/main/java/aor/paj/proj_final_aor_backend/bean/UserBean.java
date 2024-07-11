@@ -840,6 +840,7 @@ public class UserBean implements Serializable {
         userInfoInProject.setLastName(userEntity.getLastName());
         userInfoInProject.setPhoto(userEntity.getPhoto());
         userInfoInProject.setUserType(userTypeInProject);
+        userInfoInProject.setVisibility(userEntity.isVisibilityState());
         return userInfoInProject;
     }
 
