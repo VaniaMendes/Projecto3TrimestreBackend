@@ -570,9 +570,7 @@ public class ProjectService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsByUserId(@HeaderParam("token") String token,
                                         @PathParam("userId") Long userId,
-                                        @QueryParam("order") String order,
-                                        @QueryParam("vacancies") Boolean vacancies,
-                                        @QueryParam("state") Integer state) {
+                                        @QueryParam("order") String order) {
 
         String ip = request.getRemoteAddr();
 
@@ -584,7 +582,7 @@ public class ProjectService {
 
         logger.info("Received request to get projects by user id from IP: " + ip);
 
-        return Response.status(Response.Status.OK).entity(userProjectBean.getActiveProjectsOfAUser(userId)).build();
+        return Response.status(Response.Status.OK).entity(userProjectBean.getActiveProjectsOfAUser(userId, order)).build();
     }
 
     @GET

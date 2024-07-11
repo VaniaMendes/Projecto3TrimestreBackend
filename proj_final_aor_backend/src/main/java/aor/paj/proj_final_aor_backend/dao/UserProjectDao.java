@@ -68,9 +68,17 @@ public class UserProjectDao extends AbstractDao<UserProjectEntity>{
      * @param id The ID of the user.
      * @return A list of active UserProjectEntity instances associated with the specified user ID. Returns null if no match is found or an exception occurs.
      */
-    public List<UserProjectEntity> findActiveProjectsFromAUserByUserId(Long id) {
+    public List<UserProjectEntity> findActiveProjectsFromAUserByUserId(Long id, String order) {
         try {
-            return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserId", UserProjectEntity.class).setParameter("id", id).getResultList();
+            switch(order){
+                case "newest":
+                    return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserIdNewest", UserProjectEntity.class).setParameter("id", id).getResultList();
+                case "oldest":
+                    return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserIdOldest", UserProjectEntity.class).setParameter("id", id).getResultList();
+                case "state":
+                    return em.createNamedQuery("UserProject.findActiveProjectsFromAUserByUserIdState", UserProjectEntity.class).setParameter("id", id).getResultList();
+            }
+            return new ArrayList<>();
         } catch (Exception e) {
             return new ArrayList<>();
         }

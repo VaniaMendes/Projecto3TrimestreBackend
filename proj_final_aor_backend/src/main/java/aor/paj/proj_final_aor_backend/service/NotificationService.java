@@ -27,6 +27,20 @@ public class NotificationService {
     UserBean userBean;
 
 
+    /**
+     * This method is used to retrieve all notifications for a specific user.
+     * It first logs the IP address of the request.
+     * Then it attempts to retrieve all notifications for the user with the provided user id from the database.
+     * If the operation is successful and notifications are found, it logs the success and returns a response with status OK and the list of notifications.
+     * If the operation is successful but no notifications are found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status INTERNAL_SERVER_ERROR and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the notifications.
+     * @param userId The id of the user whose notifications are to be retrieved.
+     * @param page The page number for pagination. Default value is 1.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all notifications for the user or an error message.
+     */
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -51,6 +65,18 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to mark a specific notification as read.
+     * It first logs the request to mark the notification as read.
+     * Then it attempts to mark the notification as read in the database.
+     * If the operation is successful, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to mark the notification as read.
+     * @param notificationId The id of the notification to be marked as read.
+     * @return Response The response of the operation.
+     */
     @PUT
     @Path("/{notificationId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,6 +99,17 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to retrieve the count of unread notifications for a specific user.
+     * It first logs the request to get unread notifications.
+     * Then it attempts to retrieve the count of unread notifications for the user with the provided token from the database.
+     * If the operation is successful and there are unread notifications, it logs the success and returns a response with status OK and the count of unread notifications.
+     * If the operation is successful but there are no unread notifications, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the count of unread notifications.
+     * @return Response The response of the operation, containing the count of unread notifications for the user or an error message.
+     */
     @GET
     @Path("/unread")
     @Produces(MediaType.APPLICATION_JSON)
@@ -95,6 +132,20 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to retrieve the total number of pages of notifications for a specific user.
+     * It first logs the IP address of the request.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves the total count of notifications for the user from the database.
+     * It then calculates the total number of pages by dividing the total count by 6 (as there are 6 notifications per page) and rounding up to the nearest integer.
+     * If the operation is successful, it logs the success and returns a response with status OK and the total number of pages.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the total number of pages of notifications.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the total number of pages of notifications for the user or an error message.
+     */
     @GET
     @Path("/pageCount")
     @Produces(MediaType.APPLICATION_JSON)
@@ -121,6 +172,18 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to retrieve all unread notifications for a specific user.
+     * It first logs the request to get unread notifications for the user with the provided user id.
+     * Then it attempts to retrieve all unread notifications for the user with the provided token from the database.
+     * If the operation is successful and unread notifications are found, it logs the success and returns a response with status OK and the list of unread notifications.
+     * If the operation is successful but no unread notifications are found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the unread notifications.
+     * @param userId The id of the user whose unread notifications are to be retrieved.
+     * @return Response The response of the operation, containing the list of all unread notifications for the user or an error message.
+     */
     @GET
     @Path("/unread/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -144,6 +207,17 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to mark all notifications as open for a specific user.
+     * It first logs the request to mark all notifications as open.
+     * Then it attempts to mark all notifications as open in the database for the user with the provided token.
+     * If the operation is successful, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to mark all notifications as open.
+     * @return Response The response of the operation.
+     */
     @PUT
     @Path("/markAllAsOpen")
     @Produces(MediaType.APPLICATION_JSON)
@@ -166,6 +240,19 @@ public class NotificationService {
         }
     }
 
+    /**
+     * This method is used to retrieve the number of open notifications for a specific user.
+     * It first logs the request to get open notifications.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found, it retrieves the number of open notifications for the user from the database.
+     * If the operation is successful and there are open notifications, it logs the success and returns a response with status OK and the number of open notifications.
+     * If the operation is successful but there are no open notifications, it logs the success and returns a response with status OK and the number of open notifications (which is 0).
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the number of open notifications.
+     * @return Response The response of the operation, containing the number of open notifications for the user or an error message.
+     */
     @GET
     @Path("/open")
     @Produces(MediaType.APPLICATION_JSON)

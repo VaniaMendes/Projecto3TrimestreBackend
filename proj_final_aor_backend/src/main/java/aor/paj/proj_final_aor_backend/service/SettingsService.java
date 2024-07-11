@@ -23,6 +23,19 @@ public class SettingsService {
     @EJB
     UserBean userBean;
 
+    /**
+     * This method is used to retrieve the number of open notifications for a specific user.
+     * It first logs the request to get open notifications.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found, it retrieves the number of open notifications for the user from the database.
+     * If the operation is successful and there are open notifications, it logs the success and returns a response with status OK and the number of open notifications.
+     * If the operation is successful but there are no open notifications, it logs the success and returns a response with status OK and the number of open notifications (which is 0).
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to retrieve the number of open notifications.
+     * @return Response The response of the operation, containing the number of open notifications for the user or an error message.
+     */
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,10 +65,23 @@ public class SettingsService {
         }
     }
 
+    /**
+     * This method is used to retrieve the session timeout setting.
+     * It first logs the request to get the session timeout.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves the session timeout from the settings.
+     * If the operation is successful and the session timeout is found, it logs the success and returns a response with status OK and the session timeout.
+     * If the operation is successful but the session timeout is not found, it returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve the session timeout.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the session timeout or an error message.
+     */
     @GET
     @Path("/session-timeout")
     @Produces(MediaType.APPLICATION_JSON)
-public Response getSessionTimeout(@HeaderParam("token") String token, @Context HttpServletRequest request) {
+    public Response getSessionTimeout(@HeaderParam("token") String token, @Context HttpServletRequest request) {
         logger.info("Received request to get session timeout");
 
         User user = userBean.getUserByToken(token);
@@ -74,6 +100,22 @@ public Response getSessionTimeout(@HeaderParam("token") String token, @Context H
         }
     }
 
+
+    /**
+     * This method is used to update the settings for a specific user.
+     * It first logs the request to update settings.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found but is not an admin, it logs the warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is an admin, it attempts to update the settings in the database.
+     * If the operation is successful and the settings are updated, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the settings.
+     * @param settings The new settings to be updated.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -104,6 +146,20 @@ public Response getSessionTimeout(@HeaderParam("token") String token, @Context H
         }
     }
 
+
+    /**
+     * This method is used to retrieve the maximum number of members allowed in a project.
+     * It first logs the request to get the maximum number of members.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves the maximum number of members from the settings.
+     * If the operation is successful and the maximum number of members is found, it logs the success and returns a response with status OK and the maximum number of members.
+     * If the operation is successful but the maximum number of members is not found, it returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve the maximum number of members.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the maximum number of members or an error message.
+     */
     @GET
     @Path("/max-members")
     @Produces(MediaType.APPLICATION_JSON)

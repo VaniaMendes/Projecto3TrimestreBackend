@@ -31,6 +31,17 @@ import java.util.UUID;
         fileSizeThreshold=1048576
 )
 public class UploadServlet extends HttpServlet {
+
+    /**
+     * Handles POST requests to upload a file.
+     * The file is retrieved from the request, saved in the uploads directory, and its URL is returned in the response.
+     * If the file upload fails, an error message is returned in the response.
+     *
+     * @param request The HttpServletRequest object containing the file to be uploaded.
+     * @param response The HttpServletResponse object used to return the response.
+     * @throws ServletException If a servlet-specific error occurs.
+     * @throws IOException If an I/O error occurs.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
