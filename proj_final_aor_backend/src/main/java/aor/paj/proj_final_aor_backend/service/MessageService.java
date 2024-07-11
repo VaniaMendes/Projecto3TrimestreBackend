@@ -30,6 +30,21 @@ public class MessageService {
     UserBean userBean;
 
 
+    /**
+     * This method is used to send a new message from one user to another.
+     * It first retrieves the user by the provided token and logs the IP address of the request.
+     * If the user is not found, it returns a response with status UNAUTHORIZED.
+     * If the user is found, it checks if the receiver exists and if the message content is not empty.
+     * If the receiver does not exist or the message content is empty, it returns a response with status BAD_REQUEST.
+     * If the receiver exists and the message content is not empty, it attempts to send the message.
+     * If the message is sent successfully, it logs the success and returns a response with status CREATED.
+     * If the message sending fails, it logs the failure and returns a response with status BAD_REQUEST.
+     *
+     * @param token The token of the user trying to send the message.
+     * @param message The message to be sent.
+     * @param request The HTTP request.
+     * @return Response The response of the operation.
+     */
     @POST
     @Path("/send")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -68,6 +83,20 @@ public class MessageService {
         }
     }
 
+    /**
+     * This method is used to retrieve all messages between two users.
+     * It first retrieves the users by the provided token and user id and logs the IP address of the request.
+     * If either of the users is not found, it returns a response with status UNAUTHORIZED.
+     * If both users are found, it retrieves all messages between them from the database.
+     * If no messages are found, it returns a response with status NOT_FOUND.
+     * If messages are found, it returns a response with status OK and the list of all messages between the two users.
+     *
+     * @param token The token of the user trying to retrieve the messages.
+     * @param user_id The id of the other user with whom the messages are exchanged.
+     * @param page The page number for pagination. Default value is 0.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all messages between the two users.
+     */
     @GET
     @Path("/{user_id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -94,6 +123,21 @@ public class MessageService {
         return Response.status(Response.Status.OK).entity(messages).build();
     }
 
+
+    /**
+     * This method is used to send a new message to a chat group associated with a specific project.
+     * It first retrieves the user by the provided token and logs the IP address of the request.
+     * If the user is not found, it returns a response with status UNAUTHORIZED.
+     * If the user is found, it attempts to send the message to the chat group of the specified project.
+     * If the message is sent successfully, it logs the success and returns a response with status CREATED.
+     * If the message sending fails, it logs the failure and returns a response with status BAD_REQUEST.
+     *
+     * @param token The token of the user trying to send the message.
+     * @param project_id The id of the project whose chat group the message is to be sent to.
+     * @param message The message to be sent.
+     * @param request The HTTP request.
+     * @return Response The response of the operation.
+     */
     @POST
     @Path("/send/{project_id}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -121,6 +165,19 @@ public class MessageService {
         }
     }
 
+    /**
+     * This method is used to retrieve all messages associated with a specific project.
+     * It first retrieves the user by the provided token and logs the IP address of the request.
+     * If the user is not found, it returns a response with status UNAUTHORIZED.
+     * If the user is found, it retrieves all messages associated with the specified project from the database.
+     * If no messages are found, it returns a response with status NOT_FOUND.
+     * If messages are found, it logs the success and returns a response with status OK and the list of all messages associated with the project.
+     *
+     * @param token The token of the user trying to retrieve the messages.
+     * @param project_id The id of the project whose messages are to be retrieved.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all messages associated with the project.
+     */
     @GET
     @Path("/project/{project_id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -146,6 +203,19 @@ public class MessageService {
 
 
     //Get the list of users that the user logged sent or received messages
+    /**
+     * This method is used to retrieve all users with whom the authenticated user has exchanged messages.
+     * It first logs the IP address of the request.
+     * Then it checks if the user is authenticated by checking the token.
+     * If the user is not authenticated, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated, it retrieves all users with whom the authenticated user has exchanged messages from the database.
+     * If no users are found, it returns a response with status UNAUTHORIZED.
+     * If users are found, it returns a response with status OK and the list of all users with whom the authenticated user has exchanged messages.
+     *
+     * @param token The token of the user trying to retrieve the users.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all users with whom the authenticated user has exchanged messages.
+     */
     @GET
     @Path("/users")
     @Produces(MediaType.APPLICATION_JSON)
@@ -162,6 +232,19 @@ public class MessageService {
         return Response.status(Response.Status.OK).entity(users).build();
     }
 
+    /**
+     * This method is used to retrieve all users with whom the authenticated user has exchanged messages.
+     * It first logs the IP address of the request.
+     * Then it checks if the user is authenticated by checking the token.
+     * If the user is not authenticated, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated, it retrieves all users with whom the authenticated user has exchanged messages from the database.
+     * If no users are found, it returns a response with status UNAUTHORIZED.
+     * If users are found, it returns a response with status OK and the list of all users with whom the authenticated user has exchanged messages.
+     *
+     * @param token The token of the user trying to retrieve the users.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all users with whom the authenticated user has exchanged messages.
+     */
     @GET
     @Path("/{user_id}/pageCount")
     @Produces(MediaType.APPLICATION_JSON)
@@ -183,6 +266,18 @@ public class MessageService {
         return Response.status(Response.Status.OK).entity(pageCount).build();
     }
 
+    /**
+     * This method is used to mark a specific message as read.
+     * It first logs the request to mark the message as read.
+     * Then it attempts to mark the message as read in the database.
+     * If the operation is successful, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the operation, it logs the exception message and returns a response with status BAD_REQUEST and the exception message.
+     *
+     * @param token The token of the user trying to mark the message as read.
+     * @param messageId The id of the message to be marked as read.
+     * @return Response The response of the operation.
+     */
     @PUT
     @Path("/{messageId}")
     @Produces(MediaType.APPLICATION_JSON)

@@ -33,6 +33,19 @@ public class SkillService {
     private HttpServletRequest request;
 
 
+    /**
+     * This method is used to retrieve the maximum number of members allowed in a project.
+     * It first logs the request to get the maximum number of members.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves the maximum number of members from the settings.
+     * If the operation is successful and the maximum number of members is found, it logs the success and returns a response with status OK and the maximum number of members.
+     * If the operation is successful but the maximum number of members is not found, it returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve the maximum number of members.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the maximum number of members or an error message.
+     */
     @POST
     @Path("/new-skill")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -57,6 +70,21 @@ public class SkillService {
         }
     }
 
+    /**
+     * This method is used to associate a skill to a user.
+     * It first logs the request to associate a skill to a user.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found or the user's id does not match the provided user id, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user id or skill id is not provided, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found and the user id and skill id are provided, it attempts to associate the skill to the user.
+     * If the operation is successful and the skill is associated, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     *
+     * @param token The token of the user trying to associate a skill to a user.
+     * @param userId The id of the user to whom the skill is to be associated.
+     * @param skillId The id of the skill to be associated to the user.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @POST
     @Path("/associate-user")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -90,6 +118,21 @@ public class SkillService {
         }
     }
 
+    /**
+     * This method is used to soft delete a skill for a specific user.
+     * It first logs the request to update the skill.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it attempts to soft delete the skill in the database.
+     * If the operation is successful and the skill is soft deleted, it logs the success and returns a response with status OK and a success message.
+     * If the operation fails, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     *
+     * @param token The token of the user trying to soft delete the skill.
+     * @param skillId The id of the skill to be soft deleted.
+     * @param userId The id of the user for whom the skill is to be soft deleted.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{skillId}/users/{userId}/soft-delete")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -120,6 +163,15 @@ public class SkillService {
         }
     }
 
+    /**
+     * This method is used to retrieve all skills.
+     * It first logs the request to get all skills.
+     * Then it retrieves all skills from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills.
+     *
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of skills.
+     */
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -129,6 +181,19 @@ public class SkillService {
         return Response.status(Response.Status.OK).entity(skillBean.getSkills()).build();
     }
 
+    /**
+     * This method is used to retrieve all projects associated with a specific skill.
+     * It first logs the request to get projects by skill id.
+     * Then it retrieves all projects associated with the provided skill id from the database.
+     * If the operation is successful and the projects are found, it logs the success and returns a response with status OK and the list of projects.
+     * If the operation fails or no projects are found associated with the provided skill id, it logs the error and returns a response with status NOT_FOUND and an error message.
+     *
+     * @param skillId The id of the skill for which the projects are to be retrieved.
+     * @param order The order in which the projects are to be retrieved.
+     * @param state The state of the projects to be retrieved.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of projects or an error message.
+     */
     @GET
     @Path("/{skillId}/projects")
     @Produces(MediaType.APPLICATION_JSON)
@@ -152,6 +217,15 @@ public class SkillService {
         }
     }
 
+    /**
+     * This method is used to retrieve all skills that are associated with projects.
+     * It first logs the request to get all skills with projects.
+     * Then it retrieves all skills with projects from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills with projects.
+     *
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of skills with projects.
+     */
     @GET
     @Path("/with-projects")
     @Produces(MediaType.APPLICATION_JSON)
@@ -161,6 +235,17 @@ public class SkillService {
         return Response.status(Response.Status.OK).entity(skillBean.getSkillsWithProjects()).build();
     }
 
+    /**
+     * This method is used to search for skills that are associated with projects by name.
+     * It first logs the request to search for skills with projects.
+     * Then it searches for skills with projects that match the provided name from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills with projects.
+     * If the operation fails or no skills are found that match the provided name, it logs the error and returns a response with status NOT_FOUND and an error message.
+     *
+     * @param name The name of the skills to be searched.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of skills with projects or an error message.
+     */
     @GET
     @Path("/with-projects/search")
     @Produces(MediaType.APPLICATION_JSON)
@@ -182,6 +267,19 @@ public class SkillService {
     }
 
 
+    /**
+     * This method is used to retrieve all skills associated with a specific user.
+     * It first logs the request to get skills by user id.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves all skills associated with the provided user id from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills.
+     * If the operation fails or no skills are found associated with the provided user id, it logs the error and returns a response with status NOT_FOUND and an error message.
+     *
+     * @param token The token of the user trying to retrieve the skills.
+     * @param userId The id of the user for whom the skills are to be retrieved.
+     * @return Response The response of the operation, containing the list of skills or an error message.
+     */
     @GET
     @Path("/user/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -206,6 +304,18 @@ public class SkillService {
 
     }
 
+    /**
+     * This method is used to retrieve all skills that are not associated with a specific project.
+     * It first logs the request to get skills not associated with the project.
+     * Then it retrieves the user associated with the provided token.
+     * If the user is not found, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves all skills not associated with the provided project id from the database.
+     * If the operation is successful and the skills are found, it logs the success and returns a response with status OK and the list of skills not associated with the project.
+     *
+     * @param token The token of the user trying to retrieve the skills.
+     * @param projectId The id of the project for which the skills not associated are to be retrieved.
+     * @return Response The response of the operation, containing the list of skills not associated with the project.
+     */
     @GET
     @Path("/project/{projectId}/not-associated")
     @Produces(MediaType.APPLICATION_JSON)

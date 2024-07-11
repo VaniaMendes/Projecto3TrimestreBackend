@@ -45,6 +45,17 @@ public class UserService {
     private HttpServletRequest request;
 
 
+    /**
+     * This method is used to register a new user.
+     * It first tries to register the user using the provided email, password, and confirmation password.
+     * If the registration is successful, it logs the success and returns a response with status CREATED and a success message.
+     * If the registration is not successful, it returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param user The UserRegistration object containing the email, password, and confirmation password of the user to be registered.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -68,6 +79,21 @@ public class UserService {
 
     }
 
+
+    /**
+     * This method is used to confirm a user's account.
+     * It first retrieves the user's first name for logging purposes.
+     * Then it attempts to confirm the user using the provided user object, token confirmation, and lab.
+     * If the confirmation is successful, it logs the success and returns a response with status OK and a success message.
+     * If the confirmation is not successful, it logs the failure and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param tokenConfirmation The token confirmation string.
+     * @param lab The lab string.
+     * @param user The User object containing the user's information.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/confirm-account")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -92,6 +118,19 @@ public class UserService {
         }
     }
 
+    /**
+     * This method is used to log in a user.
+     * It first retrieves the user by the provided email.
+     * If the user is not found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found, it attempts to log in the user using the provided email and password.
+     * If the login is successful, it logs the success and returns a response with status OK and the user's token.
+     * If the login is not successful, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param user The Login object containing the email and password of the user trying to log in.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the user's token or an error message.
+     */
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -121,6 +160,19 @@ public class UserService {
 
     }
 
+    /**
+     * This method is used to log out a user.
+     * It first retrieves the user by the provided token.
+     * If the user is not found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found, it attempts to log out the user using the provided token.
+     * If the logout is successful, it logs the success and returns a response with status OK and a success message.
+     * If the logout is not successful, it returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to log out.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @POST
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -153,6 +205,17 @@ public class UserService {
 
     }
 
+    /**
+     * This method is used to recover a user's password.
+     * It first attempts to recover the user's password using the provided email.
+     * If the password is recovered, it logs the success and returns a response with status OK and a success message.
+     * If the password is not recovered, it returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param email The email of the user trying to recover the password.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @POST
     @Path("/recovery-password")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -176,6 +239,19 @@ public class UserService {
 
     }
 
+    /**
+     * This method is used to change a user's password.
+     * It first attempts to change the user's password using the provided reset password token, password, and confirmation password.
+     * If the password is changed, it logs the success and returns a response with status OK and a success message.
+     * If the password is not changed, it returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param resetPassToken The reset password token string.
+     * @param password The new password string.
+     * @param confirmPassword The confirmation password string.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/change-password")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -204,6 +280,19 @@ public class UserService {
 
     }
 
+    /**
+     * This method is used to update a user's information.
+     * It first attempts to update the user's information using the provided user object and user ID.
+     * If the user is updated, it logs the success and returns a response with status OK and a success message.
+     * If the user is not updated, it returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the information.
+     * @param userId The ID of the user trying to update the information.
+     * @param user The User object containing the user's information.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -238,6 +327,20 @@ public class UserService {
     }
 
 
+    /**
+     * This method is used to update the visibility of a user's profile.
+     * It first authenticates and authorizes the user using the provided token and user ID.
+     * If the user is not found or unauthorized, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found and authorized, it attempts to update the visibility of the user's profile.
+     * If the visibility is updated, it logs the success and returns a response with status OK and a success message.
+     * If the visibility is not updated, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the visibility.
+     * @param userId The ID of the user trying to update the visibility.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{userId}/visibility")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -268,6 +371,21 @@ public class UserService {
     }
 
 
+    /**
+     * This method is used to update the biography of a user.
+     * It first authenticates and authorizes the user using the provided token and user ID.
+     * If the user is not found or unauthorized, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found and authorized, it attempts to update the biography of the user.
+     * If the biography is updated, it logs the success and returns a response with status OK and a success message.
+     * If the biography is not updated, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to update the biography.
+     * @param userId The ID of the user trying to update the biography.
+     * @param user The User object containing the user's biography.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing a success or error message.
+     */
     @PUT
     @Path("/{userId}/biography")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -298,7 +416,17 @@ public class UserService {
         }
     }
 
-
+    /**
+     * This method is used to retrieve a user's information.
+     * It first authenticates the user using the provided token.
+     * If the user is not found, it logs the error and returns a response with status BAD_REQUEST and an error message.
+     * If the user is found, it logs the success and returns a response with status OK and the user's information.
+     * If an exception occurs during the process, it logs the error and returns a response with status INTERNAL_SERVER_ERROR and an error message.
+     *
+     * @param token The token of the user trying to retrieve the information.
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the user's information or an error message.
+     */
     @GET
     @Path("/user")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -324,6 +452,18 @@ public class UserService {
     }
 
 
+    /**
+     * This method is used to retrieve a user's information based on the provided user ID.
+     * It first checks if the provided token is valid.
+     * If the token is not valid, it logs a warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the token is valid, it retrieves the user's profile based on the provided user ID.
+     * If the user's profile is not visible, it returns a response with status UNAUTHORIZED and an error message.
+     * If the user's profile is visible, it logs the request and returns a response with status OK and the user's profile.
+     *
+     * @param token The token of the user trying to retrieve the information.
+     * @param userId The ID of the user whose information is to be retrieved.
+     * @return Response The response of the operation, containing the user's information or an error message.
+     */
     @GET
     @Path("/profile/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -351,6 +491,18 @@ public class UserService {
     }
 
 
+
+    /**
+     * This method is used to count the number of projects associated with a specific user.
+     * It first logs the request to count projects by user id.
+     * Then it retrieves the count of projects associated with the provided user id and state.
+     * The state parameter is optional and can be used to filter projects by their state.
+     * It returns a response with status OK and the count of projects.
+     *
+     * @param userId The id of the user whose projects are to be counted.
+     * @param state The state of the projects to be counted. This parameter is optional.
+     * @return Response The response of the operation, containing the count of projects.
+     */
     @GET
     @Path("/{id}/projects/count")
     @Produces(MediaType.APPLICATION_JSON)
@@ -361,6 +513,20 @@ public class UserService {
         return Response.status(Response.Status.OK).entity(userProjectBean.countProjectsByUserId(userId, state)).build();
     }
 
+    /**
+     * This method is used to retrieve users by their first name, last name or nickname.
+     * It first checks if the provided token is not null.
+     * If the token is null, it returns a response with status BAD_REQUEST and an error message.
+     * If the token is not null, it retrieves the user associated with the token.
+     * If the user is not found, it returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found, it retrieves a list of users whose first name starts with the provided prefix.
+     * If the list of users is not empty, it returns a response with status OK and the list of users.
+     * If the list of users is empty, it returns a response with status OK and an empty list.
+     *
+     * @param token The token of the user trying to retrieve the users.
+     * @param prefix The prefix of the first name of the users to be retrieved.
+     * @return Response The response of the operation, containing the list of users or an error message.
+     */
     @GET
     @Path("/filterByName")
     @Produces(MediaType.APPLICATION_JSON)
@@ -384,6 +550,18 @@ public class UserService {
         }
     }
 
+    /**
+     * This method is used to retrieve a user's information based on the provided user ID.
+     * It first authenticates the user using the provided token.
+     * If the user is not found or unauthorized, it logs the error and returns a response with status UNAUTHORIZED and an error message.
+     * If the user is found and authorized, it retrieves the user's information based on the provided user ID.
+     * If the user's information is found, it returns a response with status OK and the user's information.
+     * If the user's information is not found, it returns a response with status NOT_FOUND and an error message.
+     *
+     * @param token The token of the user trying to retrieve the information.
+     * @param userId The ID of the user whose information is to be retrieved.
+     * @return Response The response of the operation, containing the user's information or an error message.
+     */
     @GET
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -402,6 +580,19 @@ public class UserService {
         }
     }
 
+
+    /**
+     * This method is used to retrieve the status of a specific project associated with a specific user.
+     * It first checks if the provided token is valid.
+     * If the token is not valid, it logs a warning and returns a response with status UNAUTHORIZED and an error message.
+     * If the token is valid, it retrieves the status of the project associated with the provided user ID and project ID.
+     * It logs the request and returns a response with status OK and the project status.
+     *
+     * @param token The token of the user trying to retrieve the project status.
+     * @param userId The ID of the user associated with the project.
+     * @param projectId The ID of the project whose status is to be retrieved.
+     * @return Response The response of the operation, containing the project status or an error message.
+     */
     @GET
     @Path("/profile/{userId}/project/{projectId}/status")
     @Produces(MediaType.APPLICATION_JSON)

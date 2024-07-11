@@ -26,6 +26,21 @@ public class InterestService {
     @Context
     private HttpServletRequest request;
 
+
+
+    /**
+     * This method is used to create a new interest.
+     * It first checks if the user is authenticated by checking the token.
+     * If the user is not authenticated, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated, it attempts to create a new interest.
+     * If the interest is created successfully, it returns a response with status CREATED.
+     * If the interest creation fails, it returns a response with status BAD_REQUEST.
+     *
+     * @param token The token of the user trying to create the interest.
+     * @param interest The interest to be created.
+     * @param request The HTTP request.
+     * @return Response The response of the operation.
+     */
     @POST
     @Path("/new")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -50,6 +65,21 @@ public class InterestService {
         }
     }
 
+
+    /**
+     * This method is used to associate an interest to a user.
+     * It first logs the IP address of the request.
+     * Then it checks if the user is authenticated by checking the token and if the user id matches the id in the token.
+     * If the user is not authenticated or the ids do not match, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated and the ids match, it attempts to associate the interest to the user.
+     * If the interest is associated successfully, it logs the success and returns a response with status OK.
+     * If the interest association fails, it logs the failure and returns a response with status BAD_REQUEST.
+     *
+     * @param token The token of the user trying to associate the interest.
+     * @param userId The id of the user to whom the interest is to be associated.
+     * @param interestId The id of the interest to be associated.
+     * @return Response The response of the operation.
+     */
     @POST
     @Path("/associate-user")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -79,6 +109,22 @@ public class InterestService {
         }
     }
 
+
+    /**
+     * This method is used to remove an interest from a user.
+     * It first logs the IP address of the request.
+     * Then it checks if the user is authenticated by checking the token and if the user id matches the id in the token.
+     * If the user is not authenticated or the ids do not match, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated and the ids match, it attempts to remove the interest from the user.
+     * If the interest is removed successfully (i.e., the interest is set to inactive), it logs the success and returns a response with status OK.
+     * If the interest removal fails, it logs the failure and returns a response with status BAD_REQUEST.
+     *
+     * @param token The token of the user trying to remove the interest.
+     * @param userId The id of the user from whom the interest is to be removed.
+     * @param interestId The id of the interest to be removed.
+     * @param request The HTTP request.
+     * @return Response The response of the operation.
+     */
     @PUT
     @Path("/{interestId}/users/{userId}/soft-delete")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -109,6 +155,15 @@ public class InterestService {
         }
     }
 
+    /**
+     * This method is used to retrieve all interests.
+     * It first logs the IP address of the request.
+     * Then it retrieves all interests from the database.
+     * It returns a response with status OK and the list of all interests.
+     *
+     * @param request The HTTP request.
+     * @return Response The response of the operation, containing the list of all interests.
+     */
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -128,6 +183,18 @@ public class InterestService {
     }
 
 
+    /**
+     * This method is used to retrieve all interests of a specific user.
+     * It first logs the IP address of the request.
+     * Then it checks if the user is authenticated by checking the token.
+     * If the user is not authenticated, it returns a response with status UNAUTHORIZED.
+     * If the user is authenticated, it retrieves all interests of the user from the database.
+     * It returns a response with status OK and the list of all interests of the user.
+     *
+     * @param token The token of the user trying to retrieve the interests.
+     * @param userId The id of the user whose interests are to be retrieved.
+     * @return Response The response of the operation, containing the list of all interests of the user.
+     */
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
