@@ -584,6 +584,7 @@ public class ProjectBean implements Serializable {
      * @return true if the skill was successfully associated with the project, false otherwise.
      */
     public boolean joinSkill(Long projectId, Long skillId) {
+
         ProjectEntity projectEntity = findProject(projectId);
         if (projectEntity == null) {
             return false;
