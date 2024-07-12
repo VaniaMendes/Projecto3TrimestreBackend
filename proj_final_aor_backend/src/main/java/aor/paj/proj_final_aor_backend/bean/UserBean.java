@@ -133,7 +133,6 @@ public class UserBean implements Serializable {
         return null;
     }
 
-
     /**
      * This method is responsible by find one user by email
      *
@@ -268,7 +267,7 @@ public class UserBean implements Serializable {
             return false;
         }
         //Check if the nickname already exists
-        if (user.getNickname() != null && !user.getNickname().isEmpty()) {
+        if (!user.getNickname().isEmpty()) {
             if (nicknameExists(user.getNickname())) {
                 return false;
             }

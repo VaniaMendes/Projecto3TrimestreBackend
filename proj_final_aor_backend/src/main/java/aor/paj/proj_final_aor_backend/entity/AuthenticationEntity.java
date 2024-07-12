@@ -35,12 +35,6 @@ public class AuthenticationEntity implements Serializable {
     private String resetPassToken;
 
     /**
-     * Reset password token expiricy of the user.
-     */
-    @Column(name = "resetPassTokenExpiricy")
-    private String resetPassTokenExpiricy;
-
-    /**
      * Authentication token of the user.
      */
     @Column(name = "authenticationToken")
@@ -111,22 +105,7 @@ public class AuthenticationEntity implements Serializable {
         this.resetPassToken = resetPassToken;
     }
 
-    /**
-     * Getter for the reset password token expiricy field.
-     * @return the current reset password token expiricy field.
-     */
 
-    public String getResetPassTokenExpiricy() {
-        return resetPassTokenExpiricy;
-    }
-
-    /**
-     * Setter for the reset password token expiricy field.
-     * @param resetPassTokenExpiricy the new value for the reset password token expiricy field.
-     */
-    public void setResetPassTokenExpiricy(String resetPassTokenExpiricy) {
-        this.resetPassTokenExpiricy = resetPassTokenExpiricy;
-    }
 
     /**
      * Getter for the register date field.

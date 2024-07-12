@@ -40,6 +40,9 @@ public class StartupBean {
         labBean.createAllLabs();
         userBean.createAdminUser();
         settingsBean.createDefaultSettings();
+
+
+
     }
 
 

@@ -101,7 +101,7 @@ public class NotificationBean implements Serializable {
         notification.setSender(userBean.convertUserToDTOForMessage(sender));
         notification.setType(NotificationType.valueOf(type.toString()));
         notification.setReceiver(userBean.convertUserToDTOForMessage(user));
-        notification.setOpen(false);
+
 
         NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
         //Persist the notification in the database
@@ -166,9 +166,10 @@ public class NotificationBean implements Serializable {
         // Create a list to store the notifications that were sent
         List<Notification> sentNotifications = new ArrayList<>();
         for (UserEntity user : users) {
+            if (user.getId() != sender.getId()) {
             try {
 
-                if (user.getId() != sender.getId()) {
+
                     logger.debug("Sending notification to user with id: " + user.getId());
                     Notification notification = new Notification();
                     notification.setReadStatus(false);
@@ -177,7 +178,7 @@ public class NotificationBean implements Serializable {
                     notification.setType(type);
                     notification.setReceiver(userBean.convertUserToDTOForMessage(user));
                     notification.setRelatedIDEntity(projectId);
-                    notification.setOpen(false);
+
 
                     //Create the notification
                     NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
@@ -201,9 +202,10 @@ public class NotificationBean implements Serializable {
                     }
 
 
-                }
+
             } catch (Exception e) {
                 logger.error("Error sending notification to user with id: " + user.getId(), e);
+            }
             }
         }
 
@@ -251,27 +253,30 @@ public class NotificationBean implements Serializable {
         // Send the notification to each user in the project
         for (UserEntity user : usersProject) {
             System.out.println(user.getEmail());
-            try {
-                logger.debug("Sending notification to user with id: " + user.getId());
-                Notification notification = new Notification();
-                notification.setReadStatus(false);
-                notification.setSendTimestamp(LocalDateTime.now());
-                notification.setSender(userBean.convertUserToDTOForMessage(sender));
-                notification.setType(NotificationType.valueOf(type));
-                notification.setRelatedIDEntity(projectID);
+            if(user.getId() != sender.getId()) {
+                try {
 
-                NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
-                notificationDao.create(notificationEntity);
+                    logger.debug("Sending notification to user with id: " + user.getId());
+                    Notification notification = new Notification();
+                    notification.setReadStatus(false);
+                    notification.setSendTimestamp(LocalDateTime.now());
+                    notification.setSender(userBean.convertUserToDTOForMessage(sender));
+                    notification.setType(NotificationType.valueOf(type));
+                    notification.setRelatedIDEntity(projectID);
 
-                user.getNotifications().add(notificationEntity);
-                notificationEntity.getUsers().add(user);
+                    NotificationEntity notificationEntity = convertDtoTOEntity(notification, sender);
+                    notificationDao.create(notificationEntity);
 
-                userDao.updateUser(user);
+                    user.getNotifications().add(notificationEntity);
+                    notificationEntity.getUsers().add(user);
 
-                sentNotifications.add(notification);
+                    userDao.updateUser(user);
 
-            } catch (Exception e) {
-                logger.error("Error sending notification to user with id: " + user.getId(), e);
+                    sentNotifications.add(notification);
+
+                } catch (Exception e) {
+                    logger.error("Error sending notification to user with id: " + user.getId(), e);
+                }
             }
         }
 
@@ -343,7 +348,7 @@ public class NotificationBean implements Serializable {
             senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
             senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
             senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
-            notification.setOpen(notificationEntity.isOpen());
+
 
             MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
 
@@ -399,7 +404,7 @@ public class NotificationBean implements Serializable {
             senderEntity.setFirstName(userDao.findUserById(notificationEntity.getSender_id()).getFirstName());
             senderEntity.setLastName(userDao.findUserById(notificationEntity.getSender_id()).getLastName());
             senderEntity.setPhoto(userDao.findUserById(notificationEntity.getSender_id()).getPhoto());
-            notification.setOpen(notificationEntity.isOpen());
+
 
             MessageInfoUser senderDto = userBean.convertUserToDTOForMessage(senderEntity);
 
@@ -468,56 +473,6 @@ public class NotificationBean implements Serializable {
     }
 
 
-    public boolean markAllNotificationsAsOpen(String token){
-        // Find the user
-        UserEntity user = sessionDao.findUserByToken(token);
-
-        // Check if the user exists
-        if (user == null) {
-            logger.error("No user found with token: " + token);
-            return false;
-        }
-
-        // Find the notifications for the user
-        List<NotificationEntity> notifications = notificationDao.fianAllNotificationsOfUSer(user.getId());
-
-        // Check if there are notifications
-        if (notifications == null || notifications.isEmpty()) {
-            logger.error("No notifications found for user with id: " + user.getId());
-            return false;
-        }
-
-        // Mark the notification as read
-        for (NotificationEntity notification : notifications) {
-            notification.setOpen(true);
-            notificationDao.merge(notification);
-        }
-
-        return true;
-    }
-
-    public long getOpenNotifications (String token){
-        // Find the user
-        UserEntity user = sessionDao.findUserByToken(token);
-
-        // Check if the user exists
-        if (user == null) {
-            logger.error("No user found with token: " + token);
-            return 0;
-        }
-
-        // Find the number of unread notifications for the user
-        long notifications = notificationDao.findUnOpenNotificationsByUserID(user.getId());
-
-        // Check if there are unread notifications
-        if (notifications == 0) {
-            logger.error("No unread notifications found for user with id: " + user.getId());
-            return 0;
-        }
-
-        // Return the number of unread notifications
-        return notifications;
-    }
 
     /**
      * Method to get the number of notifications for a user.
@@ -545,7 +500,6 @@ public class NotificationBean implements Serializable {
         notificationEntity.setType(notification.getType().toString());
         notificationEntity.setRelatedEntityId(notification.getRelatedIDEntity());
         notificationEntity.setSender_id(userBean.convertUserToDTOForMessage(sender).getId());
-        notificationEntity.setOpen(notification.isOpen());
         return notificationEntity;
     }
 
