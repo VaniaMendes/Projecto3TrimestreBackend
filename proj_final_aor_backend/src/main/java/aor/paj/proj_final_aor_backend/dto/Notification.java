@@ -29,8 +29,6 @@ public class Notification extends TextEvent {
 
 
 
-    @XmlElement
-    private boolean open;
     /**
      * Default constructor.
      */
@@ -74,11 +72,5 @@ public class Notification extends TextEvent {
         this.relatedIDEntity = relatedIDEntity;
     }
 
-    public boolean isOpen() {
-        return open;
-    }
 
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
 }
